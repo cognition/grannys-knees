@@ -3,8 +3,9 @@ package com.example.grannysknees.ui.today
 /**
  * Source of [TodayUiState] for the Today screen.
  *
- * Injecting the state keeps the screen testable and lets T06 swap in a real,
- * data-backed implementation without touching the composables.
+ * Injecting the state keeps the screen testable. Production R0 uses
+ * [com.example.grannysknees.data.ForecastRepository] via composition-root
+ * wiring; [FakeTodayStateProvider] remains for previews and unit tests.
  */
 internal fun interface TodayStateProvider {
     /** The current state to render. */
@@ -12,10 +13,7 @@ internal fun interface TodayStateProvider {
 }
 
 /**
- * Deterministic placeholder states used until real data is wired in (T06).
- *
- * They exercise every visible affordance: a fresh index, a stale index, and an
- * offline state.
+ * Deterministic placeholder states used in previews and UI unit tests.
  */
 internal object SampleTodayStates {
     /** A recently fetched, normal forecast. */
@@ -38,13 +36,19 @@ internal object SampleTodayStates {
     val offline: TodayUiState.Unavailable = TodayUiState.Unavailable(
         location = "Toronto, ON",
         lastUpdatedLabel = "not yet",
+        reason = UnavailableReason.EMPTY,
+    )
+
+    /** Cache past the stale window — index must be hidden. */
+    val expired: TodayUiState.Unavailable = TodayUiState.Unavailable(
+        location = "Toronto, ON",
+        lastUpdatedLabel = "today at 5:10 AM",
+        reason = UnavailableReason.EXPIRED,
     )
 }
 
 /**
  * [TodayStateProvider] that returns a fixed sample.
- *
- * This is the default source for T05, standing in for the real data layer.
  */
 internal class FakeTodayStateProvider(
     private val state: TodayUiState = SampleTodayStates.fresh,
