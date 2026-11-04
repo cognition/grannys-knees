@@ -2,6 +2,39 @@
 
 An experimental arthritis weather-sensitivity index and symptom journal.
 
+## Personality and positioning
+
+**Your joints. Your weather. Your excuse.**
+
+Granny's Knees is a weather-informed joint discomfort index, **not** a fitness, rehabilitation, exercise-coaching or goal-tracking app. Its purpose is to offer a playful extra consideration when planning a day, explore possible weather/symptom relationships, and give users something to point to when they'd rather skip moving a sofa.
+
+### A little science. A little superstition. A perfectly good excuse.
+
+Granny's Knees uses weather data, research and your own observations to explore whether changes in the weather line up with changes in how your joints feel.
+
+**Correlation doesn't mean causation.**
+
+Your arthritis is yours. The weather doesn't magically give it to you.
+
+Think of it like rain. You're wet because you went outside in the rain, not because you were wet and somehow made it rain.
+
+The science is complicated, the evidence is mixed, and everybody's joints have their own opinions.
+
+This is a fun, experimental weather index, **not medical advice, a diagnosis or a clinically validated prediction.**
+
+But if the index says 9 out of 10 and someone wants you to help them move a sofa?
+
+Well, now you've got something to point at.
+
+**Granny says: “Not today.”**
+
+### Where this appears
+
+- **First launch:** Explain the experimental nature, mixed evidence, correlation versus causation and entertainment-first intent.
+- **Daily forecast:** Show a short, humorous observation appropriate to the index, alongside a visible reminder: “Weather-based estimate, not a medical prediction. Your joints may disagree.”
+- **About the Index:** Explain the weather variables, scoring approach, limitations, assumptions and research sources transparently.
+- **Editorial guardrail:** Humour must not imply the index is clinically validated or that weather causes arthritis. Individual symptom observations and weather-based estimates remain distinct.
+
 ## Current version
 
 Open `index.html` in a modern browser. The prototype fetches forecasts from Open-Meteo and saves symptom entries in browser local storage. It supports CSV and JSON export. The index is an unvalidated heuristic and is **not** a clinical flare-up prediction.
