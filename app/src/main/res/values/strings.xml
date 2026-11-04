@@ -1,3 +1,36 @@
 <resources>
     <string name="app_name">Granny\'s Knees</string>
+
+    <!-- Today screen -->
+    <string name="today_title">Granny\'s Knees</string>
+    <string name="today_location_eyebrow">Forecast for</string>
+    <string name="today_location_content_description">Forecast location: %1$s</string>
+    <string name="today_index_heading">Today\'s knee-weather index</string>
+    <string name="today_index_out_of">/ %1$d</string>
+    <string name="today_index_content_description">Knee-weather index %1$d out of %2$d: %3$s</string>
+
+    <!-- Index bands (match the weather/index contract) -->
+    <string name="today_band_calm">Calm</string>
+    <string name="today_band_mild">Mild</string>
+    <string name="today_band_noticeable">Noticeable</string>
+    <string name="today_band_rough">Rough</string>
+    <string name="today_band_stormy">Stormy</string>
+
+    <!-- Playful, non-clinical captions per band -->
+    <string name="today_caption_calm">Smooth sailing for the joints today.</string>
+    <string name="today_caption_mild">A little something in the air.</string>
+    <string name="today_caption_noticeable">The knees might have a few opinions.</string>
+    <string name="today_caption_rough">Creaky-weather afoot — go gently.</string>
+    <string name="today_caption_stormy">Granny says: mind the stairs today.</string>
+
+    <!-- Freshness and offline affordances -->
+    <string name="today_last_updated">Last updated %1$s</string>
+    <string name="today_stale_badge">Stale</string>
+    <string name="today_stale_detail">Showing the last forecast we managed to fetch.</string>
+    <string name="today_offline_title">No forecast just yet</string>
+    <string name="today_offline_body">We haven\'t fetched the weather yet. Pop back once you\'re online and we\'ll take a look.</string>
+
+    <!-- Experimental disclaimer -->
+    <string name="today_disclaimer_title">Experimental — just for curiosity</string>
+    <string name="today_disclaimer_body">Granny\'s Knees is a playful weather-sensitivity indicator, not medical advice, a diagnosis, or a forecast of how you\'ll feel. Weather is only weather.</string>
 </resources>

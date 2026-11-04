@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
+import com.example.grannysknees.ui.today.TodayRoute
 
 @Composable
 internal fun GrannysKneesApp() {
@@ -26,8 +27,11 @@ internal fun GrannysKneesApp() {
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = AppDestination.Home.route,
+            startDestination = AppDestination.Today.route,
         ) {
+            composable(AppDestination.Today.route) {
+                TodayRoute()
+            }
             composable(AppDestination.Home.route) {
                 FoundationShell()
             }
