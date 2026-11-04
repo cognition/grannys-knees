@@ -1,5 +1,13 @@
 # Granny's Knees
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.svg" />
+    <img src="assets/logo-light.svg" alt="Granny's Knees logo: an arthritis index gauge above two figures, one walking comfortably and one holding a painful knee" width="240" />
+  </picture>
+</p>
+
 An experimental arthritis weather-sensitivity index and symptom journal.
 
 ## Personality and positioning
