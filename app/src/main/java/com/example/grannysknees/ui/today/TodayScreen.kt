@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,18 +33,23 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.example.grannysknees.R
 import com.example.grannysknees.data.DefaultLocation
 import com.example.grannysknees.data.ForecastRepository
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
  * Today destination entry point.
  *
- * When a [repository] is supplied, loads live Toronto weather on a background
- * dispatcher. Otherwise falls back to an injected [provider] (previews/tests).
+ * When a [repository] is supplied, loads live Toronto weather once, then
+ * re-presents the cache on Activity resume and at hour/freshness boundaries
+ * so retained UI cannot keep an expired or previous-hour index (R1).
  */
 @Composable
 internal fun TodayRoute(
@@ -61,9 +67,28 @@ internal fun TodayRoute(
             TodayUiState.Loading(location = DefaultLocation.LABEL),
         )
     }
+    val scope = rememberCoroutineScope()
+    var initialLoadDone by remember { mutableStateOf(false) }
+
     LaunchedEffect(repository) {
         state = withContext(Dispatchers.IO) { repository.loadToday() }
+        initialLoadDone = true
+        while (true) {
+            val wait = withContext(Dispatchers.IO) {
+                repository.delayUntilNextPresentationChange()
+            }
+            delay(wait.toMillis().coerceAtLeast(1L))
+            state = withContext(Dispatchers.IO) { repository.presentFromCache() }
+        }
     }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        if (!initialLoadDone) return@LifecycleEventEffect
+        scope.launch {
+            state = withContext(Dispatchers.IO) { repository.presentFromCache() }
+        }
+    }
+
     TodayScreen(state = state, modifier = modifier)
 }
 

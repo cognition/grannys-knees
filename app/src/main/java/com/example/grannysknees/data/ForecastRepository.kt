@@ -11,6 +11,7 @@ import com.example.grannysknees.weather.OpenMeteoRequest
 import com.example.grannysknees.weather.UrlHttpTransport
 import java.io.IOException
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 
@@ -19,6 +20,10 @@ import java.time.ZoneId
  *
  * Network failures fall back to a usable (fresh/stale) disk cache when age
  * allows; expired or empty cache yields Unavailable without inventing scores.
+ *
+ * [fetchedAt] is stamped **after** a successful HTTP body is validated, and
+ * presentation always re-reads [clock] so hour/freshness cannot lag the
+ * transport (review R2).
  */
 internal class ForecastRepository(
     private val store: ForecastCacheStore,
@@ -37,20 +42,25 @@ internal class ForecastRepository(
      * Safe to call off the main thread (performs HTTP and file I/O).
      */
     fun loadToday(): TodayUiState {
-        val now = clock.instant()
         val zone = ZoneId.of(timezone)
         try {
-            refreshFromNetwork(now)
+            refreshFromNetwork()
         } catch (_: IOException) {
             // Fall through to cache.
         } catch (_: OpenMeteoParseException) {
             // Do not overwrite a good cache with a bad payload.
         }
 
-        return presentFromCache(now, zone)
+        // Re-read the clock after the network attempt so presentation uses
+        // "now" at evaluation time, not at request start (R2).
+        return presentFromCache(clock.instant(), zone)
     }
 
-    /** Presents disk cache only — used by tests and offline paths. */
+    /**
+     * Re-presents disk cache with a fresh clock — no network.
+     *
+     * Used for hour/freshness tickers and Activity resume (R1).
+     */
     fun presentFromCache(
         referenceNow: Instant = clock.instant(),
         zone: ZoneId = ZoneId.of(timezone),
@@ -97,7 +107,18 @@ internal class ForecastRepository(
         )
     }
 
-    private fun refreshFromNetwork(fetchedAt: Instant) {
+    /** Delay until the next hour or freshness boundary for the cached envelope. */
+    fun delayUntilNextPresentationChange(
+        referenceNow: Instant = clock.instant(),
+    ): Duration =
+        PresentationSchedule.delayUntilNextTransition(
+            now = referenceNow,
+            fetchedAt = store.read()?.fetchedAt,
+            zoneId = ZoneId.of(timezone),
+            policy = policy,
+        )
+
+    private fun refreshFromNetwork() {
         val request = OpenMeteoRequest(
             latitude = latitude,
             longitude = longitude,
@@ -107,6 +128,7 @@ internal class ForecastRepository(
         val body = transport.get(url)
         // Validate before writing so a bad payload cannot clobber a good cache.
         OpenMeteoParser.parse(body)
+        val fetchedAt = clock.instant()
         store.write(
             ForecastCacheEnvelope(
                 fetchedAt = fetchedAt,

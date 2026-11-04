@@ -135,6 +135,152 @@ class ForecastRepositoryTest {
         )
     }
 
+    @Test
+    fun `transport advancing past the hour uses the later hour score`() {
+        // Review R2 probe: start 15:59:55 Toronto, transport lands at 16:00:05.
+        val start = Instant.parse("2026-11-10T20:59:55Z")
+        val afterHttp = Instant.parse("2026-11-10T21:00:05Z")
+        val clock = MutableClock(start)
+        val repo = repository(
+            transport = ClockAdvancingTransport(nominalBody, clock, afterHttp),
+            clock = clock,
+        )
+
+        val state = repo.loadToday()
+
+        assertTrue("expected Available, got $state", state is TodayUiState.Available)
+        assertEquals(7, (state as TodayUiState.Available).score)
+        assertEquals(afterHttp, clock.instant())
+    }
+
+    @Test
+    fun `failed fetch that crosses expiry hides the index`() {
+        val start = Instant.ofEpochSecond(1_794_344_400L)
+        val afterFail = start.plusSeconds(1)
+        val fetchedAt = start.minusSeconds(180 * 60) // exactly stale at start; expired after +1s
+        val store = ForecastCacheStore(temporaryFolder.newFile("expire-cache.json"))
+        store.write(
+            ForecastCacheEnvelope(
+                fetchedAt = fetchedAt,
+                locationLabel = "Toronto, ON",
+                latitude = 43.65,
+                longitude = -79.38,
+                timezone = "America/Toronto",
+                rawBody = nominalBody,
+            ),
+        )
+        val clock = MutableClock(start)
+        val repo = repository(
+            store = store,
+            transport = ClockAdvancingTransport(fail = true, clock = clock, after = afterFail),
+            clock = clock,
+        )
+
+        val state = repo.loadToday()
+
+        assertTrue(state is TodayUiState.Unavailable)
+        assertEquals(UnavailableReason.EXPIRED, (state as TodayUiState.Unavailable).reason)
+    }
+
+    @Test
+    fun `presentFromCache after hour elapses switches the displayed score`() {
+        val atSixteen = Instant.ofEpochSecond(1_794_344_400L)
+        val atSeventeen = Instant.ofEpochSecond(1_794_348_000L)
+        val store = ForecastCacheStore(temporaryFolder.newFile("hour-cache.json"))
+        store.write(
+            ForecastCacheEnvelope(
+                fetchedAt = atSixteen,
+                locationLabel = "Toronto, ON",
+                latitude = 43.65,
+                longitude = -79.38,
+                timezone = "America/Toronto",
+                rawBody = nominalBody,
+            ),
+        )
+        val clock = MutableClock(atSixteen)
+        val repo = repository(
+            store = store,
+            transport = FailingTransport(),
+            clock = clock,
+        )
+
+        val first = repo.presentFromCache()
+        assertTrue(first is TodayUiState.Available)
+        assertEquals(7, (first as TodayUiState.Available).score)
+
+        clock.instant = atSeventeen
+        val second = repo.presentFromCache()
+        assertTrue(second is TodayUiState.Available)
+        assertEquals(7, (second as TodayUiState.Available).score) // 17:00 display is also 7
+        // Distinct hours: 16:00 score 6.9→7 display, 17:00 score 6.8→7 display.
+        // Force a clearer hour change using 18:00 (display 6).
+        clock.instant = Instant.ofEpochSecond(1_794_351_600L) // 18:00 local
+        val third = repo.presentFromCache()
+        assertTrue(third is TodayUiState.Available)
+        assertEquals(6, (third as TodayUiState.Available).score)
+    }
+
+    @Test
+    fun `presentFromCache after stale then expired boundaries updates freshness`() {
+        val atSixteen = Instant.ofEpochSecond(1_794_344_400L)
+        val store = ForecastCacheStore(temporaryFolder.newFile("fresh-cache.json"))
+        store.write(
+            ForecastCacheEnvelope(
+                fetchedAt = atSixteen,
+                locationLabel = "Toronto, ON",
+                latitude = 43.65,
+                longitude = -79.38,
+                timezone = "America/Toronto",
+                rawBody = nominalBody,
+            ),
+        )
+        val clock = MutableClock(atSixteen)
+        val repo = repository(
+            store = store,
+            transport = FailingTransport(),
+            clock = clock,
+        )
+
+        assertEquals(ForecastFreshness.Fresh, (repo.presentFromCache() as TodayUiState.Available).freshness)
+
+        clock.instant = atSixteen.plusSeconds(90 * 60)
+        assertEquals(ForecastFreshness.Stale, (repo.presentFromCache() as TodayUiState.Available).freshness)
+
+        clock.instant = atSixteen.plusSeconds(181 * 60)
+        val expired = repo.presentFromCache()
+        assertTrue(expired is TodayUiState.Unavailable)
+        assertEquals(UnavailableReason.EXPIRED, (expired as TodayUiState.Unavailable).reason)
+    }
+
+    @Test
+    fun `resume style re-present uses the advanced clock`() {
+        // Simulates retained Activity ON_RESUME calling presentFromCache only.
+        val fetchedAt = Instant.ofEpochSecond(1_794_344_400L)
+        val store = ForecastCacheStore(temporaryFolder.newFile("resume-cache.json"))
+        store.write(
+            ForecastCacheEnvelope(
+                fetchedAt = fetchedAt,
+                locationLabel = "Toronto, ON",
+                latitude = 43.65,
+                longitude = -79.38,
+                timezone = "America/Toronto",
+                rawBody = nominalBody,
+            ),
+        )
+        val clock = MutableClock(fetchedAt)
+        val repo = repository(
+            store = store,
+            transport = FailingTransport(),
+            clock = clock,
+        )
+        repo.presentFromCache()
+
+        clock.instant = fetchedAt.plusSeconds(181 * 60)
+        val afterResume = repo.presentFromCache()
+        assertTrue(afterResume is TodayUiState.Unavailable)
+        assertEquals(UnavailableReason.EXPIRED, (afterResume as TodayUiState.Unavailable).reason)
+    }
+
     private fun repository(
         transport: HttpTransport,
         clock: Clock,
@@ -152,5 +298,28 @@ class ForecastRepositoryTest {
 
     private class FailingTransport : HttpTransport {
         override fun get(url: String): String = throw IOException("offline")
+    }
+
+    private class ClockAdvancingTransport(
+        private val body: String = "",
+        private val clock: MutableClock,
+        private val after: Instant,
+        private val fail: Boolean = false,
+    ) : HttpTransport {
+        override fun get(url: String): String {
+            clock.instant = after
+            if (fail) throw IOException("offline")
+            return body
+        }
+    }
+
+    private class MutableClock(
+        @Volatile var instant: Instant,
+    ) : Clock() {
+        override fun getZone(): ZoneOffset = ZoneOffset.UTC
+
+        override fun withZone(zone: java.time.ZoneId): Clock = this
+
+        override fun instant(): Instant = instant
     }
 }
