@@ -30,8 +30,9 @@ jobs:
         with:
           packages: platform-tools
 
+      # API 37 ships as platforms;android-37.0 (directory android-37.0), not android-37.
       - name: Install pinned Android SDK packages
-        run: sdkmanager "platforms;android-37" "build-tools;36.0.0"
+        run: sdkmanager "platforms;android-37.0" "build-tools;36.0.0"
 
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
