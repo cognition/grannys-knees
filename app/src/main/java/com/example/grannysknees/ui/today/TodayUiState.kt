@@ -15,20 +15,36 @@ internal enum class ForecastFreshness {
     Stale,
 }
 
+/** Why Today cannot show an index number. */
+internal enum class UnavailableReason {
+    /** No forecast has been cached yet. */
+    EMPTY,
+
+    /** Cache age exceeded the stale window (contract §6). */
+    EXPIRED,
+
+    /** Current local hour missing or scored unavailable — no invented score. */
+    INVALID_HOUR,
+}
+
 /**
  * Immutable UI state for the Today screen.
  *
  * The screen is deliberately decoupled from weather fetching and scoring: it
- * renders whatever a [TodayStateProvider] hands it, so T05 compiles and demos
- * without owning the weather (T03) or scorer (T04) packages. Real data is wired
- * in later (T06).
+ * renders whatever a [TodayStateProvider] or repository hands it.
  */
 internal sealed interface TodayUiState {
     /** Human-readable location the forecast applies to. */
     val location: String
 
-    /** Pre-formatted "last updated" label, e.g. "today at 8:45 AM". */
+    /** Pre-formatted "last updated" label, e.g. "Nov 4, 2:15 PM". */
     val lastUpdatedLabel: String
+
+    /** First fetch / refresh in flight. */
+    data class Loading(
+        override val location: String,
+        override val lastUpdatedLabel: String = "…",
+    ) : TodayUiState
 
     /** A forecast is available (fresh or stale) and its index can be shown. */
     data class Available(
@@ -45,14 +61,15 @@ internal sealed interface TodayUiState {
     }
 
     /**
-     * No usable forecast is cached (offline or expired).
+     * No usable forecast for the current hour.
      *
-     * The screen shows an explicit offline state instead of a possibly
-     * misleading index — the contract forbids presenting stale-expired values
-     * as current (§6.1).
+     * The screen shows an explicit empty/expired/invalid state instead of a
+     * possibly misleading index — the contract forbids presenting expired
+     * values as current (§6.1) and forbids inventing scores (§7).
      */
     data class Unavailable(
         override val location: String,
         override val lastUpdatedLabel: String,
+        val reason: UnavailableReason = UnavailableReason.EMPTY,
     ) : TodayUiState
 }

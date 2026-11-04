@@ -27,8 +27,15 @@
     <string name="today_last_updated">Last updated %1$s</string>
     <string name="today_stale_badge">Stale</string>
     <string name="today_stale_detail">Showing the last forecast we managed to fetch.</string>
+    <string name="today_loading_title">Fetching the forecast…</string>
+    <string name="today_loading_body">Pulling hourly weather for Toronto (temporary fixed location until a picker lands).</string>
     <string name="today_offline_title">No forecast just yet</string>
     <string name="today_offline_body">We haven\'t fetched the weather yet. Pop back once you\'re online and we\'ll take a look.</string>
+    <string name="today_expired_title">Forecast expired</string>
+    <string name="today_expired_body">The cached forecast is too old to show as current. Connect and reopen the app for a fresh pull.</string>
+    <string name="today_invalid_hour_title">Index unavailable this hour</string>
+    <string name="today_invalid_hour_body">We have weather on hand, but this hour\'s inputs are incomplete — we won\'t invent a score.</string>
+    <string name="today_location_temporary_note">Temporary default location (no GPS yet).</string>
 
     <!-- Experimental disclaimer -->
     <string name="today_disclaimer_title">Experimental — just for curiosity</string>
