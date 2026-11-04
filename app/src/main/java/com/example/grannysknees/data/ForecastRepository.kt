@@ -1,6 +1,7 @@
 package com.example.grannysknees.data
 
 import com.example.grannysknees.index.WeatherIndexScorer
+import com.example.grannysknees.ui.outlook.OutlookUiState
 import com.example.grannysknees.ui.today.TodayUiState
 import com.example.grannysknees.ui.today.UnavailableReason
 import com.example.grannysknees.weather.HttpTransport
@@ -105,6 +106,30 @@ internal class ForecastRepository(
             zoneId = forecast.timezone.zone,
             referenceNow = referenceNow,
         )
+    }
+
+    /**
+     * Projects the disk cache into the 24-hour curve and five-day outlook — no network.
+     *
+     * Follows the same freshness gate as [presentFromCache]: only a fresh or
+     * stale cache is shown; expired, empty or unparseable caches are
+     * [OutlookUiState.Hidden] so old values are never presented as current.
+     */
+    fun presentOutlookFromCache(
+        referenceNow: Instant = clock.instant(),
+    ): OutlookUiState {
+        val envelope = store.read() ?: return OutlookUiState.Hidden
+        val status = CacheFreshness.evaluate(envelope.fetchedAt, referenceNow, policy)
+        if (status != CacheStatus.FRESH && status != CacheStatus.STALE) {
+            return OutlookUiState.Hidden
+        }
+        val forecast = try {
+            OpenMeteoParser.parse(envelope.rawBody)
+        } catch (_: OpenMeteoParseException) {
+            return OutlookUiState.Hidden
+        }
+        val scored = WeatherIndexScorer.score(WeatherToScoringAdapter.toScoringRequest(forecast))
+        return OutlookMapper.toOutlook(scored, forecast.timezone.zone, referenceNow)
     }
 
     /** Delay until the next hour or freshness boundary for the cached envelope. */
