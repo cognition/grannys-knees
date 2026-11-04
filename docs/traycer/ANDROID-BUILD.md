@@ -21,7 +21,7 @@ Android Gradle Plugin 9.1.1 supports API 37 and requires Java 17 or newer and Gr
 ## Clean-checkout build
 
 1. Install a JDK from version 17 through 25 and ensure `java -version` reports that JDK.
-2. Install Android SDK platform 37 and Build Tools 36.0.0.
+2. Install Android SDK platform **37.0** (`sdkmanager "platforms;android-37.0"`) and Build Tools 36.0.0. The platform directory is `android-37.0`, not `android-37`.
 3. Make the SDK discoverable using `ANDROID_HOME` (recommended for shells and CI), `ANDROID_SDK_ROOT`, or an untracked `local.properties` file:
 
    ```properties
@@ -48,7 +48,7 @@ Open the repository in Android Studio, select the `app` run configuration, and d
 
 ## Continuous integration
 
-`.github/workflows/android.yml` installs Java 21, Android platform 37 and Build Tools 36.0.0, validates the Gradle Wrapper, and runs the same `./gradlew test assembleDebug` checks on pushes to `main` and on pull requests.
+`.github/workflows/android.yml` installs Java 21, Android platform `platforms;android-37.0` and Build Tools 36.0.0, validates the Gradle Wrapper, and runs the same `./gradlew test assembleDebug` checks on pushes to `main` and on pull requests.
 
 ## Deferred application ID
 
