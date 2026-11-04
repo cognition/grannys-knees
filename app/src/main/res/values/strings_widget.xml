@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">Current Granny\'s Knees index for Toronto</string>
+    <string name="widget_updated">Updated %1$s</string>
+    <string name="widget_stale_badge">Stale</string>
+    <string name="widget_no_forecast">No forecast</string>
+    <string name="widget_open_app">Tap to open Granny\'s Knees</string>
+
+    <string name="widget_band_calm">Calm</string>
+    <string name="widget_band_mild">Mild</string>
+    <string name="widget_band_noticeable">Noticeable</string>
+    <string name="widget_band_rough">Rough</string>
+    <string name="widget_band_stormy">Stormy</string>
+</resources>
