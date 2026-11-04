@@ -1,5 +1,7 @@
 # Traycer execution backlog
 
+**Current execution handoff (2026-11-04):** [NEXT-EXECUTION-CYCLE.md](NEXT-EXECUTION-CYCLE.md) supersedes the original starting sequence for current work. Historical task definitions below remain as the baseline; check actual implementation before reassigning work.
+
 **How to use:** Each task is an agent-sized unit of work. Start with T00 and T01. Tasks with satisfied prerequisites and disjoint file ownership may run in parallel. All statuses below are **not started** until the repository is inspected and evidence is recorded.
 
 | ID | Priority | Dependencies | Suggested lead | Deliverable and acceptance test |
