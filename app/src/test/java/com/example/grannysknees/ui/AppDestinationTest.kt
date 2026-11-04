@@ -18,4 +18,10 @@ class AppDestinationTest {
         assertEquals("home", AppDestination.Home.route)
         assertEquals("Granny's Knees", AppDestination.Home.title)
     }
+
+    @Test
+    fun `today destination is registered as the primary route`() {
+        assertEquals("today", AppDestination.Today.route)
+        assertEquals("Granny's Knees", AppDestination.Today.title)
+    }
 }
