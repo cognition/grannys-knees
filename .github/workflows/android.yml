@@ -24,8 +24,11 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      # Avoid the action's default obsolete `tools` package (sdkmanager fails on it).
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Install pinned Android SDK packages
         run: sdkmanager "platforms;android-37" "build-tools;36.0.0"
