@@ -1,0 +1,20 @@
+<resources>
+    <!-- Today outlook: 24-hour index curve (current local calendar day) -->
+    <string name="outlook_today_heading">Today\'s index (local day)</string>
+    <string name="outlook_today_range">Low %1$s at %2$s · High %3$s at %4$s</string>
+    <string name="outlook_hours_scored">%1$d of %2$d hours scored</string>
+    <string name="outlook_partial_tag">Partial</string>
+    <string name="outlook_gap_note">Breaks in the line are hours we couldn\'t score — left blank, never filled with zeros.</string>
+    <string name="outlook_today_empty">No hours scored for today yet. We won\'t draw a line we can\'t back up.</string>
+    <string name="outlook_chart_content_description">Index through today: %1$d of %2$d hours scored.</string>
+    <string name="outlook_chart_range_content_description">Index through today: %1$d of %2$d hours scored. Low %3$s at %4$s, high %5$s at %6$s.</string>
+
+    <!-- Five-day index low/high (index, not temperature) -->
+    <string name="outlook_five_day_heading">Five-day index low–high</string>
+    <string name="outlook_five_day_caption">Daily range of the 0–10 index, not temperature.</string>
+    <string name="outlook_day_range">%1$s–%2$s</string>
+    <string name="outlook_day_no_index">No index</string>
+    <string name="outlook_day_content_description">%1$s: index low %2$s, high %3$s.</string>
+    <string name="outlook_day_partial_content_description">%1$s: index low %2$s, high %3$s. Partial day, %4$d of %5$d hours scored.</string>
+    <string name="outlook_day_unavailable_content_description">%1$s: no index available.</string>
+</resources>

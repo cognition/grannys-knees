@@ -38,6 +38,9 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import com.example.grannysknees.R
 import com.example.grannysknees.data.DefaultLocation
 import com.example.grannysknees.data.ForecastRepository
+import com.example.grannysknees.ui.outlook.OutlookSection
+import com.example.grannysknees.ui.outlook.OutlookUiState
+import com.example.grannysknees.ui.outlook.SampleOutlookStates
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -67,11 +70,13 @@ internal fun TodayRoute(
             TodayUiState.Loading(location = DefaultLocation.LABEL),
         )
     }
+    var outlook by remember { mutableStateOf<OutlookUiState>(OutlookUiState.Hidden) }
     val scope = rememberCoroutineScope()
     var initialLoadDone by remember { mutableStateOf(false) }
 
     LaunchedEffect(repository) {
         state = withContext(Dispatchers.IO) { repository.loadToday() }
+        outlook = withContext(Dispatchers.IO) { repository.presentOutlookFromCache() }
         initialLoadDone = true
         while (true) {
             val wait = withContext(Dispatchers.IO) {
@@ -79,6 +84,7 @@ internal fun TodayRoute(
             }
             delay(wait.toMillis().coerceAtLeast(1L))
             state = withContext(Dispatchers.IO) { repository.presentFromCache() }
+            outlook = withContext(Dispatchers.IO) { repository.presentOutlookFromCache() }
         }
     }
 
@@ -86,18 +92,20 @@ internal fun TodayRoute(
         if (!initialLoadDone) return@LifecycleEventEffect
         scope.launch {
             state = withContext(Dispatchers.IO) { repository.presentFromCache() }
+            outlook = withContext(Dispatchers.IO) { repository.presentOutlookFromCache() }
         }
     }
 
-    TodayScreen(state = state, modifier = modifier)
+    TodayScreen(state = state, outlook = outlook, modifier = modifier)
 }
 
-/** Stateless Today screen: shows the index, freshness and the disclaimer. */
+/** Stateless Today screen: shows the index, freshness, outlook and the disclaimer. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TodayScreen(
     state: TodayUiState,
     modifier: Modifier = Modifier,
+    outlook: OutlookUiState = OutlookUiState.Hidden,
 ) {
     Scaffold(
         modifier = modifier,
@@ -123,6 +131,9 @@ internal fun TodayScreen(
                 }
 
                 is TodayUiState.Unavailable -> OfflineNotice(state = state)
+            }
+            if (outlook is OutlookUiState.Available) {
+                OutlookSection(state = outlook)
             }
             ExperimentalDisclaimer()
         }
@@ -378,7 +389,7 @@ private fun bandCaption(band: TodayScoreBand): String = stringResource(
 @Composable
 private fun TodayScreenFreshPreview() {
     GrannysKneesTheme {
-        TodayScreen(state = SampleTodayStates.fresh)
+        TodayScreen(state = SampleTodayStates.fresh, outlook = SampleOutlookStates.withGap)
     }
 }
 
