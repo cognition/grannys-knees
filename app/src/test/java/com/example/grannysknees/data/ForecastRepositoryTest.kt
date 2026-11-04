@@ -12,6 +12,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.IOException
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 
@@ -247,6 +248,81 @@ class ForecastRepositoryTest {
         assertEquals(ForecastFreshness.Stale, (repo.presentFromCache() as TodayUiState.Available).freshness)
 
         clock.instant = atSixteen.plusSeconds(181 * 60)
+        val expired = repo.presentFromCache()
+        assertTrue(expired is TodayUiState.Unavailable)
+        assertEquals(UnavailableReason.EXPIRED, (expired as TodayUiState.Unavailable).reason)
+    }
+
+    @Test
+    fun `schedule plus present flips Fresh to Stale at 60m plus epsilon without 15m cap`() {
+        val fetchedAt = Instant.ofEpochSecond(1_794_344_400L)
+        val store = ForecastCacheStore(temporaryFolder.newFile("boundary-fresh.json"))
+        store.write(
+            ForecastCacheEnvelope(
+                fetchedAt = fetchedAt,
+                locationLabel = "Toronto, ON",
+                latitude = 43.65,
+                longitude = -79.38,
+                timezone = "America/Toronto",
+                rawBody = nominalBody,
+            ),
+        )
+        val atExact = fetchedAt.plus(Duration.ofMinutes(60))
+        val clock = MutableClock(atExact)
+        val repo = repository(
+            store = store,
+            transport = FailingTransport(),
+            clock = clock,
+        )
+
+        val stillFresh = repo.presentFromCache()
+        assertTrue(stillFresh is TodayUiState.Available)
+        assertEquals(ForecastFreshness.Fresh, (stillFresh as TodayUiState.Available).freshness)
+
+        val delay = repo.delayUntilNextPresentationChange(atExact)
+        assertTrue(
+            "expected short wake after inclusive threshold, got $delay",
+            delay < Duration.ofMinutes(15),
+        )
+        assertEquals(Duration.ofSeconds(1), delay) // MIN_WAIT after +1ns candidate
+
+        clock.instant = atExact.plus(delay)
+        val stale = repo.presentFromCache()
+        assertTrue(stale is TodayUiState.Available)
+        assertEquals(ForecastFreshness.Stale, (stale as TodayUiState.Available).freshness)
+    }
+
+    @Test
+    fun `schedule plus present flips Stale to Expired at 180m plus epsilon without 15m cap`() {
+        val fetchedAt = Instant.ofEpochSecond(1_794_344_400L)
+        val store = ForecastCacheStore(temporaryFolder.newFile("boundary-stale.json"))
+        store.write(
+            ForecastCacheEnvelope(
+                fetchedAt = fetchedAt,
+                locationLabel = "Toronto, ON",
+                latitude = 43.65,
+                longitude = -79.38,
+                timezone = "America/Toronto",
+                rawBody = nominalBody,
+            ),
+        )
+        val atExact = fetchedAt.plus(Duration.ofMinutes(180))
+        val clock = MutableClock(atExact)
+        val repo = repository(
+            store = store,
+            transport = FailingTransport(),
+            clock = clock,
+        )
+
+        val stillStale = repo.presentFromCache()
+        assertTrue(stillStale is TodayUiState.Available)
+        assertEquals(ForecastFreshness.Stale, (stillStale as TodayUiState.Available).freshness)
+
+        val delay = repo.delayUntilNextPresentationChange(atExact)
+        assertTrue(delay < Duration.ofMinutes(15))
+        assertEquals(Duration.ofSeconds(1), delay)
+
+        clock.instant = atExact.plus(delay)
         val expired = repo.presentFromCache()
         assertTrue(expired is TodayUiState.Unavailable)
         assertEquals(UnavailableReason.EXPIRED, (expired as TodayUiState.Unavailable).reason)

@@ -7,13 +7,19 @@ import java.time.ZoneId
 /**
  * Computes when Today must re-present cached forecast data without a new
  * network fetch: local hour rollover and §6 freshness boundary crossings.
+ *
+ * [CacheFreshness] treats age ≤ threshold as still on the earlier side of the
+ * boundary (`<= freshFor` → Fresh, `<= staleUntil` → Stale). Wake candidates
+ * are therefore the **first instant after** each inclusive threshold so the
+ * ticker cannot sit on equality and wait out the [MAX_WAIT] cap while the
+ * label is wrong (re-review R1).
  */
 internal object PresentationSchedule {
-    private val MAX_WAIT: Duration = Duration.ofMinutes(15)
-    private val MIN_WAIT: Duration = Duration.ofSeconds(1)
+    internal val MAX_WAIT: Duration = Duration.ofMinutes(15)
+    internal val MIN_WAIT: Duration = Duration.ofSeconds(1)
 
     /**
-     * Delay until the next presentation change at or after [now].
+     * Delay until the next presentation change after [now].
      *
      * Always returns a positive duration capped at [MAX_WAIT] so a live
      * coroutine keeps ticking even if scheduling math is sparse.
@@ -35,8 +41,9 @@ internal object PresentationSchedule {
         candidates.add(nextHour)
 
         if (fetchedAt != null) {
-            candidates.add(fetchedAt.plus(policy.freshFor))
-            candidates.add(fetchedAt.plus(policy.staleUntil))
+            // First instant after inclusive §6 thresholds (age <= T stays prior status).
+            candidates.add(fetchedAt.plus(policy.freshFor).plusNanos(1))
+            candidates.add(fetchedAt.plus(policy.staleUntil).plusNanos(1))
         }
 
         val soonest = candidates

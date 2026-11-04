@@ -25,19 +25,34 @@ class PresentationScheduleTest {
     @Test
     fun `freshness boundary can beat the next hour`() {
         val now = Instant.ofEpochSecond(1_794_344_400L) // 16:00 local
-        val fetchedAt = now.minusSeconds(59 * 60) // becomes stale in 1 minute
+        // Stale flips at fetchedAt+60m+1ns ≈ now + 1m + 1ns → MIN_WAIT coercion to 1s
+        // would hide the intent; keep 59m age so wake is ~1m+1ns (uncapped).
+        val fetchedAt = now.minusSeconds(59 * 60)
         val delay = PresentationSchedule.delayUntilNextTransition(
             now = now,
             fetchedAt = fetchedAt,
             zoneId = toronto,
         )
-        assertEquals(Duration.ofMinutes(1), delay)
+        assertEquals(Duration.ofMinutes(1).plusNanos(1), delay)
+    }
+
+    @Test
+    fun `at exact fresh threshold schedules immediate follow-up not the 15m cap`() {
+        val fetchedAt = Instant.ofEpochSecond(1_794_344_400L)
+        val atExactFresh = fetchedAt.plus(Duration.ofMinutes(60))
+        val delay = PresentationSchedule.delayUntilNextTransition(
+            now = atExactFresh,
+            fetchedAt = fetchedAt,
+            zoneId = toronto,
+        )
+        assertEquals(PresentationSchedule.MIN_WAIT, delay)
+        assertTrue(delay < PresentationSchedule.MAX_WAIT)
     }
 
     @Test
     fun `caps long waits at fifteen minutes`() {
         val now = Instant.ofEpochSecond(1_794_340_800L) // 15:00 local
-        val fetchedAt = now // fresh for 60 min; next hour is 60 min away → capped
+        val fetchedAt = now // post-threshold wake ~60m+1ns; next hour 60m → capped
         val delay = PresentationSchedule.delayUntilNextTransition(
             now = now,
             fetchedAt = fetchedAt,
