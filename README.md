@@ -2,6 +2,19 @@
 
 An experimental arthritis weather-sensitivity index and symptom journal.
 
+## Approved logo artwork
+
+The approved identity uses two gender-neutral stick figures beneath a green-to-red Arthritis Index gauge: comfortable movement on the left and knee discomfort on the right. The approved artwork has **no lettering**, with both black-background and white-background versions.
+
+**Asset status:** The exact approved PNGs have been prepared but are **not yet committed to this repository**. The existing `assets/logo-dark.svg` and `assets/logo-light.svg` are earlier, inaccurate recreations and must not be treated as approved branding.
+
+Once uploaded, the canonical assets will be:
+
+- `assets/logo-dark.png`, approved black-background artwork.
+- `assets/logo-light.png`, approved white-background artwork.
+
+After both files are committed, replace this status note with a theme-aware `<picture>` element referencing the PNGs. Do not use the SVG recreations in the README or app branding.
+
 ## Personality and positioning
 
 **Your joints. Your weather. Your excuse.**
