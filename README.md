@@ -64,6 +64,16 @@ The public-facing product name is **Granny's Knees**. The Git repository remains
 - Show most recently reported values separately from observations at the current time, with their original timestamps.
 - Android app, Android home-screen widget, Wear OS tile and optional watch-face complication share these domain rules.
 
+## Delivery and Traycer orchestration
+
+Native Android development will be coordinated through **Traycer**, using **Codex, Claude, OpenRouter and Cursor** according to task fit. GitHub code, tests and reviewed pull requests are the implementation source of truth.
+
+- [Delivery plan and release gates](docs/delivery-plan.md)
+- [Traycer agent instructions](docs/traycer/AGENT-INSTRUCTIONS.md)
+- [Traycer execution backlog and first task handoffs](docs/traycer/EXECUTION-BACKLOG.md)
+
+Start with **T00**, the repository reality check, before parallelizing **T01**, the native Android foundation, and **T02**, the weather/index contracts. Do not mark tasks complete without build/test evidence.
+
 ## Android direction
 
 The target product is a native Android app, with a home-screen widget and Wear OS tile (the Wear OS equivalent of a glanceable widget).
