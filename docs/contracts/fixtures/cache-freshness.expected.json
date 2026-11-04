@@ -1,0 +1,48 @@
+{
+  "contractVersion": "weather-index/1.0.0",
+  "indexVersion": "index-v1",
+  "about": "Repository/cache-layer fixture. Freshness is NOT part of the Open-Meteo payload; it is derived by the client cache from fetchedAt + policy. All instants are UTC. 'referenceNow' is the evaluation instant each scenario is judged against, so these cases are clock-independent and deterministic.",
+  "policy": {
+    "freshForMinutes": 60,
+    "staleAfterMinutes": 180,
+    "rule": "age = referenceNow - fetchedAt. age <= freshForMinutes => fresh; freshForMinutes < age <= staleAfterMinutes => stale (usable, must be labelled stale with the fetchedAt timestamp shown); age > staleAfterMinutes => expired (do not present index values as current; show last-updated and an explicit expired/offline state)."
+  },
+  "scenarios": [
+    {
+      "name": "fresh",
+      "source": "nominal.expected.json",
+      "fetchedAt": "2026-11-10T00:05:00Z",
+      "referenceNow": "2026-11-10T00:30:00Z",
+      "ageMinutes": 25,
+      "status": "fresh",
+      "display": {"showStaleBadge": false, "usable": true}
+    },
+    {
+      "name": "stale",
+      "source": "nominal.expected.json",
+      "fetchedAt": "2026-11-10T00:05:00Z",
+      "referenceNow": "2026-11-10T02:35:00Z",
+      "ageMinutes": 150,
+      "status": "stale",
+      "display": {"showStaleBadge": true, "usable": true, "lastUpdatedLabel": "2026-11-10T00:05:00Z"}
+    },
+    {
+      "name": "expired",
+      "source": "nominal.expected.json",
+      "fetchedAt": "2026-11-10T00:05:00Z",
+      "referenceNow": "2026-11-10T04:10:00Z",
+      "ageMinutes": 245,
+      "status": "expired",
+      "display": {"showStaleBadge": true, "usable": false, "presentAsCurrent": false, "lastUpdatedLabel": "2026-11-10T00:05:00Z"}
+    },
+    {
+      "name": "no-cache-offline",
+      "source": null,
+      "fetchedAt": null,
+      "referenceNow": "2026-11-10T04:10:00Z",
+      "ageMinutes": null,
+      "status": "unavailable",
+      "display": {"showStaleBadge": false, "usable": false, "presentAsCurrent": false, "emptyState": "No forecast cached yet; offline."}
+    }
+  ]
+}

@@ -1,0 +1,653 @@
+{
+  "contractVersion": "weather-index/1.0.0",
+  "indexVersion": "index-v1",
+  "location": {
+    "latitude": 43.65,
+    "longitude": -79.38,
+    "label": "Toronto, Ontario, CA"
+  },
+  "timezone": {
+    "name": "America/Toronto",
+    "abbreviationAtRequest": "EST",
+    "utcOffsetSecondsAtRequest": -18000,
+    "note": "utc_offset_seconds/abbreviation are a single request-time value; per-row utcOffsetSeconds comes from IANA conversion of each epoch and differs across DST."
+  },
+  "cache": {
+    "fetchedAt": "2026-11-10T00:05:00Z",
+    "providerGenerationtimeMs": 0.12,
+    "freshForMinutes": 60,
+    "staleAfterMinutes": 180,
+    "freshUntil": null,
+    "staleAfter": null,
+    "status": "fresh",
+    "note": "freshUntil/staleAfter are computed by the client from fetchedAt; null here to stay clock-independent."
+  },
+  "hours": [
+    {
+      "epoch": 1794276000,
+      "instantUtc": "2026-11-10T02:00:00Z",
+      "local": "2026-11-09T21:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-09",
+      "inputs": {
+        "surface_pressure": 1024.0,
+        "relative_humidity_2m": 84,
+        "temperature_2m": 2.0
+      },
+      "pressureTrend3h_hPa": null,
+      "subScores": {
+        "pressure": null,
+        "humidity": 8.8,
+        "temperature": 9.0
+      },
+      "indexRaw": null,
+      "indexScore": null,
+      "indexDisplay": null,
+      "status": "unavailable",
+      "unavailableReasons": [
+        "pressureTrend3h unavailable (no comparable t-3h sample)"
+      ]
+    },
+    {
+      "epoch": 1794279600,
+      "instantUtc": "2026-11-10T03:00:00Z",
+      "local": "2026-11-09T22:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-09",
+      "inputs": {
+        "surface_pressure": 1024.1,
+        "relative_humidity_2m": 86,
+        "temperature_2m": 1.0
+      },
+      "pressureTrend3h_hPa": null,
+      "subScores": {
+        "pressure": null,
+        "humidity": 9.2,
+        "temperature": 9.5
+      },
+      "indexRaw": null,
+      "indexScore": null,
+      "indexDisplay": null,
+      "status": "unavailable",
+      "unavailableReasons": [
+        "pressureTrend3h unavailable (no comparable t-3h sample)"
+      ]
+    },
+    {
+      "epoch": 1794283200,
+      "instantUtc": "2026-11-10T04:00:00Z",
+      "local": "2026-11-09T23:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-09",
+      "inputs": {
+        "surface_pressure": 1024.0,
+        "relative_humidity_2m": 87,
+        "temperature_2m": 0.0
+      },
+      "pressureTrend3h_hPa": null,
+      "subScores": {
+        "pressure": null,
+        "humidity": 9.4,
+        "temperature": 10.0
+      },
+      "indexRaw": null,
+      "indexScore": null,
+      "indexDisplay": null,
+      "status": "unavailable",
+      "unavailableReasons": [
+        "pressureTrend3h unavailable (no comparable t-3h sample)"
+      ]
+    },
+    {
+      "epoch": 1794286800,
+      "instantUtc": "2026-11-10T05:00:00Z",
+      "local": "2026-11-10T00:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1023.8,
+        "relative_humidity_2m": 88,
+        "temperature_2m": -1.0
+      },
+      "pressureTrend3h_hPa": -0.2,
+      "subScores": {
+        "pressure": 0.3333,
+        "humidity": 9.6,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.0667,
+      "indexScore": 5.1,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794290400,
+      "instantUtc": "2026-11-10T06:00:00Z",
+      "local": "2026-11-10T01:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1023.8,
+        "relative_humidity_2m": 89,
+        "temperature_2m": -2.0
+      },
+      "pressureTrend3h_hPa": -0.3,
+      "subScores": {
+        "pressure": 0.5,
+        "humidity": 9.8,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.2,
+      "indexScore": 5.2,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794294000,
+      "instantUtc": "2026-11-10T07:00:00Z",
+      "local": "2026-11-10T02:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1023.7,
+        "relative_humidity_2m": 90,
+        "temperature_2m": -2.5
+      },
+      "pressureTrend3h_hPa": -0.3,
+      "subScores": {
+        "pressure": 0.5,
+        "humidity": 10.0,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.25,
+      "indexScore": 5.3,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794297600,
+      "instantUtc": "2026-11-10T08:00:00Z",
+      "local": "2026-11-10T03:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1023.6,
+        "relative_humidity_2m": 91,
+        "temperature_2m": -3.0
+      },
+      "pressureTrend3h_hPa": -0.2,
+      "subScores": {
+        "pressure": 0.3333,
+        "humidity": 10.0,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.1667,
+      "indexScore": 5.2,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794301200,
+      "instantUtc": "2026-11-10T09:00:00Z",
+      "local": "2026-11-10T04:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1023.5,
+        "relative_humidity_2m": 92,
+        "temperature_2m": -3.5
+      },
+      "pressureTrend3h_hPa": -0.3,
+      "subScores": {
+        "pressure": 0.5,
+        "humidity": 10.0,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.25,
+      "indexScore": 5.3,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794304800,
+      "instantUtc": "2026-11-10T10:00:00Z",
+      "local": "2026-11-10T05:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1023.4,
+        "relative_humidity_2m": 92,
+        "temperature_2m": -3.8
+      },
+      "pressureTrend3h_hPa": -0.3,
+      "subScores": {
+        "pressure": 0.5,
+        "humidity": 10.0,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.25,
+      "indexScore": 5.3,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794308400,
+      "instantUtc": "2026-11-10T11:00:00Z",
+      "local": "2026-11-10T06:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1023.2,
+        "relative_humidity_2m": 92,
+        "temperature_2m": -4.0
+      },
+      "pressureTrend3h_hPa": -0.4,
+      "subScores": {
+        "pressure": 0.6667,
+        "humidity": 10.0,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.3333,
+      "indexScore": 5.3,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794312000,
+      "instantUtc": "2026-11-10T12:00:00Z",
+      "local": "2026-11-10T07:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1023.0,
+        "relative_humidity_2m": 91,
+        "temperature_2m": -3.6
+      },
+      "pressureTrend3h_hPa": -0.5,
+      "subScores": {
+        "pressure": 0.8333,
+        "humidity": 10.0,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.4167,
+      "indexScore": 5.4,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794315600,
+      "instantUtc": "2026-11-10T13:00:00Z",
+      "local": "2026-11-10T08:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1022.7,
+        "relative_humidity_2m": 89,
+        "temperature_2m": -2.8
+      },
+      "pressureTrend3h_hPa": -0.7,
+      "subScores": {
+        "pressure": 1.1667,
+        "humidity": 9.8,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.5333,
+      "indexScore": 5.5,
+      "indexDisplay": 6,
+      "status": "available"
+    },
+    {
+      "epoch": 1794319200,
+      "instantUtc": "2026-11-10T14:00:00Z",
+      "local": "2026-11-10T09:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1022.3,
+        "relative_humidity_2m": 85,
+        "temperature_2m": -1.5
+      },
+      "pressureTrend3h_hPa": -0.9,
+      "subScores": {
+        "pressure": 1.5,
+        "humidity": 9.0,
+        "temperature": 10.0
+      },
+      "indexRaw": 5.5,
+      "indexScore": 5.5,
+      "indexDisplay": 6,
+      "status": "available"
+    },
+    {
+      "epoch": 1794322800,
+      "instantUtc": "2026-11-10T15:00:00Z",
+      "local": "2026-11-10T10:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1021.8,
+        "relative_humidity_2m": 80,
+        "temperature_2m": 0.5
+      },
+      "pressureTrend3h_hPa": -1.2,
+      "subScores": {
+        "pressure": 2.0,
+        "humidity": 8.0,
+        "temperature": 9.75
+      },
+      "indexRaw": 5.4375,
+      "indexScore": 5.4,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794326400,
+      "instantUtc": "2026-11-10T16:00:00Z",
+      "local": "2026-11-10T11:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1021.1,
+        "relative_humidity_2m": 74,
+        "temperature_2m": 2.5
+      },
+      "pressureTrend3h_hPa": -1.6,
+      "subScores": {
+        "pressure": 2.6667,
+        "humidity": 6.8,
+        "temperature": 8.75
+      },
+      "indexRaw": 5.2208,
+      "indexScore": 5.2,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794330000,
+      "instantUtc": "2026-11-10T17:00:00Z",
+      "local": "2026-11-10T12:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1020.2,
+        "relative_humidity_2m": 68,
+        "temperature_2m": 4.5
+      },
+      "pressureTrend3h_hPa": -2.1,
+      "subScores": {
+        "pressure": 3.5,
+        "humidity": 5.6,
+        "temperature": 7.75
+      },
+      "indexRaw": 5.0875,
+      "indexScore": 5.1,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794333600,
+      "instantUtc": "2026-11-10T18:00:00Z",
+      "local": "2026-11-10T13:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1019.0,
+        "relative_humidity_2m": 63,
+        "temperature_2m": 6.5
+      },
+      "pressureTrend3h_hPa": -2.8,
+      "subScores": {
+        "pressure": 4.6667,
+        "humidity": 4.6,
+        "temperature": 6.75
+      },
+      "indexRaw": 5.1708,
+      "indexScore": 5.2,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794337200,
+      "instantUtc": "2026-11-10T19:00:00Z",
+      "local": "2026-11-10T14:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1017.4,
+        "relative_humidity_2m": 59,
+        "temperature_2m": 8.0
+      },
+      "pressureTrend3h_hPa": -3.7,
+      "subScores": {
+        "pressure": 6.1667,
+        "humidity": 3.8,
+        "temperature": 6.0
+      },
+      "indexRaw": 5.5333,
+      "indexScore": 5.5,
+      "indexDisplay": 6,
+      "status": "available"
+    },
+    {
+      "epoch": 1794340800,
+      "instantUtc": "2026-11-10T20:00:00Z",
+      "local": "2026-11-10T15:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1015.4,
+        "relative_humidity_2m": 56,
+        "temperature_2m": 9.0
+      },
+      "pressureTrend3h_hPa": -4.8,
+      "subScores": {
+        "pressure": 8.0,
+        "humidity": 3.2,
+        "temperature": 5.5
+      },
+      "indexRaw": 6.175,
+      "indexScore": 6.2,
+      "indexDisplay": 6,
+      "status": "available"
+    },
+    {
+      "epoch": 1794344400,
+      "instantUtc": "2026-11-10T21:00:00Z",
+      "local": "2026-11-10T16:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1013.2,
+        "relative_humidity_2m": 55,
+        "temperature_2m": 9.5
+      },
+      "pressureTrend3h_hPa": -5.8,
+      "subScores": {
+        "pressure": 9.6667,
+        "humidity": 3.0,
+        "temperature": 5.25
+      },
+      "indexRaw": 6.8958,
+      "indexScore": 6.9,
+      "indexDisplay": 7,
+      "status": "available"
+    },
+    {
+      "epoch": 1794348000,
+      "instantUtc": "2026-11-10T22:00:00Z",
+      "local": "2026-11-10T17:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1011.8,
+        "relative_humidity_2m": 56,
+        "temperature_2m": 9.2
+      },
+      "pressureTrend3h_hPa": -5.6,
+      "subScores": {
+        "pressure": 9.3333,
+        "humidity": 3.2,
+        "temperature": 5.4
+      },
+      "indexRaw": 6.8167,
+      "indexScore": 6.8,
+      "indexDisplay": 7,
+      "status": "available"
+    },
+    {
+      "epoch": 1794351600,
+      "instantUtc": "2026-11-10T23:00:00Z",
+      "local": "2026-11-10T18:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1010.8,
+        "relative_humidity_2m": 59,
+        "temperature_2m": 8.0
+      },
+      "pressureTrend3h_hPa": -4.6,
+      "subScores": {
+        "pressure": 7.6667,
+        "humidity": 3.8,
+        "temperature": 6.0
+      },
+      "indexRaw": 6.2833,
+      "indexScore": 6.3,
+      "indexDisplay": 6,
+      "status": "available"
+    },
+    {
+      "epoch": 1794355200,
+      "instantUtc": "2026-11-11T00:00:00Z",
+      "local": "2026-11-10T19:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1010.2,
+        "relative_humidity_2m": 63,
+        "temperature_2m": 6.5
+      },
+      "pressureTrend3h_hPa": -3.0,
+      "subScores": {
+        "pressure": 5.0,
+        "humidity": 4.6,
+        "temperature": 6.75
+      },
+      "indexRaw": 5.3375,
+      "indexScore": 5.3,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794358800,
+      "instantUtc": "2026-11-11T01:00:00Z",
+      "local": "2026-11-10T20:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1009.8,
+        "relative_humidity_2m": 68,
+        "temperature_2m": 5.0
+      },
+      "pressureTrend3h_hPa": -2.0,
+      "subScores": {
+        "pressure": 3.3333,
+        "humidity": 5.6,
+        "temperature": 7.5
+      },
+      "indexRaw": 4.9417,
+      "indexScore": 4.9,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794362400,
+      "instantUtc": "2026-11-11T02:00:00Z",
+      "local": "2026-11-10T21:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1009.6,
+        "relative_humidity_2m": 72,
+        "temperature_2m": 3.5
+      },
+      "pressureTrend3h_hPa": -1.2,
+      "subScores": {
+        "pressure": 2.0,
+        "humidity": 6.4,
+        "temperature": 8.25
+      },
+      "indexRaw": 4.6625,
+      "indexScore": 4.7,
+      "indexDisplay": 5,
+      "status": "available"
+    },
+    {
+      "epoch": 1794366000,
+      "instantUtc": "2026-11-11T03:00:00Z",
+      "local": "2026-11-10T22:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1009.8,
+        "relative_humidity_2m": 76,
+        "temperature_2m": 2.5
+      },
+      "pressureTrend3h_hPa": -0.4,
+      "subScores": {
+        "pressure": 0.6667,
+        "humidity": 7.2,
+        "temperature": 8.75
+      },
+      "indexRaw": 4.3208,
+      "indexScore": 4.3,
+      "indexDisplay": 4,
+      "status": "available"
+    },
+    {
+      "epoch": 1794369600,
+      "instantUtc": "2026-11-11T04:00:00Z",
+      "local": "2026-11-10T23:00:00-05:00",
+      "utcOffsetSeconds": -18000,
+      "localDate": "2026-11-10",
+      "inputs": {
+        "surface_pressure": 1010.2,
+        "relative_humidity_2m": 79,
+        "temperature_2m": 1.5
+      },
+      "pressureTrend3h_hPa": 0.4,
+      "subScores": {
+        "pressure": 0.6667,
+        "humidity": 7.8,
+        "temperature": 9.25
+      },
+      "indexRaw": 4.5958,
+      "indexScore": 4.6,
+      "indexDisplay": 5,
+      "status": "available"
+    }
+  ],
+  "daily": [
+    {
+      "date": "2026-11-10",
+      "low": 4.3,
+      "high": 6.9,
+      "lowHour": {
+        "epoch": 1794366000,
+        "instantUtc": "2026-11-11T03:00:00Z",
+        "local": "2026-11-10T22:00:00-05:00"
+      },
+      "highHour": {
+        "epoch": 1794344400,
+        "instantUtc": "2026-11-10T21:00:00Z",
+        "local": "2026-11-10T16:00:00-05:00"
+      },
+      "lowTies": 1,
+      "highTies": 1,
+      "hoursTotal": 24,
+      "hoursAvailable": 24,
+      "status": "complete",
+      "tieBreak": "earliest epoch"
+    }
+  ]
+}
