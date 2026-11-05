@@ -1,0 +1,34 @@
+{
+  "contractVersion": "symptom-observations/1.0.0",
+  "case": "untouched-symptoms",
+  "description": "The user opens the form and saves without edits or confirmations. No observation is written, including no zeros.",
+  "input": {
+    "committedAt": "2026-11-04T23:14:00.000Z",
+    "priorObservations": [
+      {
+        "id": "obs-prior-knee",
+        "observedAt": "2026-11-03T15:00:00.000Z",
+        "measurements": [
+          {
+            "bodyPart": "knee",
+            "side": "left",
+            "symptom": "ache",
+            "rating": 5,
+            "reportKind": "changed"
+          }
+        ]
+      }
+    ],
+    "edits": [],
+    "confirmations": []
+  },
+  "expected": {
+    "observationsAppended": [],
+    "snapshotsAppended": [],
+    "priorObservationUnchanged": {
+      "id": "obs-prior-knee",
+      "observedAt": "2026-11-03T15:00:00.000Z",
+      "rating": 5
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "contractVersion": "symptom-observations/1.0.0",
+  "case": "explicit-zero",
+  "description": "The user deliberately rates left-knee ache as 0. That is a stored rating, not an omitted field.",
+  "input": {
+    "committedAt": "2026-11-04T23:12:00.000Z",
+    "priorObservations": [
+      {
+        "id": "obs-prior-knee",
+        "observedAt": "2026-11-03T15:00:00.000Z",
+        "measurements": [
+          {
+            "bodyPart": "knee",
+            "side": "left",
+            "symptom": "ache",
+            "rating": 5,
+            "reportKind": "changed"
+          }
+        ]
+      }
+    ],
+    "edits": [
+      {
+        "bodyPart": "knee",
+        "side": "left",
+        "symptom": "ache",
+        "rating": 0
+      }
+    ],
+    "confirmations": []
+  },
+  "expected": {
+    "observationsAppended": [
+      {
+        "id": "obs-zero-1",
+        "observedAt": "2026-11-04T23:12:00.000Z",
+        "correctsObservationId": null,
+        "deletedAt": null,
+        "measurements": [
+          {
+            "bodyPart": "knee",
+            "side": "left",
+            "symptom": "ache",
+            "rating": 0,
+            "reportKind": "changed",
+            "previousObservationId": "obs-prior-knee",
+            "previousRating": 5,
+            "previousObservedAt": "2026-11-03T15:00:00.000Z"
+          }
+        ]
+      }
+    ],
+    "priorObservationUnchanged": {
+      "id": "obs-prior-knee",
+      "observedAt": "2026-11-03T15:00:00.000Z",
+      "rating": 5
+    }
+  }
+}

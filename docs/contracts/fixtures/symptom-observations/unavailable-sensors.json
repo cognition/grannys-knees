@@ -1,0 +1,84 @@
+{
+  "contractVersion": "symptom-observations/1.0.0",
+  "case": "unavailable-sensors",
+  "description": "A real left-knee ache is saved. Temperature is copied from the weather cache. The barometer was attempted and is unavailable, so its value is null rather than zero. The forecast index is not stored.",
+  "input": {
+    "committedAt": "2026-11-04T23:20:00.000Z",
+    "edits": [
+      {
+        "bodyPart": "knee",
+        "side": "left",
+        "symptom": "ache",
+        "rating": 7
+      }
+    ],
+    "sensorAttempts": [
+      {
+        "quantity": "temperature",
+        "state": "retrieved",
+        "value": 15.3,
+        "unit": "°C",
+        "source": "open-meteo-cache",
+        "capturedAt": "2026-11-04T23:15:46.000Z"
+      },
+      {
+        "quantity": "surface_pressure",
+        "state": "unavailable",
+        "value": null,
+        "unit": null,
+        "source": "phone-barometer",
+        "capturedAt": "2026-11-04T23:20:00.000Z"
+      }
+    ]
+  },
+  "expected": {
+    "observationsAppended": [
+      {
+        "id": "obs-sensor-1",
+        "observedAt": "2026-11-04T23:20:00.000Z",
+        "measurements": [
+          {
+            "bodyPart": "knee",
+            "side": "left",
+            "symptom": "ache",
+            "rating": 7,
+            "reportKind": "changed",
+            "previousObservationId": null,
+            "previousRating": null,
+            "previousObservedAt": null
+          }
+        ]
+      }
+    ],
+    "snapshotsAppended": [
+      {
+        "id": "snap-sensor-1",
+        "observationId": "obs-sensor-1",
+        "capturedAt": "2026-11-04T23:20:00.000Z",
+        "readings": [
+          {
+            "quantity": "temperature",
+            "state": "retrieved",
+            "value": 15.3,
+            "unit": "°C",
+            "source": "open-meteo-cache",
+            "capturedAt": "2026-11-04T23:15:46.000Z"
+          },
+          {
+            "quantity": "surface_pressure",
+            "state": "unavailable",
+            "value": null,
+            "unit": null,
+            "source": "phone-barometer",
+            "capturedAt": "2026-11-04T23:20:00.000Z"
+          }
+        ]
+      }
+    ],
+    "forbidden": [
+      "A surface_pressure value of 0",
+      "An index-v1 score stored on the snapshot or the observation",
+      "A reading for heart_rate, steps, or sleep_minutes when those sources were not attempted"
+    ]
+  }
+}
