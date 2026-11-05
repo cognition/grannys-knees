@@ -3,18 +3,24 @@ package com.example.grannysknees.widget
 import com.example.grannysknees.data.ForecastCacheEnvelope
 import com.example.grannysknees.data.ForecastCacheStore
 import com.example.grannysknees.data.ForecastRepository
+import androidx.compose.ui.unit.dp
+import com.example.grannysknees.ui.outlook.DayCurve
+import com.example.grannysknees.ui.outlook.OutlookDay
+import com.example.grannysknees.ui.outlook.OutlookUiState
 import com.example.grannysknees.ui.today.ForecastFreshness
 import com.example.grannysknees.ui.today.TodayUiState
 import com.example.grannysknees.ui.today.UnavailableReason
 import com.example.grannysknees.weather.FixtureSupport
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 
@@ -47,6 +53,7 @@ class WidgetModelLoaderTest {
         assertEquals(phoneState.freshness, widgetState.freshness)
         assertEquals(phoneState.lastUpdatedLabel, widgetState.lastUpdatedLabel)
         assertFalse(widgetState.isStale)
+        assertOutlookMatches(repository, widgetState)
     }
 
     /** Stale widget output must keep the phone's score and add stale state. */
@@ -70,6 +77,7 @@ class WidgetModelLoaderTest {
         assertEquals(ForecastFreshness.Stale, phoneState.freshness)
         assertEquals(phoneState.freshness, widgetState.freshness)
         assertTrue(widgetState.isStale)
+        assertOutlookMatches(repository, widgetState)
     }
 
     /** Expired cache must map to a score-free widget model. */
@@ -102,6 +110,86 @@ class WidgetModelLoaderTest {
             UnavailableReason.EMPTY,
             (widgetState as WidgetUiModel.Unavailable).reason,
         )
+    }
+
+    /** A wide cell lists hours. A tall cell lists the five days. A small cell does neither. */
+    @Test
+    fun `layout picker follows width then height`() {
+        assertEquals(
+            WidgetLayout.Current,
+            WidgetLayoutPicker.pick(width = 168.dp, height = 72.dp),
+        )
+        assertEquals(
+            WidgetLayout.Hourly,
+            WidgetLayoutPicker.pick(width = 280.dp, height = 160.dp),
+        )
+        assertEquals(
+            WidgetLayout.FiveDay,
+            WidgetLayoutPicker.pick(width = 280.dp, height = 280.dp),
+        )
+    }
+
+    /** A day Today left unscored stays null on the widget. It is not stored as zero. */
+    @Test
+    fun `mapper keeps a missing day null rather than zero`() {
+        val today = TodayUiState.Available(
+            location = "Toronto, ON",
+            lastUpdatedLabel = "Nov 4, 6:35 p.m.",
+            score = 4,
+            freshness = ForecastFreshness.Fresh,
+        )
+        val outlook = OutlookUiState.Available(
+            today = DayCurve(
+                date = LocalDate.parse("2026-11-04"),
+                startEpoch = 0L,
+                endEpoch = 86_400L,
+                segments = emptyList(),
+                axisTicks = emptyList(),
+                nowFraction = null,
+                currentHourEpoch = null,
+                range = null,
+            ),
+            upcoming = listOf(
+                OutlookDay(
+                    date = LocalDate.parse("2026-11-05"),
+                    dayLabel = "Thu 5",
+                    range = null,
+                ),
+            ),
+        )
+
+        val model = WidgetModelMapper().from(today, outlook)
+
+        assertTrue(model is WidgetUiModel.Available)
+        model as WidgetUiModel.Available
+        assertTrue(model.hours.isEmpty())
+        assertEquals("Thu 5", model.days.single().dayLabel)
+        assertNull(model.days.single().low)
+        assertNull(model.days.single().high)
+    }
+
+    /** Hourly labels and five-day extrema must be the outlook's, including null days. */
+    private fun assertOutlookMatches(
+        repository: ForecastRepository,
+        widgetState: WidgetUiModel.Available,
+    ) {
+        val outlook = repository.presentOutlookFromCache(referenceNow)
+        assertTrue(outlook is OutlookUiState.Available)
+        outlook as OutlookUiState.Available
+        assertEquals(
+            outlook.today.points.map { it.timeLabel to it.score },
+            widgetState.hours.map { it.timeLabel to it.score },
+        )
+        assertEquals(outlook.upcoming.size, widgetState.days.size)
+        outlook.upcoming.zip(widgetState.days).forEach { (expected, actual) ->
+            assertEquals(expected.dayLabel, actual.dayLabel)
+            assertEquals(expected.range?.low, actual.low)
+            assertEquals(expected.range?.high, actual.high)
+            if (expected.range == null) {
+                assertNull(actual.low)
+                assertNull(actual.high)
+            }
+        }
     }
 
     /** Creates a repository backed by a canonical forecast fixture. */
