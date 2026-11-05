@@ -4,14 +4,17 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
@@ -22,6 +25,7 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
@@ -29,12 +33,54 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import androidx.compose.ui.unit.DpSize
 import com.example.grannysknees.MainActivity
 import com.example.grannysknees.R
 import com.example.grannysknees.ui.today.TodayScoreBand
 
-/** Compact home-screen widget showing the current cached knee-weather index. */
+/**
+ * Which widget layout fits the cell the user has placed.
+ *
+ * Breakpoints match [GrannysKneesWidget.sizeMode]. A short cell stays on the
+ * current index. A wider cell adds scored hours. A tall cell adds the
+ * five-day low/high. Missing hours and days are omitted, never drawn as zero.
+ */
+internal enum class WidgetLayout {
+    Current,
+    Hourly,
+    FiveDay,
+}
+
+/** Picks a layout from the size Glance reports for this instance. */
+internal object WidgetLayoutPicker {
+    val hourlyMinWidth: Dp = 240.dp
+    val fiveDayMinHeight: Dp = 220.dp
+
+    /** Tallest applicable layout wins so a large cell can show the five-day rows. */
+    fun pick(width: Dp, height: Dp): WidgetLayout =
+        when {
+            height >= fiveDayMinHeight -> WidgetLayout.FiveDay
+            width >= hourlyMinWidth -> WidgetLayout.Hourly
+            else -> WidgetLayout.Current
+        }
+}
+
+/**
+ * Home-screen widget for the cached knee-weather index.
+ *
+ * Each update, including the system update after reboot, calls [provideGlance],
+ * which re-reads the same cache file as Today. This class does not fetch the
+ * network and does not score hours on its own.
+ */
 internal class GrannysKneesWidget : GlanceAppWidget() {
+    override val sizeMode: SizeMode = SizeMode.Responsive(
+        setOf(
+            DpSize(168.dp, 72.dp),
+            DpSize(280.dp, 160.dp),
+            DpSize(280.dp, 280.dp),
+        ),
+    )
+
     /** Loads one coherent model before providing the widget composition. */
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val model = WidgetModelLoader(context).load()
@@ -58,10 +104,12 @@ private object WidgetContentRenderer {
     private val badgeBackgroundColour = ColorProvider(Color(0xFFFFE7A3))
     private val badgeTextColour = ColorProvider(Color(0xFF664B00))
 
-    /** Draws the full tappable widget surface. */
+    /** Draws the full tappable widget surface at the size the launcher allocated. */
     @Composable
     fun Content(model: WidgetUiModel) {
         val context = LocalContext.current
+        val size = LocalSize.current
+        val layout = WidgetLayoutPicker.pick(size.width, size.height)
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
@@ -75,7 +123,11 @@ private object WidgetContentRenderer {
                 .padding(WIDGET_PADDING),
         ) {
             when (model) {
-                is WidgetUiModel.Available -> AvailableContent(model)
+                is WidgetUiModel.Available -> when (layout) {
+                    WidgetLayout.Current -> AvailableContent(model)
+                    WidgetLayout.Hourly -> HourlyContent(model)
+                    WidgetLayout.FiveDay -> FiveDayContent(model)
+                }
                 is WidgetUiModel.Unavailable -> UnavailableContent(model)
             }
         }
@@ -158,6 +210,122 @@ private object WidgetContentRenderer {
                 maxLines = 1,
             )
         }
+    }
+
+    /** Draws scored hours under the current index. Hours Today omitted are absent. */
+    @Composable
+    private fun HourlyContent(model: WidgetUiModel.Available) {
+        val context = LocalContext.current
+        Column(modifier = GlanceModifier.fillMaxSize()) {
+            ScoreLine(model)
+            Spacer(modifier = GlanceModifier.height(4.dp))
+            if (model.hours.isEmpty()) {
+                MetaText(context.getString(R.string.widget_no_hours))
+            } else {
+                model.hours.forEach { hour ->
+                    MetaText(
+                        context.getString(
+                            R.string.widget_hour_score,
+                            hour.timeLabel,
+                            hour.score.toPlainString(),
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
+    /** Draws the five-day index low/high under the current index. */
+    @Composable
+    private fun FiveDayContent(model: WidgetUiModel.Available) {
+        val context = LocalContext.current
+        Column(modifier = GlanceModifier.fillMaxSize()) {
+            ScoreLine(model)
+            Spacer(modifier = GlanceModifier.height(4.dp))
+            if (model.days.isEmpty()) {
+                MetaText(context.getString(R.string.widget_no_hours))
+            } else {
+                model.days.forEach { day ->
+                    DayRow(day)
+                }
+            }
+        }
+    }
+
+    /** Current score and stale badge, shared by the larger layouts. */
+    @Composable
+    private fun ScoreLine(model: WidgetUiModel.Available) {
+        val context = LocalContext.current
+        Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
+            Text(
+                text = model.score.toString(),
+                style = TextStyle(
+                    color = primaryColour,
+                    fontSize = SCORE_TEXT_SIZE,
+                    fontWeight = FontWeight.Bold,
+                ),
+                maxLines = 1,
+            )
+            Spacer(modifier = GlanceModifier.width(8.dp))
+            Text(
+                text = context.getString(bandLabelResource(model.band)),
+                style = TextStyle(
+                    color = primaryColour,
+                    fontSize = BAND_TEXT_SIZE,
+                    fontWeight = FontWeight.Medium,
+                ),
+                maxLines = 1,
+            )
+            if (model.isStale) {
+                Spacer(modifier = GlanceModifier.width(8.dp))
+                StaleBadge()
+            }
+        }
+    }
+
+    /** One five-day row. A missing range says so and does not print zero. */
+    @Composable
+    private fun DayRow(day: WidgetDayScore) {
+        val context = LocalContext.current
+        val rangeText = if (day.low != null && day.high != null) {
+            context.getString(
+                R.string.widget_day_range,
+                day.low.toPlainString(),
+                day.high.toPlainString(),
+            )
+        } else {
+            context.getString(R.string.widget_day_no_index)
+        }
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Vertical.CenterVertically,
+        ) {
+            Text(
+                text = day.dayLabel,
+                style = TextStyle(color = secondaryColour, fontSize = META_TEXT_SIZE),
+                maxLines = 1,
+            )
+            Spacer(modifier = GlanceModifier.defaultWeight())
+            Text(
+                text = rangeText,
+                style = TextStyle(
+                    color = primaryColour,
+                    fontSize = META_TEXT_SIZE,
+                    fontWeight = FontWeight.Medium,
+                ),
+                maxLines = 1,
+            )
+        }
+    }
+
+    /** Secondary line used for hours and empty outlook copy. */
+    @Composable
+    private fun MetaText(text: String) {
+        Text(
+            text = text,
+            style = TextStyle(color = secondaryColour, fontSize = META_TEXT_SIZE),
+            maxLines = 1,
+        )
     }
 
     /** Draws a score-free prompt when the cache is expired, empty, or invalid. */

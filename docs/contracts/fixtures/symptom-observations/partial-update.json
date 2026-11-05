@@ -1,0 +1,46 @@
+{
+  "contractVersion": "symptom-observations/1.0.0",
+  "case": "partial-update",
+  "description": "The user sets left-foot ache to 6 and leaves every other series untouched. Only one measurement is stored.",
+  "input": {
+    "committedAt": "2026-11-04T23:10:00.000Z",
+    "priorObservations": [],
+    "edits": [
+      {
+        "bodyPart": "foot",
+        "side": "left",
+        "symptom": "ache",
+        "rating": 6
+      }
+    ],
+    "confirmations": []
+  },
+  "expected": {
+    "observations": [
+      {
+        "id": "obs-partial-1",
+        "observedAt": "2026-11-04T23:10:00.000Z",
+        "correctsObservationId": null,
+        "deletedAt": null,
+        "measurements": [
+          {
+            "bodyPart": "foot",
+            "side": "left",
+            "symptom": "ache",
+            "rating": 6,
+            "reportKind": "changed",
+            "previousObservationId": null,
+            "previousRating": null,
+            "previousObservedAt": null
+          }
+        ]
+      }
+    ],
+    "absentSeries": [
+      {"bodyPart": "knee", "side": "left", "symptom": "ache"},
+      {"bodyPart": "knee", "side": "right", "symptom": "ache"},
+      {"bodyPart": "foot", "side": "left", "symptom": "stiffness"},
+      {"bodyPart": "hand", "side": "left", "symptom": "ache"}
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "contractVersion": "symptom-observations/1.0.0",
+  "case": "confirmed-unchanged",
+  "description": "The user confirms right-knee stiffness is still 4. A new row records the confirmation. The original timestamp stays on the original row.",
+  "input": {
+    "committedAt": "2026-11-04T23:16:00.000Z",
+    "priorObservations": [
+      {
+        "id": "obs-prior-stiff",
+        "observedAt": "2026-11-02T18:30:00.000Z",
+        "measurements": [
+          {
+            "bodyPart": "knee",
+            "side": "right",
+            "symptom": "stiffness",
+            "rating": 4,
+            "reportKind": "changed"
+          }
+        ]
+      }
+    ],
+    "edits": [],
+    "confirmations": [
+      {
+        "bodyPart": "knee",
+        "side": "right",
+        "symptom": "stiffness"
+      }
+    ]
+  },
+  "expected": {
+    "observationsAppended": [
+      {
+        "id": "obs-confirm-1",
+        "observedAt": "2026-11-04T23:16:00.000Z",
+        "correctsObservationId": null,
+        "deletedAt": null,
+        "measurements": [
+          {
+            "bodyPart": "knee",
+            "side": "right",
+            "symptom": "stiffness",
+            "rating": 4,
+            "reportKind": "confirmed_unchanged",
+            "previousObservationId": "obs-prior-stiff",
+            "previousRating": 4,
+            "previousObservedAt": "2026-11-02T18:30:00.000Z"
+          }
+        ]
+      }
+    ],
+    "priorObservationUnchanged": {
+      "id": "obs-prior-stiff",
+      "observedAt": "2026-11-02T18:30:00.000Z",
+      "rating": 4
+    }
+  }
+}

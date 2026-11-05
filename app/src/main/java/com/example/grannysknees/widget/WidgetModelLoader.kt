@@ -29,16 +29,22 @@ internal class WidgetModelLoader(
         ),
     )
 
-    /** Evaluates and maps the cached forecast at a single fixed instant. */
+    /**
+     * Evaluates and maps the cached forecast at a single fixed instant.
+     *
+     * The current score and the outlook both come from [ForecastRepository],
+     * so the widget cannot invent an hourly or daily number the phone hid.
+     */
     fun load(
         referenceNow: Instant = clock.instant(),
         zoneId: ZoneId = ZoneId.of(DefaultLocation.TIMEZONE),
     ): WidgetUiModel =
-        mapper.fromToday(
-            repository.presentFromCache(
+        mapper.from(
+            state = repository.presentFromCache(
                 referenceNow = referenceNow,
                 zone = zoneId,
             ),
+            outlook = repository.presentOutlookFromCache(referenceNow = referenceNow),
         )
 
     private companion object {

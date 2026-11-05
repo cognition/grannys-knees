@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_description">Current Granny\'s Knees index for Toronto</string>
+    <string name="widget_description">Granny\'s Knees index, today\'s scored hours, and the five-day range</string>
+    <string name="widget_hour_score">%1$s  %2$s</string>
+    <string name="widget_day_range">%1$s–%2$s</string>
+    <string name="widget_day_no_index">No index</string>
+    <string name="widget_no_hours">No hours scored</string>
     <string name="widget_updated">Updated %1$s</string>
     <string name="widget_stale_badge">Stale</string>
     <string name="widget_no_forecast">No forecast</string>
