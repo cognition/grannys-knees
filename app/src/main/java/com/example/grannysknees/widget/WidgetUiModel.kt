@@ -24,6 +24,8 @@ internal sealed interface WidgetUiModel {
         val freshness: ForecastFreshness,
         val hours: List<WidgetHourScore>,
         val days: List<WidgetDayScore>,
+        /** Position of now across the local day, when the curve can mark it. */
+        val nowFraction: Float? = null,
     ) : WidgetUiModel {
         /** Whether the widget must show the stale badge. */
         val isStale: Boolean
@@ -41,6 +43,8 @@ internal sealed interface WidgetUiModel {
 internal data class WidgetHourScore(
     val timeLabel: String,
     val score: BigDecimal,
+    /** Position of this hour from local midnight to the next midnight, 0–1. */
+    val fraction: Float = 0f,
 )
 
 /**
@@ -78,6 +82,7 @@ internal class WidgetModelMapper {
                 freshness = state.freshness,
                 hours = hoursFrom(outlook),
                 days = daysFrom(outlook),
+                nowFraction = (outlook as? OutlookUiState.Available)?.today?.nowFraction,
             )
 
             is TodayUiState.Unavailable -> WidgetUiModel.Unavailable(
@@ -94,8 +99,13 @@ internal class WidgetModelMapper {
     /** Available curve points only, in the order Today already sorted them. */
     private fun hoursFrom(outlook: OutlookUiState): List<WidgetHourScore> {
         val available = outlook as? OutlookUiState.Available ?: return emptyList()
-        return available.today.points.map { point ->
-            WidgetHourScore(timeLabel = point.timeLabel, score = point.score)
+        val curve = available.today
+        return curve.points.map { point ->
+            WidgetHourScore(
+                timeLabel = point.timeLabel,
+                score = point.score,
+                fraction = curve.fractionOf(point.epoch),
+            )
         }
     }
 

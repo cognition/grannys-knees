@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="journal_intro">Record only what changed. Leaving a joint alone does not store a zero.</string>
+    <string name="journal_body_part">Body part: %1$s</string>
+    <string name="journal_side">Side: %1$s</string>
+    <string name="journal_symptom">Symptom: %1$s</string>
+    <string name="journal_rating">Rating %1$d out of 10</string>
+    <string name="journal_save_change">Save this change</string>
+    <string name="journal_confirm">Confirm it is unchanged</string>
+    <string name="journal_nothing_saved">Nothing was stored. Untouched symptoms stay unreported.</string>
+    <string name="journal_saved">Saved on this phone.</string>
+    <string name="journal_history_empty">No reports yet.</string>
+    <string name="journal_correct">Correct</string>
+    <string name="journal_delete">Delete this report</string>
+    <string name="journal_export">Export current journal</string>
+    <string name="journal_wipe">Delete everything on this phone</string>
+    <string name="journal_last_reported">Last reported %1$s</string>
+    <string name="journal_open">How you feel</string>
+    <string name="journal_open_history">Your reports</string>
+    <string name="journal_open_about">About the index</string>
+</resources>

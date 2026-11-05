@@ -15,26 +15,65 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.grannysknees.data.ForecastRepository
+import com.example.grannysknees.data.SelectedCityStore
+import com.example.grannysknees.journal.HistoryScreen
+import com.example.grannysknees.journal.JournalScreen
+import com.example.grannysknees.ui.about.AboutScreen
+import com.example.grannysknees.ui.about.OnboardingScreen
+import com.example.grannysknees.ui.about.OnboardingStore
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
 import com.example.grannysknees.ui.today.TodayRoute
 
 @Composable
-internal fun GrannysKneesApp(repository: ForecastRepository? = null) {
+internal fun GrannysKneesApp(
+    repository: ForecastRepository? = null,
+    cityStore: SelectedCityStore? = null,
+    onboardingStore: OnboardingStore? = null,
+) {
     GrannysKneesTheme {
+        var showOnboarding by remember { mutableStateOf(onboardingStore?.seen() == false) }
+        if (showOnboarding && onboardingStore != null) {
+            OnboardingScreen(
+                onContinue = {
+                    onboardingStore.markSeen()
+                    showOnboarding = false
+                },
+            )
+            return@GrannysKneesTheme
+        }
         val navController = rememberNavController()
         NavHost(
             navController = navController,
             startDestination = AppDestination.Today.route,
         ) {
             composable(AppDestination.Today.route) {
-                TodayRoute(repository = repository)
+                TodayRoute(
+                    repository = repository,
+                    cityStore = cityStore,
+                    onOpenJournal = { navController.navigate(AppDestination.Journal.route) },
+                    onOpenHistory = { navController.navigate(AppDestination.History.route) },
+                    onOpenAbout = { navController.navigate(AppDestination.About.route) },
+                )
             }
             composable(AppDestination.Home.route) {
                 FoundationShell()
+            }
+            composable(AppDestination.Journal.route) {
+                JournalScreen(onBack = { navController.popBackStack() })
+            }
+            composable(AppDestination.History.route) {
+                HistoryScreen(onBack = { navController.popBackStack() })
+            }
+            composable(AppDestination.About.route) {
+                AboutScreen(onBack = { navController.popBackStack() })
             }
         }
     }

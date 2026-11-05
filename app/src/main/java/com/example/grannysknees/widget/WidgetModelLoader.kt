@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.grannysknees.data.DefaultLocation
 import com.example.grannysknees.data.ForecastCacheStore
 import com.example.grannysknees.data.ForecastRepository
+import com.example.grannysknees.data.SelectedCityStore
 import java.io.File
 import java.time.Clock
 import java.time.Instant
@@ -25,6 +26,9 @@ internal class WidgetModelLoader(
         repository = ForecastRepository(
             store = ForecastCacheStore(
                 File(context.filesDir, CACHE_FILE_NAME),
+            ),
+            cityStore = SelectedCityStore(
+                File(context.filesDir, CITY_FILE_NAME),
             ),
         ),
     )
@@ -50,5 +54,6 @@ internal class WidgetModelLoader(
     private companion object {
         /** Must match the cache file opened by MainActivity. */
         const val CACHE_FILE_NAME: String = "forecast-cache.json"
+        const val CITY_FILE_NAME: String = "selected-city.json"
     }
 }

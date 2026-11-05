@@ -3,8 +3,12 @@
 
     <!-- T03: the Open-Meteo forecast client performs network requests. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Optional foreground fix. City search works when this is declined. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name=".GrannysKneesApplication"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -18,6 +22,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".watch.WatchLogService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data
+                    android:host="*"
+                    android:pathPrefix="/grannys-knees/log"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
 
         <receiver
             android:name=".widget.GrannysKneesWidgetReceiver"

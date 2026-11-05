@@ -93,3 +93,26 @@ After the Today checks, the working tree’s widget was installed and placed fro
 A further drag meant to shorten the widget into the hourly layout opened the app drawer instead. There is no hourly-size screenshot. `WidgetLayoutPicker` unit test covers the width breakpoint. Reboot was not run; the emulator was left on the home screen with the tall widget still placed.
 
 Unit tests after the widget change: **76 tests, 0 failures**, including `WidgetModelLoaderTest` (6). `assembleDebug --offline` succeeded and the APK installed with `Success`.
+
+## Full product lanes (5 November 2026, same emulator)
+
+Debug build `0.3.6.0` (versionCode 9), application id `com.example.grannysknees`. Galaxy S24 FE emulator profile, API 35. Not a physical phone. Unit tests: **90 tests, 0 failures**.
+
+| Check | Screenshot | Result |
+| --- | --- | --- |
+| First launch explains the index | `12-onboarding.png` | “A little science. A little superstition.” Continue opens city search. |
+| Search `London`, pick Ontario | `13-london-ontario-results.png`, `14-london-today.png` | Live index **3 Mild** for London, Ontario. The local-day curve marks the current hour. |
+| Force-stop | `15-london-after-force-stop.png` | `selected-city.json` still London, Ontario. The screen names London and does not invent a score while the forecast is fetching. |
+| Location declined | `16-location-permission.png`, `17-location-denied.png` | “Don’t allow” leaves city search usable. |
+| Switch to Ottawa | `18-ottawa-today.png` | Header and five-day ranges change to Ottawa (Fri 6 3.6–5.4, not London’s 3.7–5.3). |
+| Partial journal | `19-journal-foot.png`, `20-history.png` | Left foot ache 0. The database row is only `foot|left|ache|0`. History shows that one report. |
+| About | `21-about.png` | Experimental index, mixed evidence, correlation is not causation, and the sofa line. Not medical advice. |
+| Widget after the Ottawa fetch | `22-widget-ottawa-fiveday.png` | **3 Mild** and the Ottawa five-day ranges. |
+| Dark theme, font scale 1.3 | `23-dark-large-type.png` | Today remains readable. The title wraps. The curve and score stay on screen. Restored to font scale 1.0 and light theme afterwards. |
+| Reboot | `24-widget-after-reboot.png` | The same widget is still on the home screen with **3 Mild** and the same Ottawa ranges. |
+
+The wide short widget cell was not captured. The launcher stretched the added widget past the 220 dp five-day breakpoint, and dragging the resize handle did not land on the hourly size. `WidgetModelLoaderTest` still checks that the hourly model keeps the whole local day and the current hour. The curve is what that size draws. This size remains an open check.
+
+No Wear system image is installed, so the watch tile was not shown on a device. The phone writes the current score for the tile, and a repeated watch event id appends one journal row (`JournalRoomTest`).
+
+`app/build/outputs/bundle/release/app-release.aab` was built with the debug signing config. No upload key is in git. Approved logo PNGs are still absent, so no new launcher art was added. Data flows are drafted in `docs/release/google-play/PRIVACY-DATA-FLOWS.md`. A physical Galaxy S24 FE was not used, and TalkBack was not run.

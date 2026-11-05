@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.clickable
@@ -219,18 +221,15 @@ private object WidgetContentRenderer {
         Column(modifier = GlanceModifier.fillMaxSize()) {
             ScoreLine(model)
             Spacer(modifier = GlanceModifier.height(4.dp))
-            if (model.hours.isEmpty()) {
+            val curve = WidgetDayCurveBitmap.draw(model)
+            if (curve == null) {
                 MetaText(context.getString(R.string.widget_no_hours))
             } else {
-                model.hours.forEach { hour ->
-                    MetaText(
-                        context.getString(
-                            R.string.widget_hour_score,
-                            hour.timeLabel,
-                            hour.score.toPlainString(),
-                        ),
-                    )
-                }
+                Image(
+                    provider = ImageProvider(curve),
+                    contentDescription = context.getString(R.string.widget_day_curve),
+                    modifier = GlanceModifier.fillMaxWidth().height(72.dp),
+                )
             }
         }
     }

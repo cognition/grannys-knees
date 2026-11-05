@@ -1,0 +1,93 @@
+package com.example.grannysknees.journal
+
+import androidx.room.Room
+import com.example.grannysknees.ui.today.ForecastFreshness
+import com.example.grannysknees.ui.today.TodayUiState
+import com.example.grannysknees.watch.parseWatchLog
+import com.example.grannysknees.watch.watchIndexText
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
+import java.time.Instant
+
+/**
+ * Room round-trip for a partial report and an idempotent watch retry.
+ */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28], application = android.app.Application::class)
+class JournalRoomTest {
+    @Test
+    fun `a left foot ache does not create a knee row`() {
+        val repository = repository()
+        repository.save(
+            committedAt = Instant.parse("2026-11-05T16:00:00Z"),
+            edits = listOf(SeriesEdit("foot", "left", "ache", 6)),
+            confirmations = emptyList(),
+        )
+        val measurements = repository.current().flatMap { it.measurements }
+        assertEquals(1, measurements.size)
+        assertEquals("foot", measurements.single().bodyPart)
+        assertEquals("left", measurements.single().side)
+        assertEquals(6, measurements.single().rating)
+    }
+
+    @Test
+    fun `a repeated watch event appends one observation`() {
+        val repository = repository()
+        val report = requireNotNull(
+            parseWatchLog("evt-1\tknee\tleft\tache\t6".toByteArray(Charsets.UTF_8)),
+        )
+        repeat(2) {
+            repository.save(
+                committedAt = Instant.parse("2026-11-05T16:00:00Z"),
+                edits = listOf(
+                    SeriesEdit(report.bodyPart, report.side, report.symptom, report.rating),
+                ),
+                confirmations = emptyList(),
+                eventId = report.eventId,
+            )
+        }
+        assertEquals(1, repository.all().size)
+        assertEquals(6, repository.current().single().measurements.single().rating)
+    }
+
+    @Test
+    fun `an explicit zero survives a room round trip`() {
+        val repository = repository()
+        repository.save(
+            committedAt = Instant.parse("2026-11-05T16:00:00Z"),
+            edits = listOf(SeriesEdit("knee", "left", "ache", 0)),
+            confirmations = emptyList(),
+        )
+        assertEquals(0, repository.current().single().measurements.single().rating)
+    }
+
+    @Test
+    fun `watch text copies the phone score and hides a missing index`() {
+        val available = TodayUiState.Available(
+            location = "London, Ontario",
+            lastUpdatedLabel = "Nov 5, 11:00 a.m.",
+            score = 4,
+            freshness = ForecastFreshness.Fresh,
+        )
+        assertEquals("4\nLondon, Ontario\nNov 5, 11:00 a.m.", watchIndexText(available))
+        val missing = TodayUiState.Unavailable(
+            location = "London, Ontario",
+            lastUpdatedLabel = "",
+        )
+        assertEquals("No index\nLondon, Ontario", watchIndexText(missing))
+        assertNull(parseWatchLog("short".toByteArray(Charsets.UTF_8)))
+    }
+
+    private fun repository(): JournalRepository {
+        val database = Room.inMemoryDatabaseBuilder(
+            RuntimeEnvironment.getApplication(),
+            JournalDatabase::class.java,
+        ).allowMainThreadQueries().build()
+        return JournalRepository(database.journalDao())
+    }
+}

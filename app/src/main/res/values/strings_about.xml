@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_body">Granny\'s Knees turns the hourly forecast into an experimental 0–10 index using temperature, humidity, and surface pressure. A higher number means less comfortable weather in the model. It is not a measurement of your pain, and it does not say the weather caused a flare.\n\nThe evidence that weather and joint symptoms line up is mixed. Correlation is not causation. Your joints may disagree with the number.\n\nIf the index is high and someone wants help moving a sofa, you have something to point at. Granny says: not today. That is a joke, not medical advice.</string>
+    <string name="onboarding_title">A little science. A little superstition.</string>
+    <string name="onboarding_body">This is a playful weather index, not a diagnosis and not a prediction of how you will feel. You can use it without recording symptoms. Anything you do record stays on this phone.</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="about_open_privacy">How data stays on this phone is described in the privacy note shipped with the app.</string>
+</resources>

@@ -28,7 +28,7 @@
     <string name="today_stale_badge">Stale</string>
     <string name="today_stale_detail">Showing the last forecast we managed to fetch.</string>
     <string name="today_loading_title">Fetching the forecast…</string>
-    <string name="today_loading_body">Pulling hourly weather for Toronto (temporary fixed location until a picker lands).</string>
+    <string name="today_loading_body">Pulling the hourly forecast.</string>
     <string name="today_offline_title">No forecast just yet</string>
     <string name="today_offline_body">We haven\'t fetched the weather yet. Pop back once you\'re online and we\'ll take a look.</string>
     <string name="today_expired_title">Forecast expired</string>

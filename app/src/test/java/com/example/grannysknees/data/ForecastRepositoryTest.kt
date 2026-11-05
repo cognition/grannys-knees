@@ -28,6 +28,53 @@ class ForecastRepositoryTest {
     private val missingBody: String = FixtureSupport.inputBody("missing-values")
 
     @Test
+    fun `a saved city does not present another city's cached score`() {
+        val now = Instant.ofEpochSecond(1_794_344_400L)
+        val cache = ForecastCacheStore(temporaryFolder.newFile("toronto.json"))
+        cache.write(
+            ForecastCacheEnvelope(
+                fetchedAt = now,
+                locationLabel = "Toronto, ON",
+                latitude = 43.65,
+                longitude = -79.38,
+                timezone = "America/Toronto",
+                rawBody = nominalBody,
+            ),
+        )
+        val cities = SelectedCityStore(temporaryFolder.newFile("city.json"))
+        cities.write(
+            com.example.grannysknees.data.SelectedCity(
+                label = "Ottawa, Ontario",
+                latitude = 45.4215,
+                longitude = -75.6972,
+                timezone = "America/Toronto",
+                admin1 = "Ontario",
+                countryCode = "CA",
+            ),
+        )
+        val seen = mutableListOf<String>()
+        val repo = ForecastRepository(
+            store = cache,
+            transport = HttpTransport { url ->
+                seen.add(url)
+                nominalBody
+            },
+            clock = Clock.fixed(now, ZoneOffset.UTC),
+            cityStore = cities,
+        )
+
+        val beforeRefresh = repo.presentFromCache(now)
+        assertTrue(beforeRefresh is TodayUiState.Unavailable)
+        assertEquals("Ottawa, Ontario", beforeRefresh.location)
+
+        val loaded = repo.loadToday()
+        assertTrue(loaded is TodayUiState.Available)
+        assertEquals("Ottawa, Ontario", loaded.location)
+        assertTrue(seen.single().contains("latitude=45.4215"))
+        assertTrue(seen.single().contains("longitude=-75.6972"))
+    }
+
+    @Test
     fun `successful fetch presents a live index for the current hour`() {
         // nominal.input covers 2026-11-09 evening through 2026-11-10; pick 16:00 local
         // (epoch 1794344400) which is uniquely the daily high in the fixture.
