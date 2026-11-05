@@ -1,6 +1,8 @@
 # Next execution cycle: native Android verification and R1 completion
 
-**Status:** Proposed / not executed. **Repository reviewed:** `main` at `ed8ba1756134d5ad0ebe3edb0f338f91d87b6c29` (2026-11-04). This is a handoff, **not** evidence of passing builds, CI or emulator tests.
+**Status:** Superseded for new work. N01–N04 were merged as pull request #12 (`32d8b9e`). The next cycle is [NEXT-PUBLICATION-CYCLE.md](NEXT-PUBLICATION-CYCLE.md). This file remains the 2026-11-04 handoff.
+
+**Repository reviewed:** `main` at `ed8ba1756134d5ad0ebe3edb0f338f91d87b6c29` (2026-11-04). This is a handoff, **not** evidence of passing builds, CI or emulator tests.
 
 ## Why this cycle
 
