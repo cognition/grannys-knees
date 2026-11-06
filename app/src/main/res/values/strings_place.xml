@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="place_title">Choose a Canadian city</string>
+    <string name="place_body">Granny\'s Knees uses the city you pick for the local forecast. Location permission is optional.</string>
+    <string name="place_search_label">City</string>
+    <string name="place_search_action">Search</string>
+    <string name="place_no_results">No Canadian city matched that name.</string>
+    <string name="place_search_failed">The city search did not answer. Try again when you are online.</string>
+    <string name="place_change">Change city</string>
+    <string name="place_use_location">Use this phone\'s location</string>
+    <string name="place_location_failed">This phone did not share a location. Search for a city instead.</string>
+    <string name="place_saved_note">Saved on this phone.</string>
+</resources>

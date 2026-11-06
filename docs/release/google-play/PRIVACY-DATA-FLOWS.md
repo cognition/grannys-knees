@@ -1,34 +1,39 @@
-# Privacy data-flow and permission audit — Android 1.0
+# Privacy data-flow and permission audit — Android
 
-**Status:** Preliminary code-backed inventory, 2026-11-05. Not a final Play Data safety determination.
-**Evidence:** `app/src/main/AndroidManifest.xml`, `app/build.gradle.kts`, `MainActivity.kt`, `weather/OpenMeteoClient.kt`; original current-state report and release plan.
+**Status:** Preliminary inventory, updated 2026-11-05 for the city, journal, and watch code. Not a public privacy policy and not a Play Data safety submission.
+**Evidence:** `app/src/main/AndroidManifest.xml`, `app/build.gradle.kts`, `MainActivity.kt`, `weather/OpenMeteoClient.kt`, `weather/OpenMeteoGeocodingClient.kt`, `data/SelectedCityStore.kt`, `journal/`, `watch/WatchSync.kt`.
 
 | Data / flow | Current observed implementation | Open verification |
 |---|---|---|
-| Weather coordinates/timezone | `OpenMeteoClient.buildUrl` adds latitude, longitude and timezone to HTTPS `api.open-meteo.com/v1/forecast` | Confirm chosen-city behaviour and exact geocoding provider once PUB02 lands |
-| Weather measurements | Requests temperature, relative humidity, surface pressure, 6+ forecast days and past hours | Verify Open-Meteo terms, production use and attribution |
-| IP and connection metadata | HTTPS request necessarily reaches external provider; provider may observe IP and request metadata | Review provider processing terms and Play Data safety implications |
-| Local weather cache | `MainActivity` creates `filesDir/forecast-cache.json` | Verify lifecycle, retention, invalidation and removal |
-| Selected city | Planned for 1.0; not evidenced in reviewed MainActivity | Verify storage, backup and city-change cache isolation |
-| Android backup | Manifest currently `android:allowBackup="true"` | Decide whether to disable or exclude cached/preferences data; verify Android 12+ data extraction rules |
-| Internet permission | Manifest `android.permission.INTERNET` | Inspect merged release manifest for transitive permissions |
-| Device GPS/location | No location permission declared in reviewed manifest | Preserve no-mandatory-GPS design |
-| Advertising/analytics | No ad/analytics SDK identified in reviewed Gradle dependencies | Scan all dependencies, source, build variants and final AAB |
-| Symptom or health reports | No symptom UI in 1.0 scope; symptom contract exists for later release | Verify no collection in final code; exclude browser prototype |
-| App accounts/cloud sync | Not in 1.0 scope | Verify final release |
-| Crash reporting | No dedicated SDK identified in reviewed dependencies | Confirm Play/OS diagnostics, SDK additions and statements |
-| App widget | Existing Glance receiver; widget reads weather/index data | Confirm widget privacy on lock screen and stale data behaviour |
+| City search | `OpenMeteoGeocodingClient` sends the typed name to HTTPS `geocoding-api.open-meteo.com/v1/search` with `countryCode=CA` | Confirm Open-Meteo terms, production use, and attribution |
+| Weather coordinates/timezone | The saved city's latitude, longitude, and IANA timezone go to HTTPS `api.open-meteo.com/v1/forecast` | Review provider processing terms and Play Data safety implications |
+| Weather measurements | Requests temperature, relative humidity, surface pressure, 6+ forecast days and past hours | Same as the forecast request |
+| IP and connection metadata | HTTPS requests reach Open-Meteo; the provider may observe IP and request metadata | Do not answer "no data collected" in Play Console |
+| Saved city | `filesDir/selected-city.json` | Decide backup behaviour. `android:allowBackup="true"` is still set |
+| Local weather cache | `filesDir/forecast-cache.json`. A cache for another city is not shown as the current score | Verify retention and removal |
+| Optional GPS | `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` only after "Use this phone's location". Declining them leaves city search working. No background location permission | Confirm the merged release manifest has no background location permission |
+| Symptom journal | Room `journal.db` on the device. Export uses the Android share sheet. Delete everything clears the local tables. No account and no cloud copy | Confirm backup does not copy the journal unless the owner wants that |
+| Watch | The phone writes the current index for the tile and accepts one partial report. A repeated event id is ignored. Traffic stays on the Wear data layer | A paired watch was not available in this pass |
+| Advertising/analytics | No ad or analytics SDK is declared in the app Gradle file | Scan the release dependency tree and the signed AAB |
+| Crash reporting | No dedicated SDK is declared | Confirm Play and OS diagnostics before a Data safety answer |
+| App widget | Glance reads the same cache as Today and does not call the network itself | Wide short cell was not captured on the emulator |
+
+## What stays on the device
+
+- `selected-city.json`
+- `forecast-cache.json`
+- `journal.db`
+- `onboarding-seen`
+- `watch-index.txt`
 
 ## Actions required before policy publication
 
-1. Inspect **full release manifest and dependency tree**, including transitive libraries, not just Gradle direct dependencies.
-2. Verify city search/geocoding endpoint, request payload, local storage and consent/choice.
-3. Decide Android backup policy. Current `allowBackup=true` means do not assert exclusively device-local storage without qualification.
-4. Confirm all third-party processors and whether provider IP/request handling triggers disclosures. Avoid automatically answering “no collection” in Play Console.
-5. Check Open-Meteo commercial licensing, attribution and privacy documentation for actual use.
-6. Establish support contact and publicly hosted HTTPS privacy policy. Do not publish personal contact information without approval.
-7. Confirm no medical claims in app/store; include Health apps declaration.
-8. Record owner sign-off, release commit, and privacy policy version.
+1. Inspect the full release manifest and dependency tree, including transitive libraries.
+2. Decide the Android backup policy. `allowBackup=true` means the app must not claim that storage is exclusively on the device.
+3. Confirm Open-Meteo licensing, attribution, and privacy documentation.
+4. Establish a support contact and a publicly hosted HTTPS privacy policy. Do not publish personal contact information without approval.
+5. Confirm there are no medical claims, and complete the Health apps declaration if Console asks for it.
+6. Record owner sign-off. Permanent application ID, privacy-policy host, and the 12-tester question are still owner decisions.
 
 ## Evidence checklist
 
@@ -38,4 +43,4 @@
 - [ ] Local persistence/backup test
 - [ ] Privacy policy owner approval
 - [ ] Public HTTPS policy link
-- [ ] Google Play Data safety and Health apps declarations checked against actual data flows
+- [ ] Google Play Data safety and Health apps declarations checked against these flows

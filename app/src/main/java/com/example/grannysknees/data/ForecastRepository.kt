@@ -32,6 +32,7 @@ internal class ForecastRepository(
     private val client: OpenMeteoClient = OpenMeteoClient(transport = transport),
     private val clock: Clock = Clock.systemUTC(),
     private val policy: CachePolicy = CachePolicy.CONTRACT_DEFAULT,
+    private val cityStore: SelectedCityStore? = null,
     private val locationLabel: String = DefaultLocation.LABEL,
     private val latitude: Double = DefaultLocation.LATITUDE,
     private val longitude: Double = DefaultLocation.LONGITUDE,
@@ -43,9 +44,12 @@ internal class ForecastRepository(
      * Safe to call off the main thread (performs HTTP and file I/O).
      */
     fun loadToday(): TodayUiState {
-        val zone = ZoneId.of(timezone)
+        val place = activePlace()
+        if (place == null) {
+            return missingCity()
+        }
         try {
-            refreshFromNetwork()
+            refreshFromNetwork(place)
         } catch (_: IOException) {
             // Fall through to cache.
         } catch (_: OpenMeteoParseException) {
@@ -54,7 +58,7 @@ internal class ForecastRepository(
 
         // Re-read the clock after the network attempt so presentation uses
         // "now" at evaluation time, not at request start (R2).
-        return presentFromCache(clock.instant(), zone)
+        return presentFromCache(clock.instant(), ZoneId.of(place.timezone))
     }
 
     /**
@@ -66,11 +70,20 @@ internal class ForecastRepository(
         referenceNow: Instant = clock.instant(),
         zone: ZoneId = ZoneId.of(timezone),
     ): TodayUiState {
+        val place = activePlace()
+        if (place == null) return missingCity()
         val envelope = store.read()
+        if (cityStore != null && envelope != null && !place.matches(envelope)) {
+            return TodayUiState.Unavailable(
+                location = place.label,
+                lastUpdatedLabel = "not yet",
+                reason = UnavailableReason.EMPTY,
+            )
+        }
         val status = CacheFreshness.evaluate(envelope?.fetchedAt, referenceNow, policy)
         if (envelope == null || status == CacheStatus.UNAVAILABLE) {
             return TodayUiState.Unavailable(
-                location = locationLabel,
+                location = place.label,
                 lastUpdatedLabel = "not yet",
                 reason = UnavailableReason.EMPTY,
             )
@@ -90,7 +103,7 @@ internal class ForecastRepository(
             OpenMeteoParser.parse(envelope.rawBody)
         } catch (_: OpenMeteoParseException) {
             return TodayUiState.Unavailable(
-                location = locationLabel,
+                location = envelope.locationLabel,
                 lastUpdatedLabel = TodayMapper.formatFetchedAt(envelope.fetchedAt, zone)
                     ?: "not yet",
                 reason = UnavailableReason.EMPTY,
@@ -118,7 +131,10 @@ internal class ForecastRepository(
     fun presentOutlookFromCache(
         referenceNow: Instant = clock.instant(),
     ): OutlookUiState {
+        val place = activePlace()
+        if (place == null) return OutlookUiState.Hidden
         val envelope = store.read() ?: return OutlookUiState.Hidden
+        if (cityStore != null && !place.matches(envelope)) return OutlookUiState.Hidden
         val status = CacheFreshness.evaluate(envelope.fetchedAt, referenceNow, policy)
         if (status != CacheStatus.FRESH && status != CacheStatus.STALE) {
             return OutlookUiState.Hidden
@@ -139,15 +155,15 @@ internal class ForecastRepository(
         PresentationSchedule.delayUntilNextTransition(
             now = referenceNow,
             fetchedAt = store.read()?.fetchedAt,
-            zoneId = ZoneId.of(timezone),
+            zoneId = ZoneId.of(activePlace()?.timezone ?: timezone),
             policy = policy,
         )
 
-    private fun refreshFromNetwork() {
+    private fun refreshFromNetwork(place: SelectedCity) {
         val request = OpenMeteoRequest(
-            latitude = latitude,
-            longitude = longitude,
-            timezone = timezone,
+            latitude = place.latitude,
+            longitude = place.longitude,
+            timezone = place.timezone,
         )
         val url = client.buildUrl(request)
         val body = transport.get(url)
@@ -157,12 +173,34 @@ internal class ForecastRepository(
         store.write(
             ForecastCacheEnvelope(
                 fetchedAt = fetchedAt,
-                locationLabel = locationLabel,
-                latitude = latitude,
-                longitude = longitude,
-                timezone = timezone,
+                locationLabel = place.label,
+                latitude = place.latitude,
+                longitude = place.longitude,
+                timezone = place.timezone,
                 rawBody = body,
             ),
         )
     }
+
+    /**
+     * Saved city when a store is attached. Constructor coordinates otherwise,
+     * so existing tests keep requesting Toronto.
+     */
+    private fun activePlace(): SelectedCity? {
+        val store = cityStore ?: return SelectedCity(
+            label = locationLabel,
+            latitude = latitude,
+            longitude = longitude,
+            timezone = timezone,
+            admin1 = "",
+            countryCode = "CA",
+        )
+        return store.read()
+    }
+
+    private fun missingCity(): TodayUiState.Unavailable = TodayUiState.Unavailable(
+        location = "",
+        lastUpdatedLabel = "not yet",
+        reason = UnavailableReason.EMPTY,
+    )
 }

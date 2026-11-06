@@ -5,6 +5,7 @@
     <string name="widget_day_range">%1$s–%2$s</string>
     <string name="widget_day_no_index">No index</string>
     <string name="widget_no_hours">No hours scored</string>
+    <string name="widget_day_curve">Today\'s index across the local day. The mark is the current hour.</string>
     <string name="widget_updated">Updated %1$s</string>
     <string name="widget_stale_badge">Stale</string>
     <string name="widget_no_forecast">No forecast</string>

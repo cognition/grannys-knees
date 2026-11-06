@@ -12,4 +12,16 @@ internal enum class AppDestination(
         route = "home",
         title = "Granny's Knees",
     ),
+    Journal(
+        route = "journal",
+        title = "How you feel",
+    ),
+    History(
+        route = "history",
+        title = "Your reports",
+    ),
+    About(
+        route = "about",
+        title = "About the index",
+    ),
 }

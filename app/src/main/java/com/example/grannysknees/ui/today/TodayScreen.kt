@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -36,12 +38,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.example.grannysknees.R
-import com.example.grannysknees.data.DefaultLocation
 import com.example.grannysknees.data.ForecastRepository
+import com.example.grannysknees.data.SelectedCity
+import com.example.grannysknees.data.SelectedCityStore
+import com.example.grannysknees.ui.place.CitySearchScreen
+import com.example.grannysknees.weather.OpenMeteoGeocodingClient
 import com.example.grannysknees.ui.outlook.OutlookSection
 import com.example.grannysknees.ui.outlook.OutlookUiState
 import com.example.grannysknees.ui.outlook.SampleOutlookStates
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
+import com.example.grannysknees.widget.GrannysKneesWidget
+import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -58,25 +65,47 @@ import kotlinx.coroutines.withContext
 internal fun TodayRoute(
     modifier: Modifier = Modifier,
     repository: ForecastRepository? = null,
+    cityStore: SelectedCityStore? = null,
+    geocoder: OpenMeteoGeocodingClient = OpenMeteoGeocodingClient(),
     provider: TodayStateProvider = FakeTodayStateProvider(),
+    onOpenJournal: (() -> Unit)? = null,
+    onOpenHistory: (() -> Unit)? = null,
+    onOpenAbout: (() -> Unit)? = null,
 ) {
     if (repository == null) {
         TodayScreen(state = provider.current(), modifier = modifier)
         return
     }
 
+    var chosen by remember { mutableStateOf(cityStore?.read()) }
+    if (cityStore != null && chosen == null) {
+        CitySearchScreen(
+            geocoder = geocoder,
+            onCityChosen = { city: SelectedCity ->
+                cityStore.write(city)
+                chosen = city
+            },
+            modifier = modifier,
+        )
+        return
+    }
+
     var state by remember {
         mutableStateOf<TodayUiState>(
-            TodayUiState.Loading(location = DefaultLocation.LABEL),
+            TodayUiState.Loading(location = chosen?.label.orEmpty()),
         )
     }
     var outlook by remember { mutableStateOf<OutlookUiState>(OutlookUiState.Hidden) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var initialLoadDone by remember { mutableStateOf(false) }
 
-    LaunchedEffect(repository) {
+    LaunchedEffect(repository, chosen?.label) {
+        state = TodayUiState.Loading(location = chosen?.label.orEmpty())
+        outlook = OutlookUiState.Hidden
         state = withContext(Dispatchers.IO) { repository.loadToday() }
         outlook = withContext(Dispatchers.IO) { repository.presentOutlookFromCache() }
+        withContext(Dispatchers.IO) { GrannysKneesWidget().updateAll(context) }
         initialLoadDone = true
         while (true) {
             val wait = withContext(Dispatchers.IO) {
@@ -85,6 +114,7 @@ internal fun TodayRoute(
             delay(wait.toMillis().coerceAtLeast(1L))
             state = withContext(Dispatchers.IO) { repository.presentFromCache() }
             outlook = withContext(Dispatchers.IO) { repository.presentOutlookFromCache() }
+            withContext(Dispatchers.IO) { GrannysKneesWidget().updateAll(context) }
         }
     }
 
@@ -93,10 +123,26 @@ internal fun TodayRoute(
         scope.launch {
             state = withContext(Dispatchers.IO) { repository.presentFromCache() }
             outlook = withContext(Dispatchers.IO) { repository.presentOutlookFromCache() }
+            withContext(Dispatchers.IO) { GrannysKneesWidget().updateAll(context) }
         }
     }
 
-    TodayScreen(state = state, outlook = outlook, modifier = modifier)
+    TodayScreen(
+        state = state,
+        outlook = outlook,
+        modifier = modifier,
+        onChangeCity = if (cityStore == null) {
+            null
+        } else {
+            {
+                cityStore.clear()
+                chosen = null
+            }
+        },
+        onOpenJournal = onOpenJournal,
+        onOpenHistory = onOpenHistory,
+        onOpenAbout = onOpenAbout,
+    )
 }
 
 /** Stateless Today screen: shows the index, freshness, outlook and the disclaimer. */
@@ -106,11 +152,34 @@ internal fun TodayScreen(
     state: TodayUiState,
     modifier: Modifier = Modifier,
     outlook: OutlookUiState = OutlookUiState.Hidden,
+    onChangeCity: (() -> Unit)? = null,
+    onOpenJournal: (() -> Unit)? = null,
+    onOpenHistory: (() -> Unit)? = null,
+    onOpenAbout: (() -> Unit)? = null,
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.today_title)) })
+            TopAppBar(
+                title = { Text(stringResource(R.string.today_title)) },
+                actions = {
+                    if (onOpenJournal != null) {
+                        TextButton(onClick = onOpenJournal) {
+                            Text(stringResource(R.string.journal_open))
+                        }
+                    }
+                    if (onOpenHistory != null) {
+                        TextButton(onClick = onOpenHistory) {
+                            Text(stringResource(R.string.journal_open_history))
+                        }
+                    }
+                    if (onOpenAbout != null) {
+                        TextButton(onClick = onOpenAbout) {
+                            Text(stringResource(R.string.journal_open_about))
+                        }
+                    }
+                },
+            )
         },
     ) { innerPadding ->
         Column(
@@ -121,7 +190,7 @@ internal fun TodayScreen(
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            LocationHeader(location = state.location)
+            LocationHeader(location = state.location, onChangeCity = onChangeCity)
             when (state) {
                 is TodayUiState.Loading -> LoadingNotice()
 
@@ -141,7 +210,7 @@ internal fun TodayScreen(
 }
 
 @Composable
-private fun LocationHeader(location: String) {
+private fun LocationHeader(location: String, onChangeCity: (() -> Unit)?) {
     val locationDescription =
         stringResource(R.string.today_location_content_description, location)
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -158,10 +227,15 @@ private fun LocationHeader(location: String) {
             },
         )
         Text(
-            text = stringResource(R.string.today_location_temporary_note),
+            text = stringResource(R.string.place_saved_note),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        if (onChangeCity != null) {
+            TextButton(onClick = onChangeCity) {
+                Text(stringResource(R.string.place_change))
+            }
+        }
     }
 }
 

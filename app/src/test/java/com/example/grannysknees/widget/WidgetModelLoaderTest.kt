@@ -4,6 +4,7 @@ import com.example.grannysknees.data.ForecastCacheEnvelope
 import com.example.grannysknees.data.ForecastCacheStore
 import com.example.grannysknees.data.ForecastRepository
 import androidx.compose.ui.unit.dp
+import com.example.grannysknees.ui.outlook.CurvePoint
 import com.example.grannysknees.ui.outlook.DayCurve
 import com.example.grannysknees.ui.outlook.OutlookDay
 import com.example.grannysknees.ui.outlook.OutlookUiState
@@ -18,6 +19,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import java.math.BigDecimal
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
@@ -127,6 +129,44 @@ class WidgetModelLoaderTest {
             WidgetLayout.FiveDay,
             WidgetLayoutPicker.pick(width = 280.dp, height = 280.dp),
         )
+    }
+
+    /** The short widget keeps morning and evening hours, plus a mark for now. */
+    @Test
+    fun `hourly model keeps the whole day and the current hour`() {
+        val points = listOf(
+            CurvePoint(epoch = 0L, timeLabel = "00:00", utcOffsetSeconds = 0, score = BigDecimal("1.0")),
+            CurvePoint(
+                epoch = 18 * 3_600L,
+                timeLabel = "18:00",
+                utcOffsetSeconds = 0,
+                score = BigDecimal("4.0"),
+            ),
+        )
+        val outlook = OutlookUiState.Available(
+            today = DayCurve(
+                date = LocalDate.parse("2026-11-04"),
+                startEpoch = 0L,
+                endEpoch = 86_400L,
+                segments = listOf(points),
+                axisTicks = emptyList(),
+                nowFraction = 18f / 24f,
+                currentHourEpoch = 18 * 3_600L,
+                range = null,
+            ),
+            upcoming = emptyList(),
+        )
+        val today = TodayUiState.Available(
+            location = "London, Ontario",
+            lastUpdatedLabel = "Nov 4, 6:00 p.m.",
+            score = 4,
+            freshness = ForecastFreshness.Fresh,
+        )
+
+        val model = WidgetModelMapper().from(today, outlook) as WidgetUiModel.Available
+
+        assertEquals(listOf("00:00", "18:00"), model.hours.map { hour -> hour.timeLabel })
+        assertEquals(18f / 24f, model.nowFraction)
     }
 
     /** A day Today left unscored stays null on the widget. It is not stored as zero. */

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -11,14 +12,17 @@ android {
         applicationId = "com.example.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 4
-        versionName = "0.3.1.0"
+        versionCode = 9
+        versionName = "0.3.6.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            // The upload key stays outside git. This local bundle is signed
+            // with the debug key so the artefact can be built and inspected.
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -59,8 +63,15 @@ dependencies {
 
     // T03: Open-Meteo client JSON parsing (runtime JSON element API; no serialization plugin).
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation("com.google.android.gms:play-services-wearable:18.2.0")
+    ksp(libs.androidx.room.compiler)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit4)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.robolectric)
 }
