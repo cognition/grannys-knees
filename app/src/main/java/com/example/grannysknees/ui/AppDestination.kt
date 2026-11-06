@@ -20,6 +20,10 @@ internal enum class AppDestination(
         route = "history",
         title = "Your reports",
     ),
+    Privacy(
+        route = "privacy",
+        title = "Your privacy",
+    ),
     About(
         route = "about",
         title = "About the index",
