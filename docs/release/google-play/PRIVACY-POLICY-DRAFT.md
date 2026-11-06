@@ -9,6 +9,12 @@
 
 > **Release hold:** Replace all brackets, verify actual release build and third-party data flows, obtain publisher approval, then publish as an accessible public HTML page. This Markdown draft is not itself a live Play Store privacy policy.
 
+## Privacy promise and important distinction
+
+Granny's Knees is designed so that the developer does not receive or collect users' personal information. It has no developer-operated account, advertising tracker or analytics service in the planned 1.0 release. The phone contacts the weather provider directly, not through a developer-operated backend. **This is not a claim that no information ever leaves the device:** weather requests send the selected location's coordinates and timezone to Open-Meteo, which can also observe connection metadata such as an IP address. The developer does not receive those forecast requests.
+
+Information used by the app should remain locally on the phone, apart from the necessary weather requests. Future symptom records must stay on the phone or paired watch; no developer collection or cloud synchronization is planned. Verify final implementation, third-party SDKs and Android backup behaviour before publication.
+
 ## 1. What Granny's Knees does
 
 Granny's Knees displays an experimental weather-based joint-discomfort index, an hourly outlook and a five-day outlook. It also offers Android home-screen widgets. The index is derived from weather measurements and forecasts. It is not a diagnosis, treatment recommendation or personalized prediction of pain or arthritis symptoms.
