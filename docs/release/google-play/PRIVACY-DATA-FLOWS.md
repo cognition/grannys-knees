@@ -26,6 +26,12 @@
 - `onboarding-seen`
 - `watch-index.txt`
 
+## Product privacy principle (owner clarification)
+
+**The requirement is no collection by the Granny's Knees developer**, not zero outbound traffic. The phone is allowed to contact an external weather provider directly to retrieve a forecast. The weather provider receives requested coordinates/timezone and technical network metadata; that traffic is not sent to the developer. No developer-operated accounts, backend collection, advertising or analytics are planned. All future symptom records must stay on the phone or paired watch. Validate this against the signed build before making public guarantees.
+
+A new in-app **Your privacy** page is linked from Today, with plain-language descriptions and a backup caveat. The page is informational, not a substitute for a publicly hosted full policy. Android currently sets `allowBackup=true`, so local-only backup claims remain blocked pending a technical decision.
+
 ## Actions required before policy publication
 
 1. Inspect the full release manifest and dependency tree, including transitive libraries.
