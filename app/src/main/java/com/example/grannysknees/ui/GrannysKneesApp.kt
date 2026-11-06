@@ -29,6 +29,7 @@ import com.example.grannysknees.journal.JournalScreen
 import com.example.grannysknees.ui.about.AboutScreen
 import com.example.grannysknees.ui.about.OnboardingScreen
 import com.example.grannysknees.ui.about.OnboardingStore
+import com.example.grannysknees.ui.privacy.PrivacyScreen
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
 import com.example.grannysknees.ui.today.TodayRoute
 
@@ -61,6 +62,7 @@ internal fun GrannysKneesApp(
                     onOpenJournal = { navController.navigate(AppDestination.Journal.route) },
                     onOpenHistory = { navController.navigate(AppDestination.History.route) },
                     onOpenAbout = { navController.navigate(AppDestination.About.route) },
+                    onOpenPrivacy = { navController.navigate(AppDestination.Privacy.route) },
                 )
             }
             composable(AppDestination.Home.route) {
@@ -71,6 +73,9 @@ internal fun GrannysKneesApp(
             }
             composable(AppDestination.History.route) {
                 HistoryScreen(onBack = { navController.popBackStack() })
+            }
+            composable(AppDestination.Privacy.route) {
+                PrivacyScreen(onBack = { navController.popBackStack() })
             }
             composable(AppDestination.About.route) {
                 AboutScreen(onBack = { navController.popBackStack() })
