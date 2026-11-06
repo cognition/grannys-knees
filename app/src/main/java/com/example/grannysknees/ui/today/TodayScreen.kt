@@ -71,6 +71,7 @@ internal fun TodayRoute(
     onOpenJournal: (() -> Unit)? = null,
     onOpenHistory: (() -> Unit)? = null,
     onOpenAbout: (() -> Unit)? = null,
+    onOpenPrivacy: (() -> Unit)? = null,
 ) {
     if (repository == null) {
         TodayScreen(state = provider.current(), modifier = modifier)
@@ -142,6 +143,7 @@ internal fun TodayRoute(
         onOpenJournal = onOpenJournal,
         onOpenHistory = onOpenHistory,
         onOpenAbout = onOpenAbout,
+        onOpenPrivacy = onOpenPrivacy,
     )
 }
 
@@ -176,6 +178,11 @@ internal fun TodayScreen(
                     if (onOpenAbout != null) {
                         TextButton(onClick = onOpenAbout) {
                             Text(stringResource(R.string.journal_open_about))
+                        }
+                    }
+                    if (onOpenPrivacy != null) {
+                        TextButton(onClick = onOpenPrivacy) {
+                            Text(stringResource(R.string.privacy_title))
                         }
                     }
                 },
