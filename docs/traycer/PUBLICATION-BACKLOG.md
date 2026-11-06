@@ -5,6 +5,8 @@
 
 **Baseline update:** `32d8b9e` merged expanded hourly/five-day widget and emulator evidence. GP04 must **audit and harden** existing work, not reimplement T09. Symptom contract was also merged, but symptom functionality is not a 1.0 release dependency.
 
+**PUB05 drafts committed (2026-11-05):** [privacy policy draft](../release/google-play/PRIVACY-POLICY-DRAFT.md), [data-flow audit](../release/google-play/PRIVACY-DATA-FLOWS.md), and [Play declarations worksheet](../release/google-play/POLICY-DECLARATIONS.md). These are **drafts only**, not approved, hosted or submitted. Complete provider, backup, SDK and owner-contact verification before closing PUB05.
+
 ## Work packages
 
 | ID | Priority | Depends on | Lead | Deliverable / acceptance |
