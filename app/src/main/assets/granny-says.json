@@ -1,0 +1,1894 @@
+{
+  "grannySays": [
+    {
+      "index": 1,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "The knees are quiet. Enjoy the day."
+        },
+        {
+          "tone": "wry",
+          "text": "The knees are behaving. Nobody make any sudden weather changes."
+        },
+        {
+          "tone": "spicy",
+          "text": "One out of ten. Nothing to complain about. Damn shame."
+        },
+        {
+          "tone": "warm",
+          "text": "Today's got a little spring in it. So do I."
+        },
+        {
+          "tone": "wry",
+          "text": "My knees haven't mentioned the weather once. Almost unsettling."
+        },
+        {
+          "tone": "spicy",
+          "text": "One out of ten. I'll have to find something else to complain about."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "Not bad at all. I might take the long way to the kettle."
+        },
+        {
+          "tone": "wry",
+          "text": "My knees have nothing to report, which is exactly how I like it."
+        },
+        {
+          "tone": "spicy",
+          "text": "Two out of ten. I've complained about worse."
+        },
+        {
+          "tone": "warm",
+          "text": "This is the sort of day you don't waste indoors."
+        },
+        {
+          "tone": "wry",
+          "text": "The knees are behaving like respectable members of society."
+        },
+        {
+          "tone": "spicy",
+          "text": "Two out of ten. Barely enough trouble to mention over tea."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "Beautiful day. Even my joints are minding their own business."
+        },
+        {
+          "tone": "wry",
+          "text": "Three out of ten. The knees approve. Carry on."
+        },
+        {
+          "tone": "spicy",
+          "text": "Three? Hardly worth swearing about."
+        },
+        {
+          "tone": "warm",
+          "text": "A good day to putter about and see where you end up."
+        },
+        {
+          "tone": "wry",
+          "text": "There's a tiny creak in the forecast, but nothing dramatic."
+        },
+        {
+          "tone": "spicy",
+          "text": "Three out of ten. I've had slippers more troublesome than this."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "A little creaky, but there's still plenty of day left."
+        },
+        {
+          "tone": "wry",
+          "text": "The knees are starting to gossip about the weather."
+        },
+        {
+          "tone": "spicy",
+          "text": "Four out of ten. Annoying, but not worth cancelling lunch."
+        },
+        {
+          "tone": "warm",
+          "text": "A bit of stiffness. Nothing a warm cup and a slow start can't negotiate."
+        },
+        {
+          "tone": "wry",
+          "text": "The knees have noticed the weather. They're keeping it to themselves for now."
+        },
+        {
+          "tone": "spicy",
+          "text": "Four out of ten. Irritating, but I've met worse at family reunions."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "Tea first. Then we'll see what the knees have to say."
+        },
+        {
+          "tone": "wry",
+          "text": "The weather's changing its mind. Again."
+        },
+        {
+          "tone": "spicy",
+          "text": "Five out of ten. The knees have begun their commentary."
+        },
+        {
+          "tone": "warm",
+          "text": "Middle of the road today. Take your time and enjoy your tea."
+        },
+        {
+          "tone": "wry",
+          "text": "Five out of ten. The knees are considering their options."
+        },
+        {
+          "tone": "spicy",
+          "text": "Five out of ten. Not awful, just enough to be a pain in the arse."
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "Sensible shoes and sensible decisions today."
+        },
+        {
+          "tone": "wry",
+          "text": "My knees are predicting weather again. Show-offs."
+        },
+        {
+          "tone": "spicy",
+          "text": "Six out of ten. I wouldn't volunteer to move a sofa."
+        },
+        {
+          "tone": "warm",
+          "text": "Go gently today. There's no need to prove anything."
+        },
+        {
+          "tone": "wry",
+          "text": "The barometer moved and apparently my knees were copied on the email."
+        },
+        {
+          "tone": "spicy",
+          "text": "Six out of ten. I'm still going out, but the stairs can piss off."
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "Take your time today. There's no prize for rushing."
+        },
+        {
+          "tone": "wry",
+          "text": "The knees have stopped whispering and started making announcements."
+        },
+        {
+          "tone": "spicy",
+          "text": "My joints have gone on strike, and frankly, I support them."
+        },
+        {
+          "tone": "warm",
+          "text": "A softer sort of day. Warm hands, warm tea, easy does it."
+        },
+        {
+          "tone": "wry",
+          "text": "Seven out of ten. The knees would prefer all destinations to have parking."
+        },
+        {
+          "tone": "spicy",
+          "text": "Seven out of ten. Any task involving the bottom cupboard has been cancelled."
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "Definitely a heating-pad sort of afternoon."
+        },
+        {
+          "tone": "wry",
+          "text": "My knees have contacted their union representative."
+        },
+        {
+          "tone": "spicy",
+          "text": "Eight out of ten. Everything downstairs can stay downstairs."
+        },
+        {
+          "tone": "warm",
+          "text": "Be patient with yourself today. The world can wait a minute."
+        },
+        {
+          "tone": "wry",
+          "text": "Eight out of ten. Even the kettle seems unnecessarily far away."
+        },
+        {
+          "tone": "spicy",
+          "text": "Eight out of ten. If you dropped it on the floor, congratulations. That's where it lives now."
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "Put the kettle on. We're not rushing anywhere."
+        },
+        {
+          "tone": "wry",
+          "text": "My knees have lodged a formal complaint."
+        },
+        {
+          "tone": "spicy",
+          "text": "Nine out of ten. Bugger that. Put the kettle on."
+        },
+        {
+          "tone": "warm",
+          "text": "Today calls for warmth, patience and taking good care of yourself."
+        },
+        {
+          "tone": "wry",
+          "text": "Nine out of ten. I'm accepting applications for someone to bring me things."
+        },
+        {
+          "tone": "spicy",
+          "text": "Nine out of ten. If it requires bending, climbing or enthusiasm, absolutely bugger off."
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "sayings": [
+        {
+          "tone": "warm",
+          "text": "Be kind to yourself today. Essential movement only."
+        },
+        {
+          "tone": "wry",
+          "text": "Today's plans have been revised by the Department of Knees."
+        },
+        {
+          "tone": "spicy",
+          "text": "Ten out of ten. I have officially run out of polite words."
+        },
+        {
+          "tone": "warm",
+          "text": "Easy today, love. Tomorrow can look after itself."
+        },
+        {
+          "tone": "wry",
+          "text": "Ten out of ten. I've decided everything important is within arm's reach."
+        },
+        {
+          "tone": "spicy",
+          "text": "Ten out of ten. Tea here. Blanket here. Everyone else can sod off."
+        }
+      ]
+    }
+  ],
+  "bonusSayings": [
+    {
+      "minIndex": 1,
+      "maxIndex": 3,
+      "tone": "warm",
+      "text": "The knees approve. Carry on."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 3,
+      "tone": "wry",
+      "text": "Nothing but blue skies and cooperative knees. Lovely."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 3,
+      "tone": "spicy",
+      "text": "The knees are quiet. Suspiciously quiet."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 6,
+      "tone": "warm",
+      "text": "The weather and I have agreed to disagree."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "Something's brewing. The knees have begun their commentary."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "Some people feel the weather in their bones. Mine apparently get advance notice."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 6,
+      "tone": "spicy",
+      "text": "The weather's got more nerve than a telemarketer at supper."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "The spirit is willing. The knees would like to discuss the matter."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "There's a storm coming. My knees have already sent the memo."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "My knees are making noises that would get a car taken to the shop."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "If you need me, leave a message with the heating pad."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "The forecast says eight. My knees have asked for a second opinion."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Today's a good day to be kind to yourself."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Even the rocking chair looks ambitious."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "At this point, getting out of bed deserves hazard pay."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "The weather's putting on quite a show. My knees bought front-row tickets."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "The forecast says nine. My knees say the forecast can shove it."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I told my knees we had things to do. They told me to piss off. Fair enough."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "The weather's gone to hell. Fortunately, I've got biscuits."
+    },
+    {
+      "minIndex": 10,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Ten out of ten. Everything I need had better be on this floor."
+    }
+  ],
+  "wildcards": [
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Take the day as it comes. The knees certainly are."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "warm",
+      "text": "A warm mug fixes more than it has any right to."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "Slow doesn't mean stopped."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "There's no medal for doing everything today."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "Listen to the knees. They've been around a while."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Be nice to yourself. Granny's orders."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Whatever gets done today is enough."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "My knees have become surprisingly interested in meteorology."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "Clouds over there. Grumbling down here. Coincidence? I think not."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "The weather hasn't arrived yet, but apparently its advance party has."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "I checked the forecast. Then I consulted the senior forecasters."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "Apparently my knees now offer same-day weather alerts."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "The knees say rain. The window says sunshine. Someone's lying."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "I used to check the sky. Now I just stand up."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "There's precipitation in the forecast and punctuation in my knees."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "The weather is free to change. I simply wish it would submit a request first."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "You call it atmospheric pressure. My knees call it Tuesday."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "Whoever keeps adjusting the air pressure, knock it off."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I bent down once today. That seems sufficient."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If you want it from the bottom shelf, you want it more than I do."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "My get-up-and-go got up and left without me."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I'm not avoiding the stairs. We've reached a mutual understanding."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "The weather may do as it pleases. So will I."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "I'm conserving cartilage. Very environmentally responsible."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "No, I haven't tried yoga. Thanks for asking for the eight-hundredth bloody time."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "If patience burned calories, I'd be an athlete."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I've got exactly one good bend left today, and I'm saving it for something important."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "The knees are happy enough. Let's not give them anything to complain about."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "A decent day for wandering about and seeing what happens."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "warm",
+      "text": "A little creak never spoiled a perfectly good morning."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "warm",
+      "text": "Nothing wrong with taking the day one cup of tea at a time."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "warm",
+      "text": "A slower pace still gets you where you're going."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "The knees are asking nicely. Best listen while they're still being polite."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "warm",
+      "text": "Some days are for doing. Some days are for taking care."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Keep yourself warm and don't be in such a hurry."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Nothing wrong with a quiet day and a comfortable chair."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Today's job is looking after yourself. Everything else can wait."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "wry",
+      "text": "The knees are off duty. Long may it last."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "wry",
+      "text": "So far the knees and the weather are on speaking terms."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "There's weather happening somewhere. My knees are investigating."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "The forecast has satellites. I've got two knees and a lifetime of experience."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "Something's changing outside. The knees have entered the chat."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "No need to check the radar. Apparently I'm wearing one."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "The sky hasn't decided what it's doing, but my knees have opinions."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "My knees are forecasting with unreasonable confidence today."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Apparently sitting down is today's fastest-growing hobby."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Today's itinerary has been shortened considerably."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "spicy",
+      "text": "Lovely day. Almost annoyingly so."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "spicy",
+      "text": "Not much wrong today. Don't worry, I'm sure something will turn up."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "spicy",
+      "text": "The knees are grumbling, but frankly, so am I."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "spicy",
+      "text": "I can still do it. Whether I can be bothered is another matter."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "If it's upstairs, I hope it's enjoying itself."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "I've looked at the weather and decided it can sort itself out."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "Today has entirely too much atmosphere."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If it can't be reached without bending, we don't need it that badly."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I have plans today. Mostly involving not making things worse."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If anybody needs me, they can bloody well come over here."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Good gardening weather. The weeds won't know what hit them."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "The garden needs weeding. I'm giving the weeds one more day to reconsider."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "The garden can wait. It'll still be growing tomorrow."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "I planted those flowers at knee height for a reason."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If that tomato wants picking, it can bloody well climb up here."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "The weeds have won today. Don't let it go to their heads."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Even the dog thinks it's a good day for a walk."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "The cat has been asleep for six hours. Finally, a sensible role model."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "The dog wants a walk. We're currently negotiating distance."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "The cat's saved me a spot on the sofa. Clever little thing."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "The dog can chase his own ball today. He's got four good knees."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "warm",
+      "text": "Good enough for a few errands. Might even stop somewhere nice."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "I've got three errands and enough enthusiasm for roughly one and a half."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "If the shop doesn't have parking near the door, we didn't need it anyway."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "That errand has been officially promoted to tomorrow's problem."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Nice day out. Come on, Grandpa, let's go before we change our minds."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "Grandpa says the weather looks fine. He's welcome to tell that to my knees."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "Grandpa made the tea. I knew I kept him around for something."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "Grandpa's doing the fetching today. He's thrilled. Probably."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Grandpa asked if I wanted to go out. I asked if he'd lost his bloody mind."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Good day for a family visit. Put the kettle on."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "wry",
+      "text": "The family's coming over. I've hidden the good biscuits accordingly."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "warm",
+      "text": "The grandkids can come over. They keep me moving and laughing."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "The grandkids have enough energy for all of us. Convenient, really."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "warm",
+      "text": "Family's always welcome. Just don't expect me to fetch anything."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If the family wants dinner, they know where the kitchen is."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Lovely day for the family to visit me instead."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Not a bad day for a little shopping and a treat on the way home."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "wry",
+      "text": "I've only got three things on the shopping list. We'll see how that turns out."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "I went in for milk. Apparently we needed six other things."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "We'll do the shopping slowly. The groceries aren't going anywhere."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "If it's not on the shopping list, I'm not walking another aisle for it."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Today we're shopping exclusively at stores with benches."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Shopping can wait. We've got bread, tea and no bloody reason to leave."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Good day to make something that leaves the kitchen smelling wonderful."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "I'm cooking something easy tonight. That's what recipes are supposed to be for."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "warm",
+      "text": "Something warm in the oven makes almost any day better."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "Dinner tonight will be whatever requires the fewest trips across the kitchen."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If supper needs more than one pot, we're having something else."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Tonight's recipe is leftovers. Step one: heat them up. Step two: don't complain."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Feeling pretty good today. Might put on some music and actually get things done."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "wry",
+      "text": "The knees are quiet. It's like finding a good song on the radio before the DJ talks over it."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 5,
+      "tone": "spicy",
+      "text": "The knees are behaving. Whatever. I'm not making a big deal about it."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "warm",
+      "text": "Good day for a drive with the radio turned up."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "wry",
+      "text": "Today's running smoother than a freshly rewound cassette."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 6,
+      "tone": "spicy",
+      "text": "My knees feel fine. Don't jinx it."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "warm",
+      "text": "Plenty of life left in these knees. Just don't ask them to rollerskate."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "I survived mall parking lots in December. This is nothing."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "spicy",
+      "text": "I've been ignoring minor inconveniences since before call display."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "My knees are giving this weather two stars and no written review."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "warm",
+      "text": "A little stiff today. Nothing worth cancelling the afternoon over."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "My knees have more static than an AM radio under a bridge."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "spicy",
+      "text": "I've dealt with dial-up internet. I can deal with this."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "The knees are buffering. Give them a minute."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "Today's mood is somewhere between whatever and don't push it."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "Take your time. The groceries will still be there after a coffee."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "My knees just made a noise like a cassette being eaten by the tape deck."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "Today's forecast has big 'be kind, please rewind' energy."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "My joints have entered their grunge period."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "We'll take it easy today. That's not quitting. That's pacing."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "The knees are acting like somebody left them in the car overnight."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "If this weather were a mixtape, I'd record over it."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "The knees have gone full unplugged today."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "warm",
+      "text": "Coffee first. Decisions second. Knees somewhere after that."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "The forecast says rain. My knees already spoiled the ending."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "I stood up too fast and briefly saw the entire 1980s."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "Getting off this sofa now requires a loading screen."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "I've got 99 problems and apparently 97 of them are atmospheric pressure."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "warm",
+      "text": "Nothing wrong with putting your feet up before dinner."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "Remember when we could sit on the floor and just get back up? Good times."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I used to dance all night. Now I make a noise getting out of the car."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Grandpa says we're not that old. Grandpa also can't find his glasses."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Grandpa can drive. I'll control the radio. Everyone wins."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "My knees just made the Windows shutdown sound, and I'm taking the hint."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Today's dress code is sweatpants and lowered expectations."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "The spirit says concert. The knees say seated venue."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "No, I don't want to go to the mall. I did my time."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "If you need me, call the landline. I won't answer that either."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I survived shoulder pads. I can survive this bloody weather."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Put on an old album, get comfortable, and let the weather do what it does."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Grandpa suggested a walk. I suggested he have a lovely time."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Grandpa can get the groceries. He knows where we keep the car."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "My knees have switched from FM to mostly static."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Today's plans have been returned to the video store without being watched."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Getting downstairs currently looks like a choose-your-own-adventure."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I didn't survive Aqua Net and acid-wash denim to be defeated by a cold front."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Today's a good day for an old movie, a blanket, and nowhere else to be."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "I've reached the VHS portion of the day: sit down and don't touch anything."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "The knees have one message for today's weather: whatever."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "My knees are older than Google and considerably less interested in your search results."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Not much to report today. That's the way I like it."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "wry",
+      "text": "Everything seems to be working. Let's not draw attention to it."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 5,
+      "tone": "spicy",
+      "text": "Feeling good today. Don't make it weird."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 5,
+      "tone": "wry",
+      "text": "The knees are cooperating. I've decided not to ask why."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "warm",
+      "text": "Good day to get a few things done and leave a few things undone."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "spicy",
+      "text": "The knees are fine. Let's quit while we're ahead."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "It's suspiciously pleasant out. I'm keeping an eye on it."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "warm",
+      "text": "A little movement, a little rest. Seems reasonable."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "wry",
+      "text": "The knees have noticed something, but they're not escalating yet."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "spicy",
+      "text": "Nothing I can't handle. I've met Mondays."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "The weather's being subtle. My knees aren't."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "warm",
+      "text": "Do what feels good today and leave some energy for tomorrow."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "There's a bit of complaining downstairs. Management is aware."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "spicy",
+      "text": "I'm fine. That's not an invitation for follow-up questions."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "warm",
+      "text": "No need to rush. Nothing good ever came from putting your socks on angrily."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "Apparently the atmosphere has opinions again."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "I can do everything I planned today. I just don't see why I should."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "My knees have detected nonsense in the atmosphere."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "A decent day to lower the expectations and raise the comfort level."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "The knees have requested fewer surprises today."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "I'm functioning. Let's not get ambitious."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "Standing up is currently a decision, not a reflex."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "Today's energy level is somewhere between maybe and absolutely not."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "warm",
+      "text": "If today needs to be slower, let it be slower."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "I have plans. The knees have submitted amendments."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "I wasn't procrastinating. I was waiting for my knees to approve the project."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "warm",
+      "text": "Do the important things. The rest can mind its own business."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "The floor seems further away than it did yesterday."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "If it's not urgent, it's enjoying a lovely day on tomorrow's list."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "I've reached the age where weather is apparently a full-contact sport."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "Someone asked if I wanted to go out. I admired their optimism."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "warm",
+      "text": "Today doesn't need to be productive to be a good day."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "I've started measuring distances by whether they're worth standing up for."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If you hear me say 'I'm fine' while standing up, give me a minute."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "My knees are providing unsolicited feedback again."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I've lowered my standards for what counts as nearby."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Pick one thing worth doing today. The rest will keep."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "The knees have switched to strongly worded body language."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I'm not cancelling. I'm aggressively rescheduling."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Today has a surprising number of things that can wait until tomorrow."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If I have to put proper shoes on, the answer is probably no."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "You don't have to earn a quiet afternoon."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "I've entered the part of the day where dropped objects belong to the floor."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If nobody's bleeding and nothing's on fire, it can bloody well wait."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Get comfortable. Today isn't asking for heroics."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "I've reviewed today's agenda. Sitting features prominently."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I'm available today for things that require absolutely no crouching."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "I dropped something earlier. We've both accepted the situation."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Some days you push through. Today, you put your feet up."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Today's capacity is one thing. Choose carefully."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Good day for seeing the family. Even better if someone else is hosting."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "wry",
+      "text": "The family group chat is busy. I've chosen peace."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "spicy",
+      "text": "I love my family. That's why some of them have their own houses."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "warm",
+      "text": "There's always room for family. Chairs, however, are first come, first served."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "Someone in this family knows where my good scissors went."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "Apparently everyone needs something today. How lovely for them."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "warm",
+      "text": "The family can come over. Just give me ten minutes to become presentable."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "The kids say they'll only stay an hour. That's adorable."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "If everyone's coming over, somebody else is carrying the chairs."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "The grandkids can visit. I'll supervise from a comfortable distance."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Family time sounds lovely. Make sure somebody brings dessert."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Yes, you can come over. No, I'm not cleaning first."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "I've reached the age where quality family time includes someone carrying things for me."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If the family wants a big dinner, I've got excellent news about takeout."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Come visit, love. Just let yourself in."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "The grandkids have offered to help. I'm documenting this historic occasion."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I raised children. I have nothing left to prove today."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 4,
+      "tone": "warm",
+      "text": "Good working weather. Let's get something useful done."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 5,
+      "tone": "wry",
+      "text": "I've made a list. That counts as making progress."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 6,
+      "tone": "spicy",
+      "text": "Another meeting? I'm sure this one will fix everything."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "I've been working long enough to know that urgent and important are not the same thing."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 7,
+      "tone": "warm",
+      "text": "One thing at a time. It'll all get done eventually."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "The email said quick question. We both know how this ends."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "If everything is a priority, nothing bloody well is."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "I have enough experience to know when we're reinventing something that already worked."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "I'll circle back when my knees stop rolling their eyes."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "warm",
+      "text": "Do what's useful today. The busywork can wait."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "I've attended enough meetings to know this could've been an email."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "I'm happy to multitask. I'll ignore several things at once."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Today's productivity goal is to look convincingly unavailable."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "warm",
+      "text": "Finish what matters and call it a day."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "That's tomorrow's problem. Tomorrow can file a complaint."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "I'm working smarter today. Mostly from this chair."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "Today I'm delegating anything that involves stairs."
+    },
+    {
+      "minIndex": 1,
+      "maxIndex": 5,
+      "tone": "wry",
+      "text": "I put something somewhere safe. It's gone forever."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 6,
+      "tone": "warm",
+      "text": "The laundry can wait until the coffee's finished."
+    },
+    {
+      "minIndex": 2,
+      "maxIndex": 6,
+      "tone": "spicy",
+      "text": "Whoever finished the milk had one job."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "wry",
+      "text": "I cleaned this room yesterday. Apparently nobody was impressed."
+    },
+    {
+      "minIndex": 3,
+      "maxIndex": 7,
+      "tone": "spicy",
+      "text": "The password needs a capital, a number, a symbol and apparently a blood sample."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "The fitted sheet and I have agreed to stop pretending we're friends."
+    },
+    {
+      "minIndex": 4,
+      "maxIndex": 8,
+      "tone": "spicy",
+      "text": "I just sat down, so naturally everything I need is in the other room."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 8,
+      "tone": "wry",
+      "text": "The package arrived. The thing I actually ordered is apparently coming separately."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "I don't know who put that on the bottom shelf, but we're no longer speaking."
+    },
+    {
+      "minIndex": 5,
+      "maxIndex": 9,
+      "tone": "wry",
+      "text": "Nothing makes you reconsider your priorities like dropping a sock behind the dryer."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 9,
+      "tone": "spicy",
+      "text": "The phone's at two percent. Honestly, same."
+    },
+    {
+      "minIndex": 6,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "The smoke alarm only needs a new battery at three in the morning. It's tradition."
+    },
+    {
+      "minIndex": 7,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "I finally got comfortable, so of course someone's at the door."
+    },
+    {
+      "minIndex": 8,
+      "maxIndex": 10,
+      "tone": "wry",
+      "text": "Whatever rolled under the sofa belongs to the sofa now."
+    },
+    {
+      "minIndex": 9,
+      "maxIndex": 10,
+      "tone": "spicy",
+      "text": "If the remote isn't within reach, we're watching whatever's already on."
+    }
+  ]
+}

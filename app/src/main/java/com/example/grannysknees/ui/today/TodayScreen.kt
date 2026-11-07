@@ -2,6 +2,7 @@ package com.example.grannysknees.ui.today
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +42,8 @@ import com.example.grannysknees.R
 import com.example.grannysknees.data.ForecastRepository
 import com.example.grannysknees.data.SelectedCity
 import com.example.grannysknees.data.SelectedCityStore
+import com.example.grannysknees.sayings.GrannySaysCatalog
+import com.example.grannysknees.sayings.GrannySaysPicker
 import com.example.grannysknees.ui.place.CitySearchScreen
 import com.example.grannysknees.weather.OpenMeteoGeocodingClient
 import com.example.grannysknees.ui.outlook.OutlookSection
@@ -53,6 +56,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 /**
  * Today destination entry point.
@@ -255,6 +259,14 @@ private fun IndexCard(state: TodayUiState.Available) {
         TodayScoreBand.MAX_SCORE,
         bandLabel,
     )
+    val context = LocalContext.current
+    val picker = remember {
+        loadGrannySaysPicker(context.assets)
+    }
+    var sayingText by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(state.score, picker) {
+        sayingText = picker?.showForScore(state.score)?.text
+    }
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
@@ -295,7 +307,33 @@ private fun IndexCard(state: TodayUiState.Available) {
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )
+            val line = sayingText
+            if (line != null && picker != null) {
+                Text(
+                    text = line,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                TextButton(
+                    onClick = { sayingText = picker.refresh()?.text },
+                    contentPadding = PaddingValues(0.dp),
+                ) {
+                    Text(stringResource(R.string.today_another_saying))
+                }
+            }
         }
+    }
+}
+
+/** Loads the packaged Granny Says list, or null when the asset is missing. */
+private fun loadGrannySaysPicker(assets: android.content.res.AssetManager): GrannySaysPicker? {
+    return try {
+        assets.open("granny-says.json").use { stream ->
+            GrannySaysPicker(GrannySaysCatalog.fromStream(stream))
+        }
+    } catch (_: IOException) {
+        null
     }
 }
 

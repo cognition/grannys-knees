@@ -22,6 +22,7 @@
     <string name="today_caption_noticeable">The knees might have a few opinions.</string>
     <string name="today_caption_rough">Creaky-weather afoot — go gently.</string>
     <string name="today_caption_stormy">Granny says: mind the stairs today.</string>
+    <string name="today_another_saying">Another saying</string>
 
     <!-- Freshness and offline affordances -->
     <string name="today_last_updated">Last updated %1$s</string>
