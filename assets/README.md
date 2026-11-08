@@ -1,7 +1,7 @@
-# Granny's Knees logo assets
+# Granny's Knees logo
 
-- `logo-dark.svg`: black background, white figures and border.
-- `logo-light.svg`: white background, black figures and border.
+- `grannys-knees-dark.png`: the mark on black, for dark backgrounds and the launcher icon.
+- `grannys-knees-light.png`: the same mark on white, for light backgrounds.
 - `granny-says.json`: weather-index sayings for Today. The app ships a copy under `app/src/main/assets/`.
 
-Both are scalable SVG recreations of the approved two-figure Arthritis Index concept, designed for Android drawable resources and app branding. They are **not pixel-identical crops** of the earlier generated comparison image. The 0–10 index is illustrative; neither logo is a medical forecast.
+The app uses these files. The gauge in the artwork is part of the logo, not a live forecast.

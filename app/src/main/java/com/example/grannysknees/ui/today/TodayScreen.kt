@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -49,6 +50,7 @@ import com.example.grannysknees.weather.OpenMeteoGeocodingClient
 import com.example.grannysknees.ui.outlook.OutlookSection
 import com.example.grannysknees.ui.outlook.OutlookUiState
 import com.example.grannysknees.ui.outlook.SampleOutlookStates
+import com.example.grannysknees.ui.theme.BrandLogo
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
 import com.example.grannysknees.widget.GrannysKneesWidget
 import androidx.glance.appwidget.updateAll
@@ -72,10 +74,6 @@ internal fun TodayRoute(
     cityStore: SelectedCityStore? = null,
     geocoder: OpenMeteoGeocodingClient = OpenMeteoGeocodingClient(),
     provider: TodayStateProvider = FakeTodayStateProvider(),
-    onOpenJournal: (() -> Unit)? = null,
-    onOpenHistory: (() -> Unit)? = null,
-    onOpenAbout: (() -> Unit)? = null,
-    onOpenPrivacy: (() -> Unit)? = null,
 ) {
     if (repository == null) {
         TodayScreen(state = provider.current(), modifier = modifier)
@@ -144,10 +142,6 @@ internal fun TodayRoute(
                 chosen = null
             }
         },
-        onOpenJournal = onOpenJournal,
-        onOpenHistory = onOpenHistory,
-        onOpenAbout = onOpenAbout,
-        onOpenPrivacy = onOpenPrivacy,
     )
 }
 
@@ -159,36 +153,21 @@ internal fun TodayScreen(
     modifier: Modifier = Modifier,
     outlook: OutlookUiState = OutlookUiState.Hidden,
     onChangeCity: (() -> Unit)? = null,
-    onOpenJournal: (() -> Unit)? = null,
-    onOpenHistory: (() -> Unit)? = null,
-    onOpenAbout: (() -> Unit)? = null,
-    onOpenPrivacy: (() -> Unit)? = null,
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.today_title)) },
-                actions = {
-                    if (onOpenJournal != null) {
-                        TextButton(onClick = onOpenJournal) {
-                            Text(stringResource(R.string.journal_open))
-                        }
-                    }
-                    if (onOpenHistory != null) {
-                        TextButton(onClick = onOpenHistory) {
-                            Text(stringResource(R.string.journal_open_history))
-                        }
-                    }
-                    if (onOpenAbout != null) {
-                        TextButton(onClick = onOpenAbout) {
-                            Text(stringResource(R.string.journal_open_about))
-                        }
-                    }
-                    if (onOpenPrivacy != null) {
-                        TextButton(onClick = onOpenPrivacy) {
-                            Text(stringResource(R.string.privacy_title))
-                        }
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        BrandLogo(
+                            modifier = Modifier.size(28.dp),
+                            contentDescription = null,
+                        )
+                        Text(stringResource(R.string.today_title))
                     }
                 },
             )
@@ -199,9 +178,14 @@ internal fun TodayScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(28.dp),
         ) {
+            BrandLogo(
+                modifier = Modifier
+                    .size(96.dp)
+                    .align(Alignment.CenterHorizontally),
+            )
             LocationHeader(location = state.location, onChangeCity = onChangeCity)
             when (state) {
                 is TodayUiState.Loading -> LoadingNotice()
@@ -225,26 +209,24 @@ internal fun TodayScreen(
 private fun LocationHeader(location: String, onChangeCity: (() -> Unit)?) {
     val locationDescription =
         stringResource(R.string.today_location_content_description, location)
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            text = stringResource(R.string.today_location_eyebrow),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+    val changeDescription = stringResource(R.string.place_change_content_description)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
         Text(
             text = location,
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.semantics {
                 contentDescription = locationDescription
             },
         )
-        Text(
-            text = stringResource(R.string.place_saved_note),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
         if (onChangeCity != null) {
-            TextButton(onClick = onChangeCity) {
+            TextButton(
+                onClick = onChangeCity,
+                modifier = Modifier.semantics { contentDescription = changeDescription },
+            ) {
                 Text(stringResource(R.string.place_change))
             }
         }
@@ -268,60 +250,44 @@ private fun IndexCard(state: TodayUiState.Available) {
     LaunchedEffect(state.score, picker) {
         sayingText = picker?.showForScore(state.score)?.text
     }
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.clearAndSetSemantics {
+                contentDescription = scoreDescription
+            },
         ) {
             Text(
-                text = stringResource(R.string.today_index_heading),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
+                text = state.score.toString(),
+                style = MaterialTheme.typography.headlineLarge,
             )
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                modifier = Modifier.clearAndSetSemantics {
-                    contentDescription = scoreDescription
-                },
-            ) {
-                Text(
-                    text = state.score.toString(),
-                    style = MaterialTheme.typography.displayLarge,
-                )
-                Text(
-                    text = stringResource(
-                        R.string.today_index_out_of,
-                        TodayScoreBand.MAX_SCORE,
-                    ),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 4.dp, bottom = 12.dp),
-                )
-            }
-            BandPill(label = bandLabel)
             Text(
-                text = bandCaption(state.band),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
+                text = stringResource(
+                    R.string.today_index_out_of,
+                    TodayScoreBand.MAX_SCORE,
+                ),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            val line = sayingText
-            if (line != null && picker != null) {
-                Text(
-                    text = line,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
-                TextButton(
-                    onClick = { sayingText = picker.refresh()?.text },
-                    contentPadding = PaddingValues(0.dp),
-                ) {
-                    Text(stringResource(R.string.today_another_saying))
-                }
+            BandPill(label = bandLabel)
+        }
+        Text(
+            text = bandCaption(state.band),
+            style = MaterialTheme.typography.bodyLarge,
+        )
+        val line = sayingText
+        if (line != null && picker != null) {
+            Text(
+                text = line,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            TextButton(
+                onClick = { sayingText = picker.refresh()?.text },
+                contentPadding = PaddingValues(0.dp),
+            ) {
+                Text(stringResource(R.string.today_another_saying))
             }
         }
     }
@@ -355,39 +321,16 @@ private fun BandPill(label: String) {
 
 @Composable
 private fun LastUpdated(label: String, isStale: Boolean) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = stringResource(R.string.today_last_updated, label),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        if (isStale) {
-            StaleAffordance()
-        }
+    val text = if (isStale) {
+        stringResource(R.string.today_stale_line, label)
+    } else {
+        stringResource(R.string.today_updated, label)
     }
-}
-
-@Composable
-private fun StaleAffordance() {
-    Surface(
-        shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.tertiaryContainer,
-        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.today_stale_badge),
-                style = MaterialTheme.typography.labelLarge,
-            )
-            Text(
-                text = stringResource(R.string.today_stale_detail),
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-    }
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 @Composable
@@ -462,25 +405,13 @@ private fun OfflineNotice(state: TodayUiState.Unavailable) {
 
 @Composable
 private fun ExperimentalDisclaimer() {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.today_disclaimer_title),
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Text(
-                text = stringResource(R.string.today_disclaimer_body),
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-    }
+    val spoken = stringResource(R.string.today_disclaimer_body)
+    Text(
+        text = stringResource(R.string.today_disclaimer_short),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.semantics { contentDescription = spoken },
+    )
 }
 
 @Composable
