@@ -162,6 +162,7 @@ internal fun TodayScreen(
     onOpenJournal: (() -> Unit)? = null,
     onOpenHistory: (() -> Unit)? = null,
     onOpenAbout: (() -> Unit)? = null,
+    onOpenPrivacy: (() -> Unit)? = null,
 ) {
     Scaffold(
         modifier = modifier,

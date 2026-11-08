@@ -44,7 +44,7 @@
     <!-- Plain-language privacy screen; full legal policy remains a release deliverable. -->
     <string name="privacy_title">Your privacy</string>
     <string name="privacy_back">Back</string>
-    <string name="privacy_intro">Granny's Knees is designed to keep your information on your devices, not send it to the app's developer.</string>
+    <string name="privacy_intro">Granny\'s Knees is designed to keep your information on your devices, not send it to the app\'s developer.</string>
     <string name="privacy_weather_heading">How we get the weather</string>
     <string name="privacy_weather_body">To get a forecast, your phone sends the coordinates and time zone of your selected city to Open-Meteo. It downloads temperature, humidity and air pressure information and calculates the knee-weather index on your phone.</string>
     <string name="privacy_local_heading">What stays on your phone</string>
@@ -52,10 +52,10 @@
     <string name="privacy_developer_heading">What the developer receives</string>
     <string name="privacy_developer_body">The app is designed without developer-operated user accounts, advertising trackers or analytics. Your symptom information is not sent to the developer.</string>
     <string name="privacy_provider_heading">What the weather provider sees</string>
-    <string name="privacy_provider_body">Open-Meteo receives the requested coordinates and can see technical connection information, such as your public IP address. That information goes to the weather provider, not to the Granny's Knees developer.</string>
+    <string name="privacy_provider_body">Open-Meteo receives the requested coordinates and can see technical connection information, such as your public IP address. That information goes to the weather provider, not to the Granny\'s Knees developer.</string>
     <string name="privacy_watch_heading">Phone and watch</string>
     <string name="privacy_watch_body">A future version may share information between your paired phone and watch. Watch synchronization is not part of the current Android release.</string>
     <string name="privacy_backup_heading">Android backups</string>
-    <string name="privacy_backup_body">Android may back up some app data depending on your device settings and the app's backup configuration. We are reviewing backup behaviour before the Play Store release.</string>
+    <string name="privacy_backup_body">Android may back up some app data depending on your device settings and the app\'s backup configuration. We are reviewing backup behaviour before the Play Store release.</string>
     <string name="privacy_footer">The weather index is experimental, not medical advice. A complete privacy policy will be provided before public release.</string>
 </resources>

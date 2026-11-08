@@ -69,10 +69,10 @@ internal fun GrannysKneesApp(
                 FoundationShell()
             }
             composable(AppDestination.Journal.route) {
-                JournalScreen(onBack = { navController.popBackStack() })
+                JournalScreen()
             }
             composable(AppDestination.History.route) {
-                HistoryScreen(onBack = { navController.popBackStack() })
+                HistoryScreen()
             }
             composable(AppDestination.Privacy.route) {
                 PrivacyScreen(onBack = { navController.popBackStack() })
