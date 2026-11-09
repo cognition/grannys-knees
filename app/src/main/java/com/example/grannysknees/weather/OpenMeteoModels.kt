@@ -53,6 +53,7 @@ data class HourlyUnits(
     val temperature2m: String,
     val relativeHumidity2m: String,
     val surfacePressure: String,
+    val weatherCode: String?,
 )
 
 /**
@@ -84,6 +85,8 @@ data class ForecastHour(
     val relativeHumidity2m: Int?,
     /** Surface (station-level) pressure in hPa, or `null` if missing. */
     val surfacePressure: Double?,
+    /** WMO weather interpretation code, or `null` when unavailable. */
+    val weatherCode: Int?,
 )
 
 /**

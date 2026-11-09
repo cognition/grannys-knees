@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.math.BigDecimal
 
 class TodayUiStateTest {
     @Test
@@ -11,11 +12,12 @@ class TodayUiStateTest {
         val state = TodayUiState.Available(
             location = "Toronto, ON",
             lastUpdatedLabel = "today at 8:45 AM",
-            score = 7,
+            score = BigDecimal("7.0"),
             freshness = ForecastFreshness.Fresh,
         )
 
         assertEquals(TodayScoreBand.Rough, state.band)
+        assertEquals("7.0", state.scoreLabel)
     }
 
     @Test
@@ -30,10 +32,20 @@ class TodayUiStateTest {
     @Test
     fun `sample states exercise each visible affordance`() {
         assertEquals(ForecastFreshness.Fresh, SampleTodayStates.fresh.freshness)
-        assertTrue(SampleTodayStates.fresh.score in TodayScoreBand.MIN_SCORE..TodayScoreBand.MAX_SCORE)
+        assertTrue(
+            SampleTodayStates.fresh.score.compareTo(BigDecimal(TodayScoreBand.MIN_SCORE)) >= 0,
+        )
+        assertTrue(
+            SampleTodayStates.fresh.score.compareTo(BigDecimal(TodayScoreBand.MAX_SCORE)) <= 0,
+        )
 
         assertTrue(SampleTodayStates.stale.isStale)
-        assertTrue(SampleTodayStates.stale.score in TodayScoreBand.MIN_SCORE..TodayScoreBand.MAX_SCORE)
+        assertTrue(
+            SampleTodayStates.stale.score.compareTo(BigDecimal(TodayScoreBand.MIN_SCORE)) >= 0,
+        )
+        assertTrue(
+            SampleTodayStates.stale.score.compareTo(BigDecimal(TodayScoreBand.MAX_SCORE)) <= 0,
+        )
 
         assertTrue(SampleTodayStates.fresh.location.isNotBlank())
         assertTrue(SampleTodayStates.fresh.lastUpdatedLabel.isNotBlank())

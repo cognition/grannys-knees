@@ -7,23 +7,31 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 /**
- * The hourly forecast variables `index-v1` requires (contract §2.1/§3), in the
- * canonical Open-Meteo spelling.
+ * The hourly forecast variables the weather index requires, in the canonical
+ * Open-Meteo spelling.
  */
 private val REQUIRED_HOURLY_VARIABLES = listOf(
     "temperature_2m",
     "relative_humidity_2m",
     "surface_pressure",
+    "weather_code",
 )
+
+/**
+ * Hours before "now" so the **whole local calendar day** is in the payload,
+ * plus the 12-hour trailing window lead-in before local midnight (`index-v2`).
+ *
+ * With only twelve past hours, a late-evening open would leave the morning
+ * blank on Today's curve.
+ */
+const val DEFAULT_PAST_HOURS: Int = 24 + 12
 
 /**
  * A single Open-Meteo `/v1/forecast` request.
  *
- * Defaults satisfy the contract minimums (§2.1): `timeformat=unixtime`,
- * `forecast_days >= 6` (5-day outlook + current local day), and
- * `past_hours >= 3` so the first displayed hour has its `t-3h` lead-in for the
- * pressure trend (§5.3). The pressure trend itself is computed downstream (T04);
- * the client only guarantees the lead-in is fetched.
+ * Defaults: `timeformat=unixtime`, `forecast_days >= 6` (5-day outlook +
+ * current local day), and `past_hours >= 12` for the 12-hour index window.
+ * [DEFAULT_PAST_HOURS] also covers morning→night on Today's curve.
  */
 data class OpenMeteoRequest(
     val latitude: Double,
@@ -32,11 +40,13 @@ data class OpenMeteoRequest(
     val timezone: String,
     val hourlyVariables: List<String> = REQUIRED_HOURLY_VARIABLES,
     val forecastDays: Int = 6,
-    val pastHours: Int = 3,
+    val pastHours: Int = DEFAULT_PAST_HOURS,
 ) {
     init {
         require(forecastDays >= 6) { "forecast_days must be >= 6 (contract §2.1)" }
-        require(pastHours >= 3) { "past_hours must be >= 3 for the 3-hour lead-in (contract §5.3)" }
+        require(pastHours >= 12) {
+            "past_hours must be >= 12 for the 12-hour index window"
+        }
         require(hourlyVariables.isNotEmpty()) { "at least one hourly variable is required" }
     }
 }

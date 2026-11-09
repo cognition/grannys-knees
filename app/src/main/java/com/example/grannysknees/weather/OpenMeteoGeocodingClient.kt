@@ -1,5 +1,6 @@
 package com.example.grannysknees.weather
 
+import com.example.grannysknees.data.PlaceSource
 import com.example.grannysknees.data.SelectedCity
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -68,6 +69,7 @@ internal class OpenMeteoGeocodingClient(
                 timezone = timezone,
                 admin1 = admin1,
                 countryCode = countryCode,
+                placeSource = PlaceSource.Search,
             )
         }
     }

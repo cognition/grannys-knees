@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import com.example.grannysknees.R
 import com.example.grannysknees.data.SelectedCity
 import com.example.grannysknees.location.OptionalGpsPlaceSource
+import com.example.grannysknees.ui.tabDestinationWindowInsets
+import com.example.grannysknees.ui.theme.BrandHeading
 import com.example.grannysknees.weather.OpenMeteoGeocodingClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -79,7 +81,14 @@ internal fun CitySearchScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.place_title)) }) },
+        contentWindowInsets = tabDestinationWindowInsets(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    BrandHeading(title = stringResource(R.string.place_title))
+                },
+            )
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier

@@ -29,6 +29,8 @@ internal object TodayMapper {
         indexResult: IndexResult?,
         zoneId: ZoneId,
         referenceNow: Instant,
+        personalResult: IndexResult? = null,
+        forecastHasSnow: Boolean = false,
     ): TodayUiState {
         val lastUpdated = formatFetchedAt(fetchedAt, zoneId)
         return when (cacheStatus) {
@@ -58,7 +60,7 @@ internal object TodayMapper {
                         lastUpdatedLabel = lastUpdated ?: "not yet",
                         reason = UnavailableReason.INVALID_HOUR,
                     )
-                if (hour.status != HourStatus.AVAILABLE || hour.indexDisplay == null) {
+                if (hour.status != HourStatus.AVAILABLE || hour.indexScore == null) {
                     return TodayUiState.Unavailable(
                         location = locationLabel,
                         lastUpdatedLabel = lastUpdated ?: "not yet",
@@ -70,11 +72,19 @@ internal object TodayMapper {
                 } else {
                     ForecastFreshness.Stale
                 }
+                val personalHour = personalResult?.let { result ->
+                    selectCurrentHour(result.hours, zoneId, referenceNow)
+                }
+                val personalScore = personalHour
+                    ?.takeIf { it.status == HourStatus.AVAILABLE }
+                    ?.indexScore
                 TodayUiState.Available(
                     location = locationLabel,
                     lastUpdatedLabel = lastUpdated ?: "just now",
-                    score = hour.indexDisplay!!,
+                    score = hour.indexScore!!,
                     freshness = freshness,
+                    personalScore = personalScore,
+                    forecastHasSnow = forecastHasSnow,
                 )
             }
         }

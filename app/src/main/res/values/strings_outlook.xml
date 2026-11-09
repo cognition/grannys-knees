@@ -8,13 +8,22 @@
     <string name="outlook_today_empty">No hours scored for today yet. We won\'t draw a line we can\'t back up.</string>
     <string name="outlook_chart_content_description">Index through today: %1$d of %2$d hours scored.</string>
     <string name="outlook_chart_range_content_description">Index through today: %1$d of %2$d hours scored. Low %3$s at %4$s, high %5$s at %6$s.</string>
+    <string name="outlook_legend_weather">Standard</string>
+    <string name="outlook_legend_yours">Personal</string>
 
-    <!-- Five-day index low/high (index, not temperature) -->
-    <string name="outlook_five_day_heading">Five-day index low–high</string>
-    <string name="outlook_five_day_caption">Daily range of the 0–10 index, not temperature.</string>
-    <string name="outlook_day_range">%1$s–%2$s</string>
+    <!-- Five-day high/low beside morning→night lava ribbon (index, not temperature) -->
+    <string name="outlook_five_day_heading">Five-day index</string>
+    <string name="outlook_five_day_caption">High and low for the day. Shape is morning to night.</string>
+    <string name="outlook_tick_morning">6am</string>
+    <string name="outlook_tick_noon">12pm</string>
+    <string name="outlook_tick_evening">6pm</string>
+    <string name="outlook_day_unknown">?</string>
+    <string name="outlook_day_range">%1$s/%2$s</string>
+    <!-- Same shape as Standard; colour (amber) marks Personal on the right. -->
+    <string name="outlook_day_personal_range">%1$s/%2$s</string>
     <string name="outlook_day_no_index">No index</string>
-    <string name="outlook_day_content_description">%1$s: index low %2$s, high %3$s.</string>
-    <string name="outlook_day_partial_content_description">%1$s: index low %2$s, high %3$s. Partial day, %4$d of %5$d hours scored.</string>
+    <string name="outlook_day_content_description">%1$s: high %2$s, low %3$s.</string>
+    <string name="outlook_day_personal_content_description"> Personal high %1$s, low %2$s.</string>
+    <string name="outlook_day_partial_content_description">%1$s: high %2$s, low %3$s. Partial day, %4$d of %5$d hours scored.</string>
     <string name="outlook_day_unavailable_content_description">%1$s: no index available.</string>
 </resources>

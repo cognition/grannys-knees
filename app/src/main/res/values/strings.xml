@@ -1,13 +1,14 @@
 <resources>
     <string name="app_name">Granny\'s Knees</string>
+    <string name="logo_content_description">Granny\'s Knees</string>
 
     <!-- Today screen -->
     <string name="today_title">Granny\'s Knees</string>
     <string name="today_location_eyebrow">Forecast for</string>
     <string name="today_location_content_description">Forecast location: %1$s</string>
     <string name="today_index_heading">Today\'s knee-weather index</string>
-    <string name="today_index_out_of">/ %1$d</string>
-    <string name="today_index_content_description">Knee-weather index %1$d out of %2$d: %3$s</string>
+    <string name="today_index_content_description">Knee-weather index %1$s: %2$s</string>
+    <string name="today_index_personal_content_description">Knee-weather index %1$s, personal %2$s: %3$s</string>
 
     <!-- Index bands (match the weather/index contract) -->
     <string name="today_band_calm">Calm</string>
@@ -22,8 +23,17 @@
     <string name="today_caption_noticeable">The knees might have a few opinions.</string>
     <string name="today_caption_rough">Creaky-weather afoot — go gently.</string>
     <string name="today_caption_stormy">Granny says: mind the stairs today.</string>
+    <string name="today_another_saying">Another saying</string>
 
     <!-- Freshness and offline affordances -->
+    <string name="today_more">More</string>
+    <string name="nav_today">Today</string>
+    <string name="nav_report">Feel</string>
+    <string name="nav_reports">History</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_about">About</string>
+    <string name="today_updated">Updated %1$s</string>
+    <string name="today_stale_line">Stale forecast, %1$s</string>
     <string name="today_last_updated">Last updated %1$s</string>
     <string name="today_stale_badge">Stale</string>
     <string name="today_stale_detail">Showing the last forecast we managed to fetch.</string>
@@ -32,29 +42,33 @@
     <string name="today_offline_title">No forecast just yet</string>
     <string name="today_offline_body">We haven\'t fetched the weather yet. Pop back once you\'re online and we\'ll take a look.</string>
     <string name="today_expired_title">Forecast expired</string>
-    <string name="today_expired_body">The cached forecast is too old to show as current. Connect and reopen the app for a fresh pull.</string>
-    <string name="today_invalid_hour_title">Index unavailable this hour</string>
-    <string name="today_invalid_hour_body">We have weather on hand, but this hour\'s inputs are incomplete — we won\'t invent a score.</string>
+    <string name="today_expired_body">The cached forecast is too old to show as current. Refresh when you are online.</string>
+    <string name="today_refresh">Refresh</string>
+    <string name="today_refresh_content_description">Refresh the forecast</string>
+    <string name="today_invalid_hour_title">No score this hour</string>
+    <string name="today_invalid_hour_body">The weather is incomplete, so nothing is filled in.</string>
     <string name="today_location_temporary_note">Temporary default location (no GPS yet).</string>
 
-    <!-- Experimental disclaimer -->
-    <string name="today_disclaimer_title">Experimental — just for curiosity</string>
-    <string name="today_disclaimer_body">Granny\'s Knees is a playful weather-sensitivity indicator, not medical advice, a diagnosis, or a forecast of how you\'ll feel. Weather is only weather.</string>
     <!-- Plain-language privacy screen; full legal policy remains a release deliverable. -->
-    <string name="privacy_title">Your privacy</string>
+    <string name="privacy_title">Privacy policy</string>
     <string name="privacy_back">Back</string>
-    <string name="privacy_intro">Granny's Knees is designed to keep your information on your devices, not send it to the app's developer.</string>
+    <string name="privacy_line_forecast">The forecast sends your city\'s coordinates to Open-Meteo.</string>
+    <string name="privacy_line_journal">Notes stay on this phone. There is no account.</string>
+    <string name="privacy_line_later">Watch sync and backup are not part of this release.</string>
+    <string name="privacy_intro">Granny\'s Knees is designed to keep your information on your devices, not send it to the app\'s developer.</string>
     <string name="privacy_weather_heading">How we get the weather</string>
     <string name="privacy_weather_body">To get a forecast, your phone sends the coordinates and time zone of your selected city to Open-Meteo. It downloads temperature, humidity and air pressure information and calculates the knee-weather index on your phone.</string>
     <string name="privacy_local_heading">What stays on your phone</string>
-    <string name="privacy_local_body">Your chosen city, downloaded forecast and calculated index are stored or used locally. Future symptom journal entries are intended to stay on your phone or paired watch, rather than being uploaded to a developer server.</string>
+    <string name="privacy_local_body">Your chosen city, downloaded forecast, smoothed local barometer reading and calculated index are stored or used locally. Future symptom journal entries are intended to stay on your phone or paired watch, rather than being uploaded to a developer server.</string>
     <string name="privacy_developer_heading">What the developer receives</string>
     <string name="privacy_developer_body">The app is designed without developer-operated user accounts, advertising trackers or analytics. Your symptom information is not sent to the developer.</string>
     <string name="privacy_provider_heading">What the weather provider sees</string>
-    <string name="privacy_provider_body">Open-Meteo receives the requested coordinates and can see technical connection information, such as your public IP address. That information goes to the weather provider, not to the Granny's Knees developer.</string>
+    <string name="privacy_provider_body">Open-Meteo receives the requested coordinates and can see technical connection information, such as your public IP address. That information goes to the weather provider, not to the Granny\'s Knees developer.</string>
     <string name="privacy_watch_heading">Phone and watch</string>
     <string name="privacy_watch_body">A future version may share information between your paired phone and watch. Watch synchronization is not part of the current Android release.</string>
     <string name="privacy_backup_heading">Android backups</string>
-    <string name="privacy_backup_body">Android may back up some app data depending on your device settings and the app's backup configuration. We are reviewing backup behaviour before the Play Store release.</string>
-    <string name="privacy_footer">The weather index is experimental, not medical advice. A complete privacy policy will be provided before public release.</string>
+    <string name="privacy_backup_body">Android may back up some app data depending on your device settings and the app\'s backup configuration. We are reviewing backup behaviour before the Play Store release.</string>
+    <string name="privacy_footer">The weather index is not medical advice.</string>
+    <string name="about_local_pressure_title">Blend local pressure into Personal</string>
+    <string name="about_local_pressure_hint">Uses a smoothed phone barometer reading for the nearest hour. The Standard score stays forecast-based.</string>
 </resources>

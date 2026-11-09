@@ -9,110 +9,137 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 /**
- * Pure-Kotlin implementation of the **experimental** `index-v1` Arthritis Index
- * (contract `docs/contracts/weather-index.md`, §9). It is a transparent,
- * versioned heuristic — **not medical advice, a diagnosis, or a clinically
- * validated prediction.** The scorer makes no causal or medical claim; it only
- * converts forecast weather into a 0-10 "joint-weather" signal.
+ * Pure-Kotlin implementation of the experimental **12-hour** weather index
+ * (`docs/contracts/weather-index-v2.md`).
  *
- * The scorer is self-contained: it performs its own `unixtime` + IANA timezone
- * conversion (contract §4) from each [HourlyObservation.epoch], so it does not
- * depend on the weather client. It does no I/O, no HTTP, and no Android work.
+ * Each scored hour is compared to the observation exactly twelve elapsed hours
+ * earlier (UTC epoch match). Falling pressure, falling temperature, and rising
+ * humidity raise the signal. The result is a playful 1–10 heuristic — **not
+ * medical advice**.
  *
- * Arithmetic is done in exact [BigDecimal] (divisions at [MathContext.DECIMAL128]),
- * and quantisation is applied half-up to the decimal value rather than a binary
- * float (contract §9.4.2) — so a decimal like `5.25` rounds to `5.3`, not `5.2`.
- * Equality against the fixtures is therefore exact on the canonical quantised
- * values, with no floating-point tolerance.
+ * Arithmetic uses [BigDecimal] with half-up quantisation so fixture equality
+ * stays exact on canonical scales.
  */
 object WeatherIndexScorer {
 
-    const val CONTRACT_VERSION: String = "weather-index/1.0.0"
-    const val INDEX_VERSION: String = "index-v1"
+    const val CONTRACT_VERSION: String = "weather-index/2.0.0"
+    const val INDEX_VERSION: String = "index-v2"
 
     /** Reported tie-break rule for daily low/high (contract §8.4). */
     const val TIE_BREAK: String = "earliest epoch"
 
-    // --- index-v1 constants (experimental anchors; see contract §9.1-§9.2, §11) ---
-    private const val TREND_LAG = 3                      // positions = exactly 3 real hours (§5.1)
-    private val PRESSURE_SCALE_HPA = BigDecimal("6")     // |3-h change| mapped onto 0-10 (§9.1)
-    private val HUMIDITY_OFFSET = BigDecimal("40")
-    private val HUMIDITY_SPAN = BigDecimal("50")
-    private val TEMP_BASELINE_C = BigDecimal("20")       // colder than this scores higher
-    private val TEMP_SPAN = BigDecimal("20")
-    private val WEIGHT_PRESSURE = BigDecimal("0.50")
-    private val WEIGHT_HUMIDITY = BigDecimal("0.25")
-    private val WEIGHT_TEMPERATURE = BigDecimal("0.25")
-    private const val COMPLETE_DAY_MIN_AVAILABLE_HOURS = 18 // contract §8.3 (reviewable default)
+    private const val WINDOW_SECONDS: Long = 12L * 3_600L
+    private const val COMPLETE_DAY_MIN_AVAILABLE_HOURS = 18
+    private const val PERSONAL_INDEX_VERSION: String = "index-v2-personal"
 
-    // --- quantisation scales (contract §9.3-§9.4) ---
-    private const val SCALE_TREND = 2
-    private const val SCALE_SUBSCORE = 4
+    /** Historical raw-signal floor that maps to index 1 (Ottawa ERA5 calibration). */
+    private val SIGNAL_FLOOR = BigDecimal("-89.4")
+
+    /** Historical raw-signal span from floor to ceiling (89.4 + 88.4). */
+    private val SIGNAL_SPAN = BigDecimal("177.8")
+
+    private val INDEX_MIN = BigDecimal.ONE
+    private val INDEX_MAX = BigDecimal.TEN
+    private val NINE = BigDecimal("9")
+    private val TWO = BigDecimal("2")
+
+    private const val SCALE_DELTA = 2
     private const val SCALE_INDEX_RAW = 4
     private const val SCALE_INDEX_SCORE = 1
 
-    // --- machine-readable unavailability reasons (contract §7) ---
     private const val REASON_PRESSURE_NULL = "surface_pressure null"
     private const val REASON_HUMIDITY_NULL = "relative_humidity_2m null"
     private const val REASON_TEMPERATURE_NULL = "temperature_2m null"
-    private const val REASON_TREND = "pressureTrend3h unavailable (no comparable t-3h sample)"
+    private const val REASON_WINDOW =
+        "12-hour window unavailable (no comparable t-12h sample)"
 
     private val MC = MathContext.DECIMAL128
-    private val SCALE_TEN = BigDecimal.TEN
-    private val CLAMP_MIN = BigDecimal.ZERO
-    private val CLAMP_MAX = BigDecimal.TEN
 
     private val LOCAL_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx")
     private val UTC_FORMAT =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneOffset.UTC)
 
-    /** Score every hour and derive the daily low/high outlook. */
-    fun score(request: ScoringRequest): IndexResult {
+    /** Score every hour with baseline (neutral) sensitivities. */
+    fun score(request: ScoringRequest): IndexResult =
+        score(request, DeltaSensitivities.BASELINE)
+
+    /**
+     * Score every hour, optionally applying personal **influence** weights to
+     * each signed contribution before the signal map.
+     *
+     * Influence means how much that weather factor affects the person — not
+     * “high vs low pressure” or “hot vs cold”. Higher influence amplifies
+     * contributions that raise discomfort and dampens relief from that factor,
+     * so dialling influence up does not push Personal *down* on a calming day.
+     * Non-baseline sensitivities stamp [PERSONAL_INDEX_VERSION].
+     */
+    internal fun score(
+        request: ScoringRequest,
+        sensitivities: DeltaSensitivities,
+    ): IndexResult {
         val zone = ZoneId.of(request.zoneId)
-        val samples = request.hours
-        val hours = samples.indices.map { i -> scoreHour(samples, i, zone) }
+        val byEpoch = request.hours.associateBy { it.epoch }
+        val hours = request.hours.map { sample ->
+            scoreHour(sample, byEpoch, zone, sensitivities)
+        }
         return IndexResult(
             contractVersion = CONTRACT_VERSION,
-            indexVersion = INDEX_VERSION,
+            indexVersion = if (sensitivities.isBaseline()) {
+                INDEX_VERSION
+            } else {
+                PERSONAL_INDEX_VERSION
+            },
             hours = hours,
             daily = aggregateDaily(hours),
         )
     }
 
-    private fun scoreHour(samples: List<HourlyObservation>, i: Int, zone: ZoneId): HourIndex {
-        val sample = samples[i]
+    private fun scoreHour(
+        sample: HourlyObservation,
+        byEpoch: Map<Long, HourlyObservation>,
+        zone: ZoneId,
+        sensitivities: DeltaSensitivities,
+    ): HourIndex {
         val instant = Instant.ofEpochSecond(sample.epoch)
         val zoned = instant.atZone(zone)
+        val prior = byEpoch[sample.epoch - WINDOW_SECONDS]
 
         val pressure = sample.surfacePressureHpa?.let { BigDecimal.valueOf(it) }
         val humidity = sample.relativeHumidityPct?.let { BigDecimal.valueOf(it) }
         val temperature = sample.temperatureC?.let { BigDecimal.valueOf(it) }
+        val priorPressure = prior?.surfacePressureHpa?.let { BigDecimal.valueOf(it) }
+        val priorHumidity = prior?.relativeHumidityPct?.let { BigDecimal.valueOf(it) }
+        val priorTemperature = prior?.temperatureC?.let { BigDecimal.valueOf(it) }
 
-        // 3-hour pressure trend from comparable timestamps (contract §5.1, §7).
-        val priorPressure =
-            if (i >= TREND_LAG) samples[i - TREND_LAG].surfacePressureHpa?.let { BigDecimal.valueOf(it) } else null
-        val trend: BigDecimal? =
-            if (i >= TREND_LAG && pressure != null && priorPressure != null) pressure - priorPressure else null
-
-        // Sub-scores: each computed independently, clamped to 0-10 (contract §9.1).
-        val pressureSub = trend?.let { clamp(it.abs().multiply(SCALE_TEN).divide(PRESSURE_SCALE_HPA, MC)) }
-        val humiditySub =
-            humidity?.let { clamp((it - HUMIDITY_OFFSET).divide(HUMIDITY_SPAN, MC).multiply(SCALE_TEN)) }
-        val temperatureSub =
-            temperature?.let { clamp((TEMP_BASELINE_C - it).divide(TEMP_SPAN, MC).multiply(SCALE_TEN)) }
-
-        // indexRaw uses full-precision (unrounded) sub-scores (contract §9.2, §9.4.1).
-        val indexRawValue: BigDecimal? =
-            if (pressureSub != null && humiditySub != null && temperatureSub != null) {
-                pressureSub.multiply(WEIGHT_PRESSURE)
-                    .add(humiditySub.multiply(WEIGHT_HUMIDITY))
-                    .add(temperatureSub.multiply(WEIGHT_TEMPERATURE))
+        val deltaPressure =
+            if (pressure != null && priorPressure != null) pressure - priorPressure else null
+        val deltaHumidity =
+            if (humidity != null && priorHumidity != null) humidity - priorHumidity else null
+        val deltaTemperature =
+            if (temperature != null && priorTemperature != null) {
+                temperature - priorTemperature
             } else {
                 null
             }
 
-        val available = indexRawValue != null
-        val reasons = if (available) emptyList() else buildReasons(sample, trend)
+        val signal: BigDecimal? =
+            if (deltaPressure != null && deltaHumidity != null && deltaTemperature != null) {
+                // Contributions match baseline signal = ΔH − ΔP − ΔT.
+                val humidityContribution = scaleContribution(deltaHumidity, sensitivities.humidity)
+                val pressureContribution =
+                    scaleContribution(deltaPressure.negate(), sensitivities.pressure)
+                val temperatureContribution =
+                    scaleContribution(deltaTemperature.negate(), sensitivities.temperature)
+                humidityContribution
+                    .add(pressureContribution, MC)
+                    .add(temperatureContribution, MC)
+            } else {
+                null
+            }
+
+        val indexUnrounded: BigDecimal? = signal?.let { mapSignal(it) }
+        val available = indexUnrounded != null
+        val reasons = if (available) emptyList() else buildReasons(sample, prior)
 
         return HourIndex(
             epoch = sample.epoch,
@@ -125,34 +152,70 @@ object WeatherIndexScorer {
                 relativeHumidityPct = sample.relativeHumidityPct,
                 temperatureC = sample.temperatureC,
             ),
-            pressureTrend3hHpa = trend?.setScale(SCALE_TREND, RoundingMode.HALF_UP),
+            // 12-hour pressure change (field name retained for API stability).
+            pressureTrend3hHpa = deltaPressure?.setScale(SCALE_DELTA, RoundingMode.HALF_UP),
             subScores = SubScores(
-                pressure = pressureSub?.setScale(SCALE_SUBSCORE, RoundingMode.HALF_UP),
-                humidity = humiditySub?.setScale(SCALE_SUBSCORE, RoundingMode.HALF_UP),
-                temperature = temperatureSub?.setScale(SCALE_SUBSCORE, RoundingMode.HALF_UP),
+                pressure = deltaPressure?.setScale(SCALE_DELTA, RoundingMode.HALF_UP),
+                humidity = deltaHumidity?.setScale(SCALE_DELTA, RoundingMode.HALF_UP),
+                temperature = deltaTemperature?.setScale(SCALE_DELTA, RoundingMode.HALF_UP),
             ),
-            indexRaw = indexRawValue?.setScale(SCALE_INDEX_RAW, RoundingMode.HALF_UP),
-            indexScore = indexRawValue?.setScale(SCALE_INDEX_SCORE, RoundingMode.HALF_UP),
-            indexDisplay = indexRawValue?.setScale(0, RoundingMode.HALF_UP)?.intValueExact(),
+            indexRaw = indexUnrounded?.setScale(SCALE_INDEX_RAW, RoundingMode.HALF_UP),
+            indexScore = indexUnrounded?.setScale(SCALE_INDEX_SCORE, RoundingMode.HALF_UP),
+            indexDisplay = indexUnrounded?.setScale(0, RoundingMode.HALF_UP)?.intValueExact(),
             status = if (available) HourStatus.AVAILABLE else HourStatus.UNAVAILABLE,
             unavailableReasons = reasons,
         )
     }
 
-    private fun buildReasons(sample: HourlyObservation, trend: BigDecimal?): List<String> =
+    /**
+     * Maps a raw signal onto 1–10 using the fixed Ottawa ERA5 anchors, then
+     * clamps. Rounding is applied by the caller from this unrounded value.
+     */
+    internal fun mapSignal(signal: BigDecimal): BigDecimal {
+        val shifted = signal.subtract(SIGNAL_FLOOR, MC)
+        val scaled = shifted.multiply(NINE, MC).divide(SIGNAL_SPAN, MC)
+        return INDEX_MIN.add(scaled, MC).coerceIn(INDEX_MIN, INDEX_MAX)
+    }
+
+    /**
+     * Scales one signed contribution by an influence multiplier.
+     *
+     * Positive contributions (toward discomfort) are multiplied by [sensitivity].
+     * Negative (relief) contributions are multiplied by `2 − sensitivity`, so
+     * at the default `1` nothing changes, at strong influence (`2`) relief from
+     * that factor is ignored, and at `0` that factor does not push discomfort.
+     */
+    internal fun scaleContribution(
+        contribution: BigDecimal,
+        sensitivity: BigDecimal,
+    ): BigDecimal {
+        val sign = contribution.signum()
+        if (sign == 0) return BigDecimal.ZERO
+        return if (sign > 0) {
+            contribution.multiply(sensitivity, MC)
+        } else {
+            val reliefFactor = TWO.subtract(sensitivity, MC)
+            contribution.multiply(reliefFactor, MC)
+        }
+    }
+
+    private fun buildReasons(
+        sample: HourlyObservation,
+        prior: HourlyObservation?,
+    ): List<String> =
         buildList {
             if (sample.surfacePressureHpa == null) add(REASON_PRESSURE_NULL)
             if (sample.relativeHumidityPct == null) add(REASON_HUMIDITY_NULL)
             if (sample.temperatureC == null) add(REASON_TEMPERATURE_NULL)
-            if (trend == null) add(REASON_TREND)
+            if (prior == null) {
+                add(REASON_WINDOW)
+            } else {
+                if (prior.surfacePressureHpa == null) add(REASON_PRESSURE_NULL)
+                if (prior.relativeHumidityPct == null) add(REASON_HUMIDITY_NULL)
+                if (prior.temperatureC == null) add(REASON_TEMPERATURE_NULL)
+            }
         }
 
-    /**
-     * Daily low/high from the hourly `indexScore` (contract §8.2-§8.4), grouped
-     * by local calendar date and over available hours only. Local dates with no
-     * available hours (e.g. lead-in hours whose trend is undefined) are omitted,
-     * matching the committed fixtures.
-     */
     private fun aggregateDaily(hours: List<HourIndex>): List<DailyIndex> =
         hours.groupBy { it.localDate }.entries.mapNotNull { (date, dayHours) ->
             val available = dayHours.filter { it.indexScore != null }
@@ -187,6 +250,4 @@ object WeatherIndexScorer {
         }
 
     private fun HourIndex.toRef() = HourRef(epoch = epoch, instantUtc = instantUtc, local = local)
-
-    private fun clamp(value: BigDecimal): BigDecimal = value.coerceIn(CLAMP_MIN, CLAMP_MAX)
 }

@@ -26,7 +26,7 @@ When the forecast is missing, too old, or incomplete for this hour, the app says
 
 You can use the index without recording anything. If you do record a change, only that report is saved. Leaving a joint alone does not store a zero.
 
-A report can name a body part, an optional side, ache or stiffness, and a rating from 0 to 10. Zero is a real rating. You can also confirm that something is unchanged. Your reports keep the time they were written. You can correct one, delete one, export the current journal, or delete everything on the phone.
+A report can name a body part, an optional side, ache or stiffness, and a rating from 0 to 10. Zero is a real rating. You can also confirm that something is unchanged. Your reports keep the time they were written. You can delete one, export the current journal, or delete everything on the phone.
 
 Nothing in the journal is uploaded. There is no account.
 

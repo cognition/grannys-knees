@@ -19,7 +19,7 @@ internal sealed interface WidgetUiModel {
     data class Available(
         override val location: String,
         val lastUpdatedLabel: String,
-        val score: Int,
+        val score: BigDecimal,
         val band: TodayScoreBand,
         val freshness: ForecastFreshness,
         val hours: List<WidgetHourScore>,

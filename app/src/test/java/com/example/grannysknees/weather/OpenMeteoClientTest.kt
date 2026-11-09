@@ -39,7 +39,7 @@ class OpenMeteoClientTest {
         val params = queryParams(url)
         assertEquals("43.65", params["latitude"])
         assertEquals("-79.38", params["longitude"])
-        assertEquals("temperature_2m,relative_humidity_2m,surface_pressure", params["hourly"])
+        assertEquals("temperature_2m,relative_humidity_2m,surface_pressure,weather_code", params["hourly"])
         assertEquals("America/Toronto", params["timezone"])
         assertEquals("unixtime", params["timeformat"])
     }
@@ -48,13 +48,23 @@ class OpenMeteoClientTest {
     fun `buildUrl satisfies the forecast-days and lead-in minimums`() {
         val params = queryParams(OpenMeteoClient().buildUrl(torontoRequest))
         assertTrue("forecast_days >= 6", params["forecast_days"]!!.toInt() >= 6)
-        assertTrue("past_hours >= 3", params["past_hours"]!!.toInt() >= 3)
+        assertTrue("past_hours >= 12", params["past_hours"]!!.toInt() >= 12)
+    }
+
+    @Test
+    fun `default past hours cover a full local day plus lead-in`() {
+        val params = queryParams(OpenMeteoClient().buildUrl(torontoRequest))
+        assertEquals(DEFAULT_PAST_HOURS, params["past_hours"]!!.toInt())
+        assertTrue(
+            "past_hours covers 24h day + 12h lead-in",
+            params["past_hours"]!!.toInt() >= 36,
+        )
     }
 
     @Test
     fun `request rejects an insufficient lead-in`() {
         assertThrows(IllegalArgumentException::class.java) {
-            OpenMeteoRequest(latitude = 1.0, longitude = 2.0, timezone = "UTC", pastHours = 2)
+            OpenMeteoRequest(latitude = 1.0, longitude = 2.0, timezone = "UTC", pastHours = 11)
         }
     }
 

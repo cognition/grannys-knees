@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Five-day index — start to end of day</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --ink: light-dark(#1c1915, #f6e7d4);
+      --muted: light-dark(#5c564c, #c4bbae);
+      --line: light-dark(#d4c0a6, #3a342c);
+      --rule: light-dark(#c9b396, #4a4036);
+      --paper: light-dark(#fbf3e8, #1a1612);
+      --page: light-dark(#f6e7d4, #161310);
+      --mark: light-dark(#1c1915, #f6e7d4);
+      --ribbon: light-dark(#5c564c, #c4bbae);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font: 400 15px/1.4 "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font: 500 1.5rem/1.2 Georgia, "Times New Roman", serif;
+    }
+    .lede {
+      margin: 0 0 20px;
+      color: var(--muted);
+      max-width: 44rem;
+    }
+    .panel {
+      max-width: 26rem;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .title {
+      margin: 0 0 4px;
+      font: 500 0.8rem/1.2 system-ui, sans-serif;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .caption {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--paper) 92%, var(--ink) 2%);
+    }
+    .day {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+      padding: 8px 4px 10px;
+      text-align: center;
+      border-right: 1px solid var(--rule);
+    }
+    .day:last-child { border-right: 0; }
+    .day .heading {
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 8px;
+      display: grid;
+      gap: 2px;
+      justify-items: center;
+    }
+    .day .name {
+      font: 500 0.8rem/1.2 system-ui, sans-serif;
+    }
+    .day .date {
+      font: 400 0.7rem/1.2 system-ui, sans-serif;
+      color: var(--muted);
+    }
+    .day .body {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 132px;
+    }
+    .day .start,
+    .day .end {
+      font: 600 0.95rem/1 system-ui, sans-serif;
+    }
+    .day .start { margin-bottom: 6px; }
+    .day .end {
+      margin-top: 6px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .day .when {
+      display: block;
+      margin-top: 2px;
+      font: 400 0.6rem/1 system-ui, sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .day .miss {
+      color: var(--muted);
+      font: 600 1.1rem/1 Georgia, "Times New Roman", serif;
+      padding-top: 36px;
+    }
+    .day.is-unknown {
+      background: color-mix(in srgb, var(--paper) 88%, var(--muted) 12%);
+    }
+    .day.is-unknown .plot .axis {
+      background: transparent;
+      border-left: 1px dashed var(--rule);
+      width: 0;
+    }
+    .plot {
+      position: relative;
+      height: 96px;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 2.6rem;
+    }
+    .plot .axis {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      transform: translateX(-50%);
+      background: var(--rule);
+    }
+    .plot .mark {
+      position: absolute;
+      left: 50%;
+      width: 14px;
+      height: 2px;
+      transform: translate(-50%, -50%);
+      background: var(--mark);
+      border-radius: 1px;
+      z-index: 2;
+    }
+    .plot .mark.end {
+      height: 1.5px;
+      opacity: 0.75;
+      width: 12px;
+    }
+    .plot .ribbon {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .plot .ribbon path {
+      fill: color-mix(in srgb, var(--ribbon) 42%, transparent);
+      stroke: color-mix(in srgb, var(--mark) 55%, transparent);
+      stroke-width: 0.8;
+    }
+    .plot .ribbon.partial path {
+      fill: color-mix(in srgb, var(--ribbon) 22%, transparent);
+      stroke-dasharray: 2 2;
+    }
+    .notes {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    .notes ul {
+      margin: 8px 0 0;
+      padding-left: 1.2rem;
+    }
+    .notes li { margin: 4px 0; }
+  </style>
+</head>
+<body>
+  <h1>Five-day index</h1>
+  <p class="lede">
+    No left scale. Each column reads top to bottom as the day unfolds: the starting index, then a tapered ribbon through the day, then the ending index. A falling day shows high → low; a rising day shows low → high.
+  </p>
+
+  <div class="panel">
+    <p class="title">Five-day index</p>
+    <p class="caption">Top is how the day starts. Bottom is how it ends. Ribbon width hints at time spent along the way.</p>
+
+    <div class="calendar" role="img" aria-label="Five day calendar from start to end of day: Wed 11 starts 7 ends 4, Thu 12 starts 4 ends 7, Fri 13 unknown, Sat 14 starts 8 ends 3, Sun 15 starts 5 ends 6">
+
+      <!-- Plot y goes start→end of day, not fixed score-up. Ribbons taper by time spent. -->
+      <div class="day">
+        <div class="heading">
+          <span class="name">Wed</span>
+          <span class="date">11</span>
+        </div>
+        <div class="body">
+          <div class="start">7<span class="when">start</span></div>
+          <div class="plot">
+            <span class="axis"></span>
+            <svg class="ribbon" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+              <!-- falling: brief at 7, most of day mid, ends at 4 -->
+              <path d="M20,0
+                C24,10 28,28 28,48
+                C28,68 24,88 20,100
+                C16,88 12,68 12,48
+                C12,28 16,10 20,0 Z" />
+            </svg>
+            <span class="mark" style="top:0%;" title="Start 7"></span>
+            <span class="mark end" style="top:100%;" title="End 4"></span>
+          </div>
+          <div class="end">4<span class="when">end</span></div>
+        </div>
+      </div>
+
+      <div class="day">
+        <div class="heading">
+          <span class="name">Thu</span>
+          <span class="date">12</span>
+        </div>
+        <div class="body">
+          <div class="start">4<span class="when">start</span></div>
+          <div class="plot">
+            <span class="axis"></span>
+            <svg class="ribbon partial" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+              <!-- rising: starts 4, builds later, ends 7 -->
+              <path d="M20,0
+                C23,18 24,40 26,62
+                C27,78 24,92 20,100
+                C16,92 13,78 14,62
+                C16,40 17,18 20,0 Z" />
+            </svg>
+            <span class="mark" style="top:0%; opacity:0.7;" title="Start 4"></span>
+            <span class="mark end" style="top:100%; opacity:0.7;" title="End 7"></span>
+          </div>
+          <div class="end">7<span class="when">end</span></div>
+        </div>
+      </div>
+
+      <div class="day is-unknown">
+        <div class="heading">
+          <span class="name">Fri</span>
+          <span class="date">13</span>
+        </div>
+        <div class="body">
+          <div class="miss" aria-label="Unknown">?</div>
+          <div class="plot">
+            <span class="axis"></span>
+          </div>
+          <div class="end" style="visibility:hidden;">0<span class="when">end</span></div>
+        </div>
+      </div>
+
+      <div class="day">
+        <div class="heading">
+          <span class="name">Sat</span>
+          <span class="date">14</span>
+        </div>
+        <div class="body">
+          <div class="start">8<span class="when">start</span></div>
+          <div class="plot">
+            <span class="axis"></span>
+            <svg class="ribbon" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+              <!-- falling hard: brief high, long spell lower -->
+              <path d="M20,0
+                C22,8 23,16 22,28
+                C28,48 30,68 24,88
+                C22,94 21,98 20,100
+                C19,98 18,94 16,88
+                C10,68 12,48 18,28
+                C17,16 18,8 20,0 Z" />
+            </svg>
+            <span class="mark" style="top:0%;" title="Start 8"></span>
+            <span class="mark end" style="top:100%;" title="End 3"></span>
+          </div>
+          <div class="end">3<span class="when">end</span></div>
+        </div>
+      </div>
+
+      <div class="day">
+        <div class="heading">
+          <span class="name">Sun</span>
+          <span class="date">15</span>
+        </div>
+        <div class="body">
+          <div class="start">5<span class="when">start</span></div>
+          <div class="plot">
+            <span class="axis"></span>
+            <svg class="ribbon" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+              <!-- gentle rise 5 → 6, fairly even -->
+              <path d="M20,0
+                C27,20 28,50 27,80
+                C26,92 23,98 20,100
+                C17,98 14,92 13,80
+                C12,50 13,20 20,0 Z" />
+            </svg>
+            <span class="mark" style="top:0%;" title="Start 5"></span>
+            <span class="mark end" style="top:100%;" title="End 6"></span>
+          </div>
+          <div class="end">6<span class="when">end</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <strong>In this sketch</strong>
+    <ul>
+      <li>The left 10–0 scale is gone.</li>
+      <li>Top number is the index at the start of the day; bottom is the index at the end.</li>
+      <li>So a day that starts at 7 and ends at 1 reads high → low; a day that starts at 1 and ends at 7 reads low → high.</li>
+      <li>The ribbon between them is thicker where more of the day sat, thinner where it only visited briefly.</li>
+      <li>Unknown days show only a question mark.</li>
+    </ul>
+  </div>
+</body>
+</html>

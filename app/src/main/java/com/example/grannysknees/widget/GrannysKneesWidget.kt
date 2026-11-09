@@ -100,11 +100,12 @@ class GrannysKneesWidgetReceiver : GlanceAppWidgetReceiver() {
 
 /** Renders fresh, stale, and unavailable compact widget states. */
 private object WidgetContentRenderer {
-    private val backgroundColour = ColorProvider(Color(0xFFF4F7F2))
-    private val primaryColour = ColorProvider(Color(0xFF17352A))
-    private val secondaryColour = ColorProvider(Color(0xFF557066))
-    private val badgeBackgroundColour = ColorProvider(Color(0xFFFFE7A3))
-    private val badgeTextColour = ColorProvider(Color(0xFF664B00))
+    private val backgroundColour = ColorProvider(Color(0xFFF4F8F9))
+    private val primaryColour = ColorProvider(Color(0xFF0E7C86))
+    private val secondaryColour = ColorProvider(Color(0xFF5E7380))
+    private val badgeBackgroundColour = ColorProvider(Color(0xFFF8E4E1))
+    private val badgeTextColour = ColorProvider(Color(0xFFC24E2D))
+
 
     /** Draws the full tappable widget surface at the size the launcher allocated. */
     @Composable
@@ -158,7 +159,7 @@ private object WidgetContentRenderer {
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
                 Text(
-                    text = model.score.toString(),
+                    text = TodayScoreBand.formatScore(model.score),
                     style = TextStyle(
                         color = primaryColour,
                         fontSize = SCORE_TEXT_SIZE,
@@ -257,7 +258,7 @@ private object WidgetContentRenderer {
         val context = LocalContext.current
         Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
             Text(
-                text = model.score.toString(),
+                text = TodayScoreBand.formatScore(model.score),
                 style = TextStyle(
                     color = primaryColour,
                     fontSize = SCORE_TEXT_SIZE,

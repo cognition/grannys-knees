@@ -14,6 +14,7 @@ import java.io.IOException
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 
 /**
@@ -25,6 +26,9 @@ import java.time.ZoneId
  * [fetchedAt] is stamped **after** a successful HTTP body is validated, and
  * presentation always re-reads [clock] so hour/freshness cannot lag the
  * transport (review R2).
+ *
+ * Automatic network pulls are gated to the first open of the place's local
+ * calendar day unless [forceNetwork] is true (pull-to-refresh or city change).
  */
 internal class ForecastRepository(
     private val store: ForecastCacheStore,
@@ -33,32 +37,69 @@ internal class ForecastRepository(
     private val clock: Clock = Clock.systemUTC(),
     private val policy: CachePolicy = CachePolicy.CONTRACT_DEFAULT,
     private val cityStore: SelectedCityStore? = null,
+    private val fetchStampStore: DailyFetchStampStore? = null,
+    private val sensitivityStore: SensitivityProfileStore? = null,
+    private val localPressureStore: LocalPressureStore? = null,
+    private val feelCalibrationStore: FeelCalibrationStore? = null,
     private val locationLabel: String = DefaultLocation.LABEL,
     private val latitude: Double = DefaultLocation.LATITUDE,
     private val longitude: Double = DefaultLocation.LONGITUDE,
     private val timezone: String = DefaultLocation.TIMEZONE,
 ) {
     /**
-     * Loads Today state: attempts a network refresh, then presents cache + score.
+     * Loads Today state, optionally skipping HTTP when today's stamp and a
+     * matching cache already exist.
      *
      * Safe to call off the main thread (performs HTTP and file I/O).
+     *
+     * @param forceNetwork when true, always attempts a forecast HTTP pull
+     * (explicit refresh or city change). Default true keeps older callers and
+     * tests on the explicit path.
      */
-    fun loadToday(): TodayUiState {
+    fun loadToday(forceNetwork: Boolean = true): TodayUiState {
         val place = activePlace()
         if (place == null) {
             return missingCity()
         }
-        try {
-            refreshFromNetwork(place)
-        } catch (_: IOException) {
-            // Fall through to cache.
-        } catch (_: OpenMeteoParseException) {
-            // Do not overwrite a good cache with a bad payload.
+        if (shouldFetchFromNetwork(forceNetwork, place)) {
+            try {
+                refreshFromNetwork(place)
+                stampSuccessfulFetch(place)
+            } catch (_: IOException) {
+                // Fall through to cache.
+            } catch (_: OpenMeteoParseException) {
+                // Do not overwrite a good cache with a bad payload.
+            }
         }
 
         // Re-read the clock after the network attempt so presentation uses
         // "now" at evaluation time, not at request start (R2).
         return presentFromCache(clock.instant(), ZoneId.of(place.timezone))
+    }
+
+    /**
+     * True when a forecast HTTP pull is required for this open.
+     *
+     * Network is required when forced, when there is no usable cache for the
+     * saved place, or when today's local date has not been stamped yet.
+     */
+    internal fun shouldFetchFromNetwork(
+        forceNetwork: Boolean,
+        place: SelectedCity,
+        referenceNow: Instant = clock.instant(),
+    ): Boolean {
+        if (forceNetwork) return true
+        val envelope = store.read()
+        if (envelope == null || !place.matches(envelope)) return true
+        val today = LocalDate.ofInstant(referenceNow, ZoneId.of(place.timezone))
+        val stamped = fetchStampStore?.readLocalDate()
+        return stamped != today
+    }
+
+    private fun stampSuccessfulFetch(place: SelectedCity) {
+        val stampStore = fetchStampStore ?: return
+        val today = LocalDate.ofInstant(clock.instant(), ZoneId.of(place.timezone))
+        stampStore.writeLocalDate(today)
     }
 
     /**
@@ -96,6 +137,7 @@ internal class ForecastRepository(
                 indexResult = null,
                 zoneId = zone,
                 referenceNow = referenceNow,
+                forecastHasSnow = false,
             )
         }
 
@@ -110,7 +152,14 @@ internal class ForecastRepository(
             )
         }
 
-        val scored = WeatherIndexScorer.score(WeatherToScoringAdapter.toScoringRequest(forecast))
+        val request = WeatherToScoringAdapter.toScoringRequest(forecast)
+        val scored = WeatherIndexScorer.score(request)
+        val personalProfile = resolvePersonalProfile() ?:
+            SensitivityProfile.DEFAULT.takeIf { localPressureEnabled() }
+        val personalRequest = personalScoringRequest(forecast, referenceNow)
+        val personal = personalProfile?.let { profile ->
+            WeatherIndexScorer.score(personalRequest, profile.toDeltaSensitivities())
+        }
         return TodayMapper.toUiState(
             locationLabel = envelope.locationLabel,
             fetchedAt = envelope.fetchedAt,
@@ -118,6 +167,8 @@ internal class ForecastRepository(
             indexResult = scored,
             zoneId = forecast.timezone.zone,
             referenceNow = referenceNow,
+            personalResult = personal,
+            forecastHasSnow = forecast.hours.any { it.weatherCode in SNOW_WEATHER_CODES },
         )
     }
 
@@ -144,9 +195,96 @@ internal class ForecastRepository(
         } catch (_: OpenMeteoParseException) {
             return OutlookUiState.Hidden
         }
-        val scored = WeatherIndexScorer.score(WeatherToScoringAdapter.toScoringRequest(forecast))
-        return OutlookMapper.toOutlook(scored, forecast.timezone.zone, referenceNow)
+        val request = WeatherToScoringAdapter.toScoringRequest(forecast)
+        val scored = WeatherIndexScorer.score(request)
+        val personalProfile = resolvePersonalProfile() ?:
+            SensitivityProfile.DEFAULT.takeIf { localPressureEnabled() }
+        val personalRequest = personalScoringRequest(forecast, referenceNow)
+        val personal = personalProfile?.let { profile ->
+            WeatherIndexScorer.score(personalRequest, profile.toDeltaSensitivities())
+        }
+        return OutlookMapper.toOutlook(
+            indexResult = scored,
+            zoneId = forecast.timezone.zone,
+            referenceNow = referenceNow,
+            personalResult = personal,
+        )
     }
+
+    /**
+     * Weather context for a Feel save from the disk cache — no network.
+     *
+     * Returns a capture with a null window mean when the cache cannot supply
+     * AVAILABLE hours in the ±3h window.
+     */
+    fun captureFeelWeather(at: Instant = clock.instant()): FeelWeatherCapture {
+        val place = activePlace() ?: return FeelWeatherCapture(
+            weatherWindowMean = null,
+            deltaPressure = null,
+            deltaHumidity = null,
+            deltaTemperature = null,
+        )
+        val envelope = store.read() ?: return FeelWeatherCapture(
+            weatherWindowMean = null,
+            deltaPressure = null,
+            deltaHumidity = null,
+            deltaTemperature = null,
+        )
+        if (cityStore != null && !place.matches(envelope)) {
+            return FeelWeatherCapture(
+                weatherWindowMean = null,
+                deltaPressure = null,
+                deltaHumidity = null,
+                deltaTemperature = null,
+            )
+        }
+        val forecast = try {
+            OpenMeteoParser.parse(envelope.rawBody)
+        } catch (_: OpenMeteoParseException) {
+            return FeelWeatherCapture(
+                weatherWindowMean = null,
+                deltaPressure = null,
+                deltaHumidity = null,
+                deltaTemperature = null,
+            )
+        }
+        val scored = WeatherIndexScorer.score(
+            WeatherToScoringAdapter.toScoringRequest(forecast),
+        )
+        return FeelWeatherWindow.capture(scored.hours, at)
+    }
+
+    /** Effective Personal multipliers from Adj + Feel samples, or null. */
+    private fun resolvePersonalProfile(): SensitivityProfile? {
+        val prefs = sensitivityStore?.readState() ?: SensitivityPreferences.DEFAULT
+        val samples = feelCalibrationStore?.read().orEmpty()
+        return PersonalIndexResolver.effectiveProfile(
+            adj = prefs.profile,
+            feelOptIn = prefs.feelCalibrationEnabled,
+            samples = samples,
+        )
+    }
+
+    private fun personalScoringRequest(
+        forecast: com.example.grannysknees.weather.HourlyForecast,
+        referenceNow: Instant,
+    ) = if (sensitivityStore?.readLocalPressureEnabled() == true) {
+        val blended = LocalPressureBlend.pressureForCurrentHour(
+            forecast = forecast,
+            reading = localPressureStore?.read(),
+            now = referenceNow,
+        )
+        WeatherToScoringAdapter.toScoringRequest(
+            forecast = forecast,
+            localPressureHpa = blended,
+            referenceNow = referenceNow,
+        )
+    } else {
+        WeatherToScoringAdapter.toScoringRequest(forecast)
+    }
+
+    private fun localPressureEnabled(): Boolean =
+        sensitivityStore?.readLocalPressureEnabled() == true
 
     /** Delay until the next hour or freshness boundary for the cached envelope. */
     fun delayUntilNextPresentationChange(
@@ -203,4 +341,9 @@ internal class ForecastRepository(
         lastUpdatedLabel = "not yet",
         reason = UnavailableReason.EMPTY,
     )
+
+    private companion object {
+        /** Open-Meteo WMO codes for snow, snow grains, and snow showers. */
+        val SNOW_WEATHER_CODES = setOf(71, 73, 75, 77, 85, 86)
+    }
 }

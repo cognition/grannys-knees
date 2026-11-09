@@ -5,6 +5,9 @@ package com.example.grannysknees.data
  *
  * [label] is the short name shown on Today and the widget, for example
  * "London, Ontario".
+ *
+ * [placeSource] records whether the place came from GPS or city search so
+ * pull-to-refresh can re-resolve location only when appropriate.
  */
 internal data class SelectedCity(
     val label: String,
@@ -13,6 +16,7 @@ internal data class SelectedCity(
     val timezone: String,
     val admin1: String,
     val countryCode: String,
+    val placeSource: PlaceSource = PlaceSource.Search,
 ) {
     /** True when this city is the one stored on [envelope]. */
     fun matches(envelope: ForecastCacheEnvelope): Boolean {
