@@ -176,6 +176,7 @@ internal fun SettingsScreen(
     grannySpeaksFreely: Boolean = false,
     onGrannySpeaksFreelyChange: (Boolean) -> Unit = {},
     feelCalibrationStore: FeelCalibrationStore? = null,
+    onFeelCleared: () -> Unit = {},
     onDataReset: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -191,6 +192,9 @@ internal fun SettingsScreen(
         )
     }
     var resetNotice by remember { mutableStateOf<String?>(null) }
+    var feelSampleCount by remember {
+        mutableStateOf(feelCalibrationStore?.read()?.size ?: 0)
+    }
     Scaffold(
         modifier = modifier,
         contentWindowInsets = tabDestinationWindowInsets(),
@@ -213,6 +217,13 @@ internal fun SettingsScreen(
                 onProfileChange = onSensitivityProfileChange,
                 feelCalibrationEnabled = feelCalibrationEnabled,
                 onFeelCalibrationEnabledChange = onFeelCalibrationEnabledChange,
+                feelSampleCount = feelSampleCount,
+                onClearFeel = {
+                    feelCalibrationStore?.clear()
+                    feelSampleCount = 0
+                    onFeelCleared()
+                    resetNotice = context.getString(R.string.about_feel_clear_done)
+                },
             )
             FreeSpeechSection(
                 enabled = grannySpeaksFreely,
@@ -335,6 +346,8 @@ private fun PersonalCalibrationSection(
     onProfileChange: (SensitivityProfile) -> Unit,
     feelCalibrationEnabled: Boolean,
     onFeelCalibrationEnabledChange: (Boolean) -> Unit,
+    feelSampleCount: Int = 0,
+    onClearFeel: () -> Unit = {},
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
@@ -367,6 +380,16 @@ private fun PersonalCalibrationSection(
                 checked = feelCalibrationEnabled,
                 onCheckedChange = onFeelCalibrationEnabledChange,
             )
+        }
+        if (feelSampleCount > 0) {
+            Text(
+                text = stringResource(R.string.about_feel_clear_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            TextButton(onClick = onClearFeel) {
+                Text(stringResource(R.string.about_feel_clear))
+            }
         }
         CalibrationSlider(
             label = stringResource(R.string.about_sensitivity_pressure),

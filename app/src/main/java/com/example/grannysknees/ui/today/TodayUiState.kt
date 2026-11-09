@@ -60,6 +60,8 @@ internal sealed interface TodayUiState {
          * not at defaults. Shown in brackets beside [score].
          */
         val personalScore: BigDecimal? = null,
+        /** True when any forecast hour carries a snow WMO weather code. */
+        val forecastHasSnow: Boolean = false,
     ) : TodayUiState {
         /** Display band derived from [score]. */
         val band: TodayScoreBand get() = TodayScoreBand.forScore(score)

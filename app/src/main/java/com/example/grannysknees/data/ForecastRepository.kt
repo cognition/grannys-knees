@@ -136,6 +136,7 @@ internal class ForecastRepository(
                 indexResult = null,
                 zoneId = zone,
                 referenceNow = referenceNow,
+                forecastHasSnow = false,
             )
         }
 
@@ -164,6 +165,7 @@ internal class ForecastRepository(
             zoneId = forecast.timezone.zone,
             referenceNow = referenceNow,
             personalResult = personal,
+            forecastHasSnow = forecast.hours.any { it.weatherCode in SNOW_WEATHER_CODES },
         )
     }
 
@@ -313,4 +315,9 @@ internal class ForecastRepository(
         lastUpdatedLabel = "not yet",
         reason = UnavailableReason.EMPTY,
     )
+
+    private companion object {
+        /** Open-Meteo WMO codes for snow, snow grains, and snow showers. */
+        val SNOW_WEATHER_CODES = setOf(71, 73, 75, 77, 85, 86)
+    }
 }

@@ -30,6 +30,7 @@ internal object TodayMapper {
         zoneId: ZoneId,
         referenceNow: Instant,
         personalResult: IndexResult? = null,
+        forecastHasSnow: Boolean = false,
     ): TodayUiState {
         val lastUpdated = formatFetchedAt(fetchedAt, zoneId)
         return when (cacheStatus) {
@@ -83,6 +84,7 @@ internal object TodayMapper {
                     score = hour.indexScore!!,
                     freshness = freshness,
                     personalScore = personalScore,
+                    forecastHasSnow = forecastHasSnow,
                 )
             }
         }

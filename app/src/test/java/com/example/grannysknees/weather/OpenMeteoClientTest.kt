@@ -39,7 +39,7 @@ class OpenMeteoClientTest {
         val params = queryParams(url)
         assertEquals("43.65", params["latitude"])
         assertEquals("-79.38", params["longitude"])
-        assertEquals("temperature_2m,relative_humidity_2m,surface_pressure", params["hourly"])
+        assertEquals("temperature_2m,relative_humidity_2m,surface_pressure,weather_code", params["hourly"])
         assertEquals("America/Toronto", params["timezone"])
         assertEquals("unixtime", params["timeformat"])
     }

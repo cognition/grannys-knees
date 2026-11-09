@@ -27,8 +27,9 @@ internal class GrannySaysPicker(
         private set
 
     private var score: Int? = null
-    private var personalDiffers: Boolean = false
+    private var personalScore: Int? = null
     private var freeSpeechEnabled: Boolean = false
+    private var season: GrannySeason = GrannySeason.ALL_YEAR
     private var current: GrannySaying? = null
 
     /** Weights used for the next pick of the current score. */
@@ -44,16 +45,19 @@ internal class GrannySaysPicker(
         score: Int,
         personalScore: Int? = null,
         allowFreeSpeech: Boolean = false,
+        season: GrannySeason = GrannySeason.ALL_YEAR,
+        snowInForecast: Boolean = false,
     ): GrannySaying? {
-        val nextPersonalDiffers = personalScore != null && personalScore != score
-        if (this.score == score && personalDiffers == nextPersonalDiffers &&
-            freeSpeechEnabled == allowFreeSpeech && current != null
+        val nextSeason = if (snowInForecast) GrannySeason.WINTER else season
+        if (this.score == score && this.personalScore == personalScore &&
+            freeSpeechEnabled == allowFreeSpeech && this.season == nextSeason && current != null
         ) {
             return current
         }
         this.score = score
-        personalDiffers = nextPersonalDiffers
+        this.personalScore = personalScore
         freeSpeechEnabled = allowFreeSpeech
+        this.season = nextSeason
         refreshIndex = 0
         current = pick(currentWeights(), excludeText = null)
         return current
@@ -84,13 +88,29 @@ internal class GrannySaysPicker(
     }
 
     private fun eligibleBand(band: List<GrannySaying>): List<GrannySaying> {
+        val standard = score
+        val personal = personalScore
+        val personalPresent = personal != null && standard != null
+        val personalDiffers = personalPresent && personal != standard
+        val personalAgrees = personalPresent && personal == standard
         val eligible = band.filter { saying ->
-            (!saying.requiresPersonalDifference || personalDiffers) &&
+            seasonMatches(saying) &&
+                (!saying.requiresPersonalAgreement || personalAgrees) &&
+                (!saying.requiresPersonalDifference || personalDiffers) &&
+                (saying.expectedPersonalScore == null || saying.expectedPersonalScore == personal) &&
                 (!saying.requiresFreeSpeech || freeSpeechEnabled)
         }
-        val clean = band.filter { saying -> !saying.requiresFreeSpeech }
-        return eligible.ifEmpty { clean.ifEmpty { band } }
+        val clean = band.filter { saying ->
+            seasonMatches(saying) &&
+                !saying.requiresFreeSpeech &&
+                !saying.requiresPersonalAgreement &&
+                !saying.requiresPersonalDifference
+        }
+        return eligible.ifEmpty { clean.ifEmpty { band.filter(::seasonMatches).ifEmpty { band } } }
     }
+
+    private fun seasonMatches(saying: GrannySaying): Boolean =
+        saying.season == GrannySeason.ALL_YEAR || saying.season == season
 
     private fun drawTone(weights: ToneWeights, band: List<GrannySaying>): GrannyTone? {
         val present = buildList {

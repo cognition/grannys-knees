@@ -14,6 +14,7 @@ private val REQUIRED_HOURLY_VARIABLES = listOf(
     "temperature_2m",
     "relative_humidity_2m",
     "surface_pressure",
+    "weather_code",
 )
 
 /**

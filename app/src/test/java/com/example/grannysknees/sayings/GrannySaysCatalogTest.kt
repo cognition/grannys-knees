@@ -36,9 +36,56 @@ class GrannySaysCatalogTest {
     }
 
     @Test
+    fun `loads bonus and wildcard ranges into every covered score`() {
+        // Bonus + wildcards use minIndex/maxIndex and must land in those bands.
+        assertTrue(
+            "score 5 should include ranged sayings",
+            catalog.sayingsForScore(5).size >= 100,
+        )
+        assertTrue(
+            catalog.sayingsForScore(1).any {
+                it.text == "The knees approve. Carry on."
+            },
+        )
+        assertTrue(
+            catalog.sayingsForScore(4).any {
+                it.text == "Take the day as it comes. The knees certainly are."
+            },
+        )
+    }
+
+    @Test
+    fun `free-speech section lines require the free-speech toggle`() {
+        val gated = catalog.sayingsForScore(7).filter { it.requiresFreeSpeech }
+        assertTrue(gated.size >= 15)
+    }
+
+    @Test
     fun `out of range scores clamp into the supported window`() {
         assertEquals(catalog.sayingsForScore(1), catalog.sayingsForScore(-3))
         assertEquals(catalog.sayingsForScore(10), catalog.sayingsForScore(99))
+    }
+
+    @Test
+    fun `winter wording is tagged as seasonal`() {
+        assertTrue(
+            catalog.sayingsForScore(6).any {
+                it.season == GrannySeason.WINTER && it.text.contains("shovel")
+            },
+        )
+    }
+
+    @Test
+    fun `personal comparison sayings are gated to matching scores`() {
+        val agree = catalog.sayingsForScore(4).single {
+            it.text.startsWith("Standard says four; personalized says four.")
+        }
+        assertTrue(agree.requiresPersonalAgreement)
+        val differ = catalog.sayingsForScore(4).single {
+            it.text.startsWith("Standard says four; personalized says five.")
+        }
+        assertTrue(differ.requiresPersonalDifference)
+        assertEquals(5, differ.expectedPersonalScore)
     }
 
     private fun canonicalJson(): String {

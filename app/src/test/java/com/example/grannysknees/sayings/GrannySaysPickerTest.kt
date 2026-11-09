@@ -92,6 +92,39 @@ class GrannySaysPickerTest {
     }
 
     @Test
+    fun `personal agreement sayings are hidden when scores differ`() {
+        val agree = GrannySaying(
+            tone = GrannyTone.WRY,
+            text = "Standard says four; personalized says four. Even the fussy numbers agree.",
+            requiresPersonalAgreement = true,
+        )
+        val usual = GrannySaying(GrannyTone.WARM, "usual")
+        val picker = GrannySaysPicker(listOf(usual, agree), random = Random(7))
+
+        picker.showForScore(4, personalScore = 2)
+        assertEquals("usual", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+        picker.showForScore(4, personalScore = 4)
+        assertEquals(agree.text, picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+    }
+
+    @Test
+    fun `personal difference sayings require the claimed personal score`() {
+        val differ = GrannySaying(
+            tone = GrannyTone.WRY,
+            text = "Standard says four; personalized says five.",
+            requiresPersonalDifference = true,
+            expectedPersonalScore = 5,
+        )
+        val usual = GrannySaying(GrannyTone.WARM, "usual")
+        val picker = GrannySaysPicker(listOf(usual, differ), random = Random(8))
+
+        picker.showForScore(4, personalScore = 2)
+        assertEquals("usual", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+        picker.showForScore(4, personalScore = 5)
+        assertEquals(differ.text, picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+    }
+
+    @Test
     fun `free speech sayings are hidden by default`() {
         val clean = GrannySaying(GrannyTone.WARM, "clean")
         val salty = GrannySaying(GrannyTone.WRY, "salty", requiresFreeSpeech = true)
@@ -101,5 +134,27 @@ class GrannySaysPickerTest {
         assertEquals("clean", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
         picker.showForScore(5, allowFreeSpeech = true)
         assertEquals("salty", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+    }
+
+    @Test
+    fun `winter sayings are hidden outside winter`() {
+        val allYear = GrannySaying(GrannyTone.WARM, "all year")
+        val winter = GrannySaying(GrannyTone.WRY, "winter", season = GrannySeason.WINTER)
+        val picker = GrannySaysPicker(listOf(allYear, winter), random = Random(5))
+
+        picker.showForScore(5, season = GrannySeason.SUMMER)
+        assertEquals("all year", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+        picker.showForScore(5, season = GrannySeason.WINTER)
+        assertEquals("winter", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+    }
+
+    @Test
+    fun `snow forecast enables winter sayings outside winter`() {
+        val allYear = GrannySaying(GrannyTone.WARM, "all year")
+        val winter = GrannySaying(GrannyTone.WRY, "winter", season = GrannySeason.WINTER)
+        val picker = GrannySaysPicker(listOf(allYear, winter), random = Random(6))
+
+        picker.showForScore(5, season = GrannySeason.SUMMER, snowInForecast = true)
+        assertEquals("winter", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
     }
 }

@@ -39,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -278,6 +279,33 @@ internal fun JournalScreen(
                             matchHeightConstraintsFirst = true,
                         ),
                 )
+                TextButton(
+                    onClick = {
+                        if (!editing) {
+                            return@TextButton
+                        }
+                        val cleared = store.fresh(Instant.now())
+                        scope.launch {
+                            withContext(Dispatchers.IO) { store.write(cleared) }
+                        }
+                        chosen = cleared.places
+                        focus = 0
+                        playing = false
+                        framePlaces = null
+                        frameLabel = null
+                        notice = context.getString(R.string.journal_figure_clear_done)
+                    },
+                    enabled = editing,
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.journal_figure_clear),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
             }
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -337,33 +365,6 @@ internal fun JournalScreen(
                     contentDescription = ratingDescription
                 },
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.journal_feel_tune_title),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Text(
-                        text = stringResource(
-                            if (feelCalibrationEnabled) {
-                                R.string.journal_feel_tune_hint_on
-                            } else {
-                                R.string.journal_feel_tune_hint_off
-                            },
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Switch(
-                    checked = feelCalibrationEnabled,
-                    onCheckedChange = onFeelCalibrationEnabledChange,
-                )
-            }
             Button(
                 onClick = {
                     scope.launch {
@@ -489,6 +490,25 @@ internal fun JournalScreen(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.journal_feel_tune_compact),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(
+                    checked = feelCalibrationEnabled,
+                    onCheckedChange = onFeelCalibrationEnabledChange,
+                    modifier = Modifier.scale(0.55f),
+                )
             }
         }
     }

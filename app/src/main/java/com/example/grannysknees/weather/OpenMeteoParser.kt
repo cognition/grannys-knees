@@ -43,6 +43,7 @@ object OpenMeteoParser {
     private const val KEY_TEMPERATURE = "temperature_2m"
     private const val KEY_HUMIDITY = "relative_humidity_2m"
     private const val KEY_PRESSURE = "surface_pressure"
+    private const val KEY_WEATHER_CODE = "weather_code"
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -72,6 +73,7 @@ object OpenMeteoParser {
         val temperatures = hourly.optionalDoubleColumn(KEY_TEMPERATURE, epochs.size)
         val humidities = hourly.optionalIntColumn(KEY_HUMIDITY, epochs.size)
         val pressures = hourly.optionalDoubleColumn(KEY_PRESSURE, epochs.size)
+        val weatherCodes = hourly.optionalIntColumnIfPresent(KEY_WEATHER_CODE, epochs.size)
 
         val hours = epochs.mapIndexed { i, epoch ->
             val instant = Instant.ofEpochSecond(epoch)
@@ -85,6 +87,7 @@ object OpenMeteoParser {
                 temperature2m = temperatures[i],
                 relativeHumidity2m = humidities[i],
                 surfacePressure = pressures[i],
+                weatherCode = weatherCodes?.get(i),
             )
         }
 
@@ -124,6 +127,7 @@ object OpenMeteoParser {
             temperature2m = u.requireString(KEY_TEMPERATURE),
             relativeHumidity2m = u.requireString(KEY_HUMIDITY),
             surfacePressure = u.requireString(KEY_PRESSURE),
+            weatherCode = u[KEY_WEATHER_CODE]?.contentOrNull(),
         )
     }
 
@@ -180,6 +184,9 @@ object OpenMeteoParser {
 
     private fun JsonObject.optionalIntColumn(key: String, expectedSize: Int): List<Int?> =
         requireColumn(key, expectedSize).map { it.intOrNullPreservingNull(key) }
+
+    private fun JsonObject.optionalIntColumnIfPresent(key: String, expectedSize: Int): List<Int?>? =
+        if (this[key] == null) null else optionalIntColumn(key, expectedSize)
 
     private fun JsonObject.requireColumn(key: String, expectedSize: Int): JsonArray {
         val array = arr(key)

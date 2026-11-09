@@ -58,6 +58,7 @@ import com.example.grannysknees.data.SelectedCityStore
 import com.example.grannysknees.location.OptionalGpsPlaceSource
 import com.example.grannysknees.sayings.GrannySaysCatalog
 import com.example.grannysknees.sayings.GrannySaysPicker
+import com.example.grannysknees.sayings.GrannySeason
 import com.example.grannysknees.ui.place.CitySearchScreen
 import com.example.grannysknees.weather.OpenMeteoGeocodingClient
 import com.example.grannysknees.ui.outlook.OutlookSection
@@ -69,6 +70,7 @@ import com.example.grannysknees.ui.theme.personalIndexColour
 import com.example.grannysknees.widget.GrannysKneesWidget
 import androidx.glance.appwidget.updateAll
 import java.math.RoundingMode
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 
 import kotlinx.coroutines.delay
@@ -413,12 +415,22 @@ private fun IndexCard(
     val picker = remember {
         loadGrannySaysPicker(context.assets)
     }
+    val season = GrannySeason.current(LocalDate.now().monthValue)
     var sayingText by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(state.score, picker) {
+    LaunchedEffect(
+        state.score,
+        state.personalScore,
+        grannySpeaksFreely,
+        state.forecastHasSnow,
+        picker,
+        season,
+    ) {
         sayingText = picker?.showForScore(
             score = state.score.setScale(0, RoundingMode.HALF_UP).intValueExact(),
             personalScore = state.personalScore?.setScale(0, RoundingMode.HALF_UP)?.intValueExact(),
             allowFreeSpeech = grannySpeaksFreely,
+            season = season,
+            snowInForecast = state.forecastHasSnow,
         )?.text
     }
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -476,6 +488,9 @@ private fun IndexCard(
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
                     softWrap = true,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = true),
                 )
             }

@@ -176,7 +176,11 @@ internal fun GrannysKneesApp(
                             sensitivityStore?.writeGrannySpeaksFreely(enabled)
                         },
                         feelCalibrationStore = feelCalibrationStore,
-                        onDataReset = { journalDataEpoch += 1 },
+                        onFeelCleared = { sensitivityEpoch += 1 },
+                        onDataReset = {
+                            journalDataEpoch += 1
+                            sensitivityEpoch += 1
+                        },
                     )
                 }
                 composable(AppDestination.About.route) {

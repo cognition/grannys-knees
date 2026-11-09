@@ -96,7 +96,7 @@ class WeatherIndexScorerTest {
     }
 
     @Test
-    fun personalPressureSensitivityChangesScore() {
+    fun personalPressureSensitivityRaisesScoreWhenPressureFalls() {
         val request = windowRequest(
             priorPressure = 1020.0,
             priorHumidity = 50.0,
@@ -113,7 +113,43 @@ class WeatherIndexScorerTest {
         val personalScore = personal.hours.last().indexScore!!
 
         assertEquals("index-v2-personal", personal.indexVersion)
-        assertTrue(personalScore.compareTo(baseline) != 0)
+        assertTrue(personalScore.compareTo(baseline) > 0)
+    }
+
+    @Test
+    fun personalSensitivityDoesNotLowerScoreOnReliefWeather() {
+        // Galaxy-shaped hour: rising pressure, falling humidity — baseline ~4.1.
+        // High “hits you hard” sliders used to amplify relief and drop Personal to ~2.9.
+        val request = windowRequest(
+            priorPressure = 1005.0,
+            priorHumidity = 70.0,
+            priorTemperature = 5.0,
+            nowPressure = 1013.4,
+            nowHumidity = 50.0,
+            nowTemperature = 4.1,
+        )
+        val baseline = WeatherIndexScorer.score(request).hours.last().indexScore!!
+        val personal = WeatherIndexScorer.score(
+            request,
+            DeltaSensitivities.fromMultipliers(2f, 1.8f, 1.4f),
+        ).hours.last().indexScore!!
+
+        assertTrue(
+            "personal $personal should be at least baseline $baseline on relief weather",
+            personal.compareTo(baseline) >= 0,
+        )
+    }
+
+    @Test
+    fun scaleContributionAmplifiesProvocationAndDampensRelief() {
+        val bad = WeatherIndexScorer.scaleContribution(BigDecimal("10"), BigDecimal("2"))
+        val good = WeatherIndexScorer.scaleContribution(BigDecimal("-10"), BigDecimal("2"))
+        assertEquals(0, BigDecimal("20").compareTo(bad))
+        assertEquals(0, BigDecimal.ZERO.compareTo(good))
+        val neutralBad = WeatherIndexScorer.scaleContribution(BigDecimal("10"), BigDecimal.ONE)
+        val neutralGood = WeatherIndexScorer.scaleContribution(BigDecimal("-10"), BigDecimal.ONE)
+        assertEquals(0, BigDecimal("10").compareTo(neutralBad))
+        assertEquals(0, BigDecimal("-10").compareTo(neutralGood))
     }
 
     @Test

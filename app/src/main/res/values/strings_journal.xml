@@ -42,5 +42,8 @@
     <string name="journal_feel_tune_title">Use these reports to tune real-feel</string>
     <string name="journal_feel_tune_hint_on">After ten spaced check-ins, Feel can gently tune Personal real-feel.</string>
     <string name="journal_feel_tune_hint_off">Recording only — Feel will not change real-feel.</string>
+    <string name="journal_figure_clear">Clear</string>
+    <string name="journal_figure_clear_done">Figure reset. Mark how you feel again.</string>
+    <string name="journal_feel_tune_compact">Tune real-feel from Feel</string>
     <string name="journal_feel_no_backdate">You cannot currently go back in time to report earlier in the day. Each save is for now.</string>
 </resources>

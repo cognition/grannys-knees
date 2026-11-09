@@ -41,6 +41,7 @@ object WeatherIndexScorer {
     private val INDEX_MIN = BigDecimal.ONE
     private val INDEX_MAX = BigDecimal.TEN
     private val NINE = BigDecimal("9")
+    private val TWO = BigDecimal("2")
 
     private const val SCALE_DELTA = 2
     private const val SCALE_INDEX_RAW = 4
@@ -63,8 +64,13 @@ object WeatherIndexScorer {
         score(request, DeltaSensitivities.BASELINE)
 
     /**
-     * Score every hour, optionally scaling each 12-hour delta before the signal.
+     * Score every hour, optionally applying personal **influence** weights to
+     * each signed contribution before the signal map.
      *
+     * Influence means how much that weather factor affects the person — not
+     * “high vs low pressure” or “hot vs cold”. Higher influence amplifies
+     * contributions that raise discomfort and dampens relief from that factor,
+     * so dialling influence up does not push Personal *down* on a calming day.
      * Non-baseline sensitivities stamp [PERSONAL_INDEX_VERSION].
      */
     internal fun score(
@@ -118,9 +124,15 @@ object WeatherIndexScorer {
 
         val signal: BigDecimal? =
             if (deltaPressure != null && deltaHumidity != null && deltaTemperature != null) {
-                deltaHumidity.multiply(sensitivities.humidity, MC)
-                    .subtract(deltaPressure.multiply(sensitivities.pressure, MC), MC)
-                    .subtract(deltaTemperature.multiply(sensitivities.temperature, MC), MC)
+                // Contributions match baseline signal = ΔH − ΔP − ΔT.
+                val humidityContribution = scaleContribution(deltaHumidity, sensitivities.humidity)
+                val pressureContribution =
+                    scaleContribution(deltaPressure.negate(), sensitivities.pressure)
+                val temperatureContribution =
+                    scaleContribution(deltaTemperature.negate(), sensitivities.temperature)
+                humidityContribution
+                    .add(pressureContribution, MC)
+                    .add(temperatureContribution, MC)
             } else {
                 null
             }
@@ -163,6 +175,28 @@ object WeatherIndexScorer {
         val shifted = signal.subtract(SIGNAL_FLOOR, MC)
         val scaled = shifted.multiply(NINE, MC).divide(SIGNAL_SPAN, MC)
         return INDEX_MIN.add(scaled, MC).coerceIn(INDEX_MIN, INDEX_MAX)
+    }
+
+    /**
+     * Scales one signed contribution by an influence multiplier.
+     *
+     * Positive contributions (toward discomfort) are multiplied by [sensitivity].
+     * Negative (relief) contributions are multiplied by `2 − sensitivity`, so
+     * at the default `1` nothing changes, at strong influence (`2`) relief from
+     * that factor is ignored, and at `0` that factor does not push discomfort.
+     */
+    internal fun scaleContribution(
+        contribution: BigDecimal,
+        sensitivity: BigDecimal,
+    ): BigDecimal {
+        val sign = contribution.signum()
+        if (sign == 0) return BigDecimal.ZERO
+        return if (sign > 0) {
+            contribution.multiply(sensitivity, MC)
+        } else {
+            val reliefFactor = TWO.subtract(sensitivity, MC)
+            contribution.multiply(reliefFactor, MC)
+        }
     }
 
     private fun buildReasons(

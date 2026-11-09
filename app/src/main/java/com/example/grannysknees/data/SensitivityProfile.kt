@@ -3,11 +3,11 @@ package com.example.grannysknees.data
 import com.example.grannysknees.index.DeltaSensitivities
 
 /**
- * User sensitivity multipliers for the personal index curve.
+ * How much each weather factor influences the personal real-feel curve.
  *
- * Each factor is clamped to [MIN]–[MAX]. [DEFAULT] (all 1) matches the shared
- * `index-v2` Weather line. Factors scale the matching 12-hour weather delta
- * before the signal is mapped onto 1–10.
+ * This is influence (does pressure / humidity / temperature affect you?), not
+ * a high-vs-low or hot-vs-cold preference. Each factor is clamped to
+ * [MIN]–[MAX]. [DEFAULT] (all 1) matches the shared `index-v2` Weather line.
  */
 internal data class SensitivityProfile(
     val pressure: Float = DEFAULT_SENSITIVITY,
@@ -49,8 +49,8 @@ internal data class SensitivityProfile(
         private const val DEFAULT_EPSILON: Float = 0.0001f
 
         /**
-         * User-facing real-feel scale on Settings sliders.
-         * 0 = no adjustment (standard multiplier); 10 = strongest boost.
+         * User-facing influence scale on Settings sliders.
+         * 0 = no influence adjustment (standard); 10 = strongest influence.
          */
         const val DISPLAY_MIN: Float = 0f
         const val DISPLAY_MAX: Float = 10f
@@ -60,8 +60,8 @@ internal data class SensitivityProfile(
         val DEFAULT: SensitivityProfile = SensitivityProfile()
 
         /**
-         * Maps a stored multiplier onto the 0–10 scale.
-         * Values at or below the default read as 0 (no adjustment).
+         * Maps a stored multiplier onto the 0–10 influence scale.
+         * Values at or below the default read as 0 (no influence).
          */
         fun toDisplayScale(multiplier: Float): Float {
             val safe = multiplier.coerceIn(MIN, MAX)
@@ -71,8 +71,8 @@ internal data class SensitivityProfile(
         }
 
         /**
-         * Maps a 0–10 rating to a stored multiplier.
-         * 0 → default (no adjustment); 10 → maximum boost.
+         * Maps a 0–10 influence rating to a stored multiplier.
+         * 0 → default (no influence); 10 → strongest influence.
          */
         fun fromDisplayScale(display: Float): Float {
             val rating = display.coerceIn(DISPLAY_MIN, DISPLAY_MAX)
