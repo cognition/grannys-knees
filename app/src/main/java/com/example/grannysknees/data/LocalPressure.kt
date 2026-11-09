@@ -23,15 +23,17 @@ internal class LocalPressureStore(
     private val file: File,
     private val json: Json = Json,
 ) {
-    fun read(): LocalPressureReading? = try {
-        if (!file.exists()) return null
-        val root = json.parseToJsonElement(file.readText()).jsonObject
-        val pressure = root["pressureHpa"]?.jsonPrimitive?.doubleOrNull ?: return null
-        val epoch = root["recordedAtEpoch"]?.jsonPrimitive?.longOrNull ?: return null
-        if (!pressure.isFinite() || pressure <= 0.0) null
-        else LocalPressureReading(pressure, Instant.ofEpochSecond(epoch))
-    } catch (_: Exception) {
-        null
+    fun read(): LocalPressureReading? {
+        return try {
+            if (!file.exists()) return null
+            val root = json.parseToJsonElement(file.readText()).jsonObject
+            val pressure = root["pressureHpa"]?.jsonPrimitive?.doubleOrNull ?: return null
+            val epoch = root["recordedAtEpoch"]?.jsonPrimitive?.longOrNull ?: return null
+            if (!pressure.isFinite() || pressure <= 0.0) null
+            else LocalPressureReading(pressure, Instant.ofEpochSecond(epoch))
+        } catch (_: Exception) {
+            null
+        }
     }
 
     fun write(reading: LocalPressureReading) {
