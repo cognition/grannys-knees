@@ -39,6 +39,7 @@ internal class ForecastRepository(
     private val cityStore: SelectedCityStore? = null,
     private val fetchStampStore: DailyFetchStampStore? = null,
     private val sensitivityStore: SensitivityProfileStore? = null,
+    private val localPressureStore: LocalPressureStore? = null,
     private val feelCalibrationStore: FeelCalibrationStore? = null,
     private val locationLabel: String = DefaultLocation.LABEL,
     private val latitude: Double = DefaultLocation.LATITUDE,
@@ -153,9 +154,11 @@ internal class ForecastRepository(
 
         val request = WeatherToScoringAdapter.toScoringRequest(forecast)
         val scored = WeatherIndexScorer.score(request)
-        val personalProfile = resolvePersonalProfile()
+        val personalProfile = resolvePersonalProfile() ?:
+            SensitivityProfile.DEFAULT.takeIf { localPressureEnabled() }
+        val personalRequest = personalScoringRequest(forecast, referenceNow)
         val personal = personalProfile?.let { profile ->
-            WeatherIndexScorer.score(request, profile.toDeltaSensitivities())
+            WeatherIndexScorer.score(personalRequest, profile.toDeltaSensitivities())
         }
         return TodayMapper.toUiState(
             locationLabel = envelope.locationLabel,
@@ -194,9 +197,11 @@ internal class ForecastRepository(
         }
         val request = WeatherToScoringAdapter.toScoringRequest(forecast)
         val scored = WeatherIndexScorer.score(request)
-        val personalProfile = resolvePersonalProfile()
+        val personalProfile = resolvePersonalProfile() ?:
+            SensitivityProfile.DEFAULT.takeIf { localPressureEnabled() }
+        val personalRequest = personalScoringRequest(forecast, referenceNow)
         val personal = personalProfile?.let { profile ->
-            WeatherIndexScorer.score(request, profile.toDeltaSensitivities())
+            WeatherIndexScorer.score(personalRequest, profile.toDeltaSensitivities())
         }
         return OutlookMapper.toOutlook(
             indexResult = scored,
@@ -259,6 +264,27 @@ internal class ForecastRepository(
             samples = samples,
         )
     }
+
+    private fun personalScoringRequest(
+        forecast: com.example.grannysknees.weather.HourlyForecast,
+        referenceNow: Instant,
+    ) = if (sensitivityStore?.readLocalPressureEnabled() == true) {
+        val blended = LocalPressureBlend.pressureForCurrentHour(
+            forecast = forecast,
+            reading = localPressureStore?.read(),
+            now = referenceNow,
+        )
+        WeatherToScoringAdapter.toScoringRequest(
+            forecast = forecast,
+            localPressureHpa = blended,
+            referenceNow = referenceNow,
+        )
+    } else {
+        WeatherToScoringAdapter.toScoringRequest(forecast)
+    }
+
+    private fun localPressureEnabled(): Boolean =
+        sensitivityStore?.readLocalPressureEnabled() == true
 
     /** Delay until the next hour or freshness boundary for the cached envelope. */
     fun delayUntilNextPresentationChange(

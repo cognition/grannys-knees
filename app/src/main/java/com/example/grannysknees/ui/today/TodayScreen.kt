@@ -64,7 +64,7 @@ import com.example.grannysknees.weather.OpenMeteoGeocodingClient
 import com.example.grannysknees.ui.outlook.OutlookSection
 import com.example.grannysknees.ui.outlook.OutlookUiState
 import com.example.grannysknees.ui.outlook.SampleOutlookStates
-import com.example.grannysknees.ui.theme.BrandLogo
+import com.example.grannysknees.ui.theme.BrandHeading
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
 import com.example.grannysknees.ui.theme.personalIndexColour
 import com.example.grannysknees.widget.GrannysKneesWidget
@@ -229,16 +229,7 @@ internal fun TodayScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        BrandLogo(
-                            modifier = Modifier.size(40.dp),
-                            contentDescription = null,
-                        )
-                        Text(stringResource(R.string.today_title))
-                    }
+                    BrandHeading(title = stringResource(R.string.today_title))
                 },
                 actions = {
                     if (onRefresh != null) {
@@ -467,21 +458,27 @@ private fun IndexCard(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        val line = sayingText
-        if (line != null && picker != null) {
+        // Always reserve two saying lines so Another saying never shifts the layout.
+        if (picker != null) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.padding(top = 6.dp),
             ) {
                 CircularRefreshButton(
-                    onClick = { sayingText = picker.refresh()?.text },
+                    onClick = {
+                        val next = picker.refresh()?.text
+                        if (next != null) {
+                            sayingText = next
+                        }
+                    },
                     contentDescription = stringResource(R.string.today_another_saying),
                     buttonSize = 28.dp,
                     iconSize = 16.dp,
+                    enabled = sayingText != null,
                 )
                 Text(
-                    text = line,
+                    text = sayingText.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Medium,

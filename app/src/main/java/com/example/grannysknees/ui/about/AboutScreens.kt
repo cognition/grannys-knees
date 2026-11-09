@@ -46,6 +46,7 @@ import com.example.grannysknees.data.SensitivityProfile
 import com.example.grannysknees.journal.JournalDatabase
 import com.example.grannysknees.journal.JournalRepository
 import com.example.grannysknees.ui.tabDestinationWindowInsets
+import com.example.grannysknees.ui.theme.BrandHeading
 import com.example.grannysknees.ui.theme.GrannyCorner
 import com.example.grannysknees.ui.theme.ThemePreference
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +74,13 @@ internal fun OnboardingScreen(
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.onboarding_title)) }) },
+        topBar = {
+            TopAppBar(
+                title = {
+                    BrandHeading(title = stringResource(R.string.onboarding_title))
+                },
+            )
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -105,7 +112,9 @@ internal fun AboutScreen(
         contentWindowInsets = tabDestinationWindowInsets(),
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.journal_open_about)) },
+                title = {
+                    BrandHeading(title = stringResource(R.string.journal_open_about))
+                },
                 navigationIcon = {
                     TextButton(onClick = onBack) {
                         Text(stringResource(R.string.settings_back))
@@ -175,6 +184,8 @@ internal fun SettingsScreen(
     onFeelCalibrationEnabledChange: (Boolean) -> Unit = {},
     grannySpeaksFreely: Boolean = false,
     onGrannySpeaksFreelyChange: (Boolean) -> Unit = {},
+    localPressureEnabled: Boolean = false,
+    onLocalPressureEnabledChange: (Boolean) -> Unit = {},
     feelCalibrationStore: FeelCalibrationStore? = null,
     onFeelCleared: () -> Unit = {},
     onDataReset: () -> Unit = {},
@@ -200,7 +211,9 @@ internal fun SettingsScreen(
         contentWindowInsets = tabDestinationWindowInsets(),
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.settings_title)) },
+                title = {
+                    BrandHeading(title = stringResource(R.string.settings_title))
+                },
             )
         },
     ) { innerPadding ->
@@ -224,6 +237,10 @@ internal fun SettingsScreen(
                     onFeelCleared()
                     resetNotice = context.getString(R.string.about_feel_clear_done)
                 },
+            )
+            LocalPressureSection(
+                enabled = localPressureEnabled,
+                onEnabledChange = onLocalPressureEnabledChange,
             )
             FreeSpeechSection(
                 enabled = grannySpeaksFreely,
@@ -286,6 +303,31 @@ internal fun SettingsScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun LocalPressureSection(
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.about_local_pressure_title),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Text(
+                text = stringResource(R.string.about_local_pressure_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = enabled, onCheckedChange = onEnabledChange)
     }
 }
 

@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.grannysknees.R
 import com.example.grannysknees.ui.tabDestinationWindowInsets
+import com.example.grannysknees.ui.theme.BrandHeading
 
 /**
  * In-app privacy policy page.
@@ -33,7 +34,9 @@ internal fun PrivacyScreen(onBack: () -> Unit) {
         contentWindowInsets = tabDestinationWindowInsets(),
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.privacy_title)) },
+                title = {
+                    BrandHeading(title = stringResource(R.string.privacy_title))
+                },
                 navigationIcon = {
                     TextButton(onClick = onBack) {
                         Text(stringResource(R.string.privacy_back))

@@ -31,6 +31,9 @@ internal class SensitivityProfileStore(
     /** Whether optional salty Granny lines are allowed. */
     fun readGrannySpeaksFreely(): Boolean = readState().grannySpeaksFreely
 
+    /** Whether the phone barometer may refine the Personal pressure signal. */
+    fun readLocalPressureEnabled(): Boolean = readState().localPressureEnabled
+
     /** Combined Adj + Feel opt-in state. */
     fun readState(): SensitivityPreferences {
         if (!file.exists()) return SensitivityPreferences.DEFAULT
@@ -60,6 +63,11 @@ internal class SensitivityProfileStore(
         writeState(readState().copy(grannySpeaksFreely = enabled))
     }
 
+    /** Updates the local-pressure switch; keeps the other preferences. */
+    fun writeLocalPressureEnabled(enabled: Boolean) {
+        writeState(readState().copy(localPressureEnabled = enabled))
+    }
+
     /** Replaces Adj and Feel opt-in together. */
     fun writeState(state: SensitivityPreferences) {
         val safe = state.copy(profile = state.profile.clamped())
@@ -73,6 +81,7 @@ internal class SensitivityProfileStore(
             put("cold", safe.profile.cold)
             put("feelCalibrationEnabled", safe.feelCalibrationEnabled)
             put("grannySpeaksFreely", safe.grannySpeaksFreely)
+            put("localPressureEnabled", safe.localPressureEnabled)
         }.toString()
         file.writeText(payload, Charsets.UTF_8)
     }
@@ -84,6 +93,7 @@ internal class SensitivityProfileStore(
         val cold = root.float("cold") ?: return null
         val feelEnabled = root["feelCalibrationEnabled"]?.jsonPrimitive?.booleanOrNull ?: true
         val grannySpeaksFreely = root["grannySpeaksFreely"]?.jsonPrimitive?.booleanOrNull ?: false
+        val localPressureEnabled = root["localPressureEnabled"]?.jsonPrimitive?.booleanOrNull ?: false
         return SensitivityPreferences(
             profile = SensitivityProfile(
                 pressure = pressure,
@@ -92,6 +102,7 @@ internal class SensitivityProfileStore(
             ).clamped(),
             feelCalibrationEnabled = feelEnabled,
             grannySpeaksFreely = grannySpeaksFreely,
+            localPressureEnabled = localPressureEnabled,
         )
     }
 
@@ -109,6 +120,7 @@ internal data class SensitivityPreferences(
     val profile: SensitivityProfile = SensitivityProfile.DEFAULT,
     val feelCalibrationEnabled: Boolean = true,
     val grannySpeaksFreely: Boolean = false,
+    val localPressureEnabled: Boolean = false,
 ) {
     companion object {
         val DEFAULT: SensitivityPreferences = SensitivityPreferences()

@@ -47,6 +47,7 @@ import com.example.grannysknees.ui.about.OnboardingScreen
 import com.example.grannysknees.ui.about.OnboardingStore
 import com.example.grannysknees.ui.about.SettingsScreen
 import com.example.grannysknees.ui.privacy.PrivacyScreen
+import com.example.grannysknees.ui.theme.BrandHeading
 import com.example.grannysknees.ui.theme.GrannysKneesTheme
 import com.example.grannysknees.ui.theme.ThemePreference
 import com.example.grannysknees.ui.theme.ThemePreferenceStore
@@ -74,6 +75,9 @@ internal fun GrannysKneesApp(
     var grannySpeaksFreely by remember {
         mutableStateOf(sensitivityStore?.readGrannySpeaksFreely() ?: false)
     }
+    var localPressureEnabled by remember {
+        mutableStateOf(sensitivityStore?.readLocalPressureEnabled() ?: false)
+    }
     var sensitivityEpoch by remember { mutableStateOf(0) }
     var journalDataEpoch by remember { mutableIntStateOf(0) }
     GrannysKneesTheme(darkTheme = themePreference.resolveDark(systemDark)) {
@@ -89,7 +93,14 @@ internal fun GrannysKneesApp(
         }
         val navController = rememberNavController()
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-        val showTabs = currentRoute == null || bottomTabs.any { it.destination.route == currentRoute }
+        // Privacy stays inside the About tab shell (same bottom bar area).
+        val showTabs = currentRoute == null ||
+            currentRoute == AppDestination.Privacy.route ||
+            bottomTabs.any { it.destination.route == currentRoute }
+        val selectedTabRoute = when (currentRoute) {
+            AppDestination.Privacy.route -> AppDestination.About.route
+            else -> currentRoute
+        }
         // Zero content insets here: the bottom bar owns system-nav padding, and
         // each destination Scaffold owns status-bar / top insets. Applying
         // safeDrawing again on the outer Scaffold doubled the gap above the tabs.
@@ -98,7 +109,7 @@ internal fun GrannysKneesApp(
             bottomBar = {
                 if (showTabs) {
                     BottomTabs(
-                        currentRoute = currentRoute,
+                        currentRoute = selectedTabRoute,
                         onSelect = { route ->
                             navController.navigate(route) {
                                 popUpTo(AppDestination.Today.route) {
@@ -149,7 +160,15 @@ internal fun GrannysKneesApp(
                     }
                 }
                 composable(AppDestination.Privacy.route) {
-                    PrivacyScreen(onBack = { navController.popBackStack() })
+                    PrivacyScreen(
+                        onBack = {
+                            if (!navController.popBackStack()) {
+                                navController.navigate(AppDestination.About.route) {
+                                    launchSingleTop = true
+                                }
+                            }
+                        },
+                    )
                 }
                 composable(AppDestination.Settings.route) {
                     SettingsScreen(
@@ -175,6 +194,12 @@ internal fun GrannysKneesApp(
                             grannySpeaksFreely = enabled
                             sensitivityStore?.writeGrannySpeaksFreely(enabled)
                         },
+                        localPressureEnabled = localPressureEnabled,
+                        onLocalPressureEnabledChange = { enabled ->
+                            localPressureEnabled = enabled
+                            sensitivityStore?.writeLocalPressureEnabled(enabled)
+                            sensitivityEpoch += 1
+                        },
                         feelCalibrationStore = feelCalibrationStore,
                         onFeelCleared = { sensitivityEpoch += 1 },
                         onDataReset = {
@@ -187,7 +212,9 @@ internal fun GrannysKneesApp(
                     AboutScreen(
                         onBack = { navController.popBackStack() },
                         onOpenPrivacy = {
-                            navController.navigate(AppDestination.Privacy.route)
+                            navController.navigate(AppDestination.Privacy.route) {
+                                launchSingleTop = true
+                            }
                         },
                     )
                 }
@@ -249,7 +276,7 @@ private fun FoundationShell() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(AppDestination.Home.title) },
+                title = { BrandHeading(title = AppDestination.Home.title) },
             )
         },
     ) { innerPadding ->

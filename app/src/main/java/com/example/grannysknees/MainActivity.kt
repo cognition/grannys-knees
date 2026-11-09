@@ -8,6 +8,8 @@ import com.example.grannysknees.data.DailyFetchStampStore
 import com.example.grannysknees.data.FeelCalibrationStore
 import com.example.grannysknees.data.ForecastCacheStore
 import com.example.grannysknees.data.ForecastRepository
+import com.example.grannysknees.data.LocalBarometerSensor
+import com.example.grannysknees.data.LocalPressureStore
 import com.example.grannysknees.data.SelectedCityStore
 import com.example.grannysknees.data.SensitivityProfileStore
 import com.example.grannysknees.ui.GrannysKneesApp
@@ -17,6 +19,8 @@ import com.example.grannysknees.watch.WatchIndexPublisher
 import java.io.File
 
 class MainActivity : ComponentActivity() {
+    private lateinit var localBarometerSensor: LocalBarometerSensor
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -25,6 +29,8 @@ class MainActivity : ComponentActivity() {
         val stampFile = File(filesDir, "forecast-fetch-day.txt")
         val sensitivityFile = File(filesDir, "sensitivity-profile.json")
         val feelCalibrationFile = File(filesDir, "feel-calibration.json")
+        val localPressureStore = LocalPressureStore(File(filesDir, "local-pressure.json"))
+        localBarometerSensor = LocalBarometerSensor(this, localPressureStore)
         val cities = SelectedCityStore(cityFile)
         val sensitivityStore = SensitivityProfileStore(sensitivityFile)
         val feelCalibrationStore = FeelCalibrationStore(feelCalibrationFile)
@@ -33,6 +39,7 @@ class MainActivity : ComponentActivity() {
             cityStore = cities,
             fetchStampStore = DailyFetchStampStore(stampFile),
             sensitivityStore = sensitivityStore,
+            localPressureStore = localPressureStore,
             feelCalibrationStore = feelCalibrationStore,
         )
         setContent {
@@ -49,5 +56,14 @@ class MainActivity : ComponentActivity() {
         }
         WatchIndexPublisher(this).publish(repository.presentFromCache())
     }
-}
 
+    override fun onStart() {
+        super.onStart()
+        localBarometerSensor.start()
+    }
+
+    override fun onStop() {
+        localBarometerSensor.stop()
+        super.onStop()
+    }
+}

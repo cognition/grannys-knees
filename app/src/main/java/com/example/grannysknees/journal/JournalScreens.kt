@@ -52,6 +52,7 @@ import androidx.room.Room
 import com.example.grannysknees.R
 import com.example.grannysknees.data.FeelCalibrationStore
 import com.example.grannysknees.data.ForecastRepository
+import com.example.grannysknees.ui.theme.BrandHeading
 import com.example.grannysknees.ui.theme.GrannyCorner
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
@@ -182,7 +183,9 @@ internal fun JournalScreen(
         contentWindowInsets = tabDestinationWindowInsets(),
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.journal_open)) },
+                title = {
+                    BrandHeading(title = stringResource(R.string.journal_open))
+                },
             )
         },
     ) { innerPadding ->
@@ -604,7 +607,9 @@ internal fun HistoryScreen(
         contentWindowInsets = tabDestinationWindowInsets(),
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.journal_open_history)) },
+                title = {
+                    BrandHeading(title = stringResource(R.string.journal_open_history))
+                },
             )
         },
     ) { innerPadding ->
