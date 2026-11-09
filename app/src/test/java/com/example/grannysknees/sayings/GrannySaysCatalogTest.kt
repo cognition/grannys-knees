@@ -29,6 +29,13 @@ class GrannySaysCatalogTest {
     }
 
     @Test
+    fun `each score has ten additional sayings`() {
+        (1..10).forEach { score ->
+            assertTrue("score $score", catalog.sayingsForScore(score).size >= 16)
+        }
+    }
+
+    @Test
     fun `out of range scores clamp into the supported window`() {
         assertEquals(catalog.sayingsForScore(1), catalog.sayingsForScore(-3))
         assertEquals(catalog.sayingsForScore(10), catalog.sayingsForScore(99))

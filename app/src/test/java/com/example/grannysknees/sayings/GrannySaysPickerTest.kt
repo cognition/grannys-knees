@@ -75,4 +75,31 @@ class GrannySaysPickerTest {
         }
         assertTrue("expected mostly wry, got $wryHits", wryHits > 140)
     }
+
+    @Test
+    fun `personal difference sayings are hidden unless scores differ`() {
+        val conditional = GrannySaying(
+            tone = GrannyTone.WRY,
+            text = "different",
+            requiresPersonalDifference = true,
+        )
+        val picker = GrannySaysPicker(listOf(GrannySaying(GrannyTone.WARM, "usual"), conditional), random = Random(3))
+
+        picker.showForScore(5, personalScore = 5)
+        assertEquals("usual", picker.pick(ToneWeights(wry = 0, warm = 100, spicy = 0), null)!!.text)
+        picker.showForScore(5, personalScore = 7)
+        assertEquals("different", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+    }
+
+    @Test
+    fun `free speech sayings are hidden by default`() {
+        val clean = GrannySaying(GrannyTone.WARM, "clean")
+        val salty = GrannySaying(GrannyTone.WRY, "salty", requiresFreeSpeech = true)
+        val picker = GrannySaysPicker(listOf(clean, salty), random = Random(4))
+
+        picker.showForScore(5)
+        assertEquals("clean", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+        picker.showForScore(5, allowFreeSpeech = true)
+        assertEquals("salty", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+    }
 }

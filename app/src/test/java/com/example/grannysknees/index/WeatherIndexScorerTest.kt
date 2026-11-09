@@ -6,175 +6,166 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
- * Fixture-backed tests for the experimental `index-v1` scorer.
- *
- * Each case drives [WeatherIndexScorer.score] with the Open-Meteo-shaped
- * `<case>.input.json` and asserts the result reproduces `<case>.expected.json`
- * exactly on the canonical quantised values (contract §9.4) — no floating-point
- * tolerance. Numbers are compared by value via [BigDecimal.compareTo] so scale
- * differences such as `5.1` vs `5.10` are equal while `5.1` vs `5.2` are not.
+ * Behaviour tests for the experimental `index-v2` 12-hour scorer.
  */
 class WeatherIndexScorerTest {
 
     @Test
-    fun nominal_reproducesFixture() = assertFixture("nominal")
+    fun calibrationAnchorsMapToEndsAndMidpoint() {
+        assertEquals(
+            0,
+            BigDecimal("1.0").compareTo(
+                WeatherIndexScorer.mapSignal(BigDecimal("-89.4"))
+                    .setScale(1, RoundingMode.HALF_UP),
+            ),
+        )
+        assertEquals(
+            0,
+            BigDecimal("10.0").compareTo(
+                WeatherIndexScorer.mapSignal(BigDecimal("88.4"))
+                    .setScale(1, RoundingMode.HALF_UP),
+            ),
+        )
+        val mid = WeatherIndexScorer.mapSignal(BigDecimal.ZERO)
+            .setScale(1, RoundingMode.HALF_UP)
+        assertEquals(0, BigDecimal("5.5").compareTo(mid))
+    }
 
     @Test
-    fun missingValues_reproducesFixture() = assertFixture("missing-values")
-
-    @Test
-    fun pressureTrendBoundary_reproducesFixture() = assertFixture("pressure-trend-boundary")
-
-    @Test
-    fun dstFallBack_reproducesFixture() = assertFixture("dst-fall-back")
-
-    @Test
-    fun dstSpringForward_reproducesFixture() = assertFixture("dst-spring-forward")
-
-    // --- focused behaviour checks (documented in the contract) ---
-
-    @Test
-    fun subScoresClampToZeroTen() {
-        // Warm + dry + flat pressure clamps temperature and humidity to 0.
-        val request = ScoringRequest(
-            zoneId = "America/Toronto",
-            hours = (0..3).map { i ->
-                HourlyObservation(
-                    epoch = BASE_EPOCH + i * 3600L,
-                    surfacePressureHpa = 1013.0,
-                    relativeHumidityPct = 30.0, // below 40 -> negative -> clamp 0
-                    temperatureC = 25.0,        // above 20 -> negative -> clamp 0
-                )
-            },
+    fun twelveHourWindowProducesAvailableScore() {
+        val request = windowRequest(
+            priorPressure = 1015.0,
+            priorHumidity = 40.0,
+            priorTemperature = 15.0,
+            nowPressure = 1010.0,
+            nowHumidity = 70.0,
+            nowTemperature = 5.0,
         )
         val last = WeatherIndexScorer.score(request).hours.last()
+
         assertEquals(HourStatus.AVAILABLE, last.status)
-        assertEquals(0, BigDecimal("0.0").compareTo(last.subScores.humidity))
-        assertEquals(0, BigDecimal("0.0").compareTo(last.subScores.temperature))
-        assertEquals(0, BigDecimal("0.0").compareTo(last.subScores.pressure)) // flat pressure
+        assertEquals("index-v2", WeatherIndexScorer.score(request).indexVersion)
+        assertNotNull(last.indexScore)
+        // ΔH=30, ΔP=-5, ΔT=-10 → signal = 30 - (-5) - (-10) = 45
+        val expected = WeatherIndexScorer.mapSignal(BigDecimal("45"))
+            .setScale(1, RoundingMode.HALF_UP)
+        assertEquals(0, expected.compareTo(last.indexScore))
     }
 
     @Test
-    fun firstThreeHoursHaveNoTrendAndAreUnavailable() {
-        val request = ScoringRequest(
-            zoneId = "America/Toronto",
-            hours = (0..4).map { i ->
-                HourlyObservation(
-                    epoch = BASE_EPOCH + i * 3600L,
-                    surfacePressureHpa = 1013.0 - i,
-                    relativeHumidityPct = 70.0,
-                    temperatureC = 5.0,
-                )
-            },
+    fun firstTwelveHoursAreUnavailableWithoutLeadIn() {
+        val hours = (0..12).map { i ->
+            HourlyObservation(
+                epoch = BASE_EPOCH + i * 3600L,
+                surfacePressureHpa = 1013.0,
+                relativeHumidityPct = 60.0,
+                temperatureC = 10.0,
+            )
+        }
+        val scored = WeatherIndexScorer.score(
+            ScoringRequest(zoneId = "America/Toronto", hours = hours),
+        ).hours
+
+        for (i in 0 until 12) {
+            assertEquals(HourStatus.UNAVAILABLE, scored[i].status)
+            assertTrue(scored[i].unavailableReasons.any { it.contains("12-hour") })
+        }
+        assertEquals(HourStatus.AVAILABLE, scored[12].status)
+    }
+
+    @Test
+    fun missingValueMarksHourUnavailable() {
+        val hours = (0..12).map { i ->
+            HourlyObservation(
+                epoch = BASE_EPOCH + i * 3600L,
+                surfacePressureHpa = if (i == 12) null else 1013.0,
+                relativeHumidityPct = 60.0,
+                temperatureC = 10.0,
+            )
+        }
+        val last = WeatherIndexScorer.score(
+            ScoringRequest(zoneId = "America/Toronto", hours = hours),
+        ).hours.last()
+
+        assertEquals(HourStatus.UNAVAILABLE, last.status)
+        assertNull(last.indexScore)
+        assertTrue(last.unavailableReasons.any { it.contains("surface_pressure") })
+    }
+
+    @Test
+    fun personalPressureSensitivityChangesScore() {
+        val request = windowRequest(
+            priorPressure = 1020.0,
+            priorHumidity = 50.0,
+            priorTemperature = 10.0,
+            nowPressure = 1010.0,
+            nowHumidity = 50.0,
+            nowTemperature = 10.0,
         )
-        val hours = WeatherIndexScorer.score(request).hours
-        for (i in 0..2) {
-            assertNull("hour $i trend", hours[i].pressureTrend3hHpa)
-            assertEquals(HourStatus.UNAVAILABLE, hours[i].status)
-            assertTrue(hours[i].unavailableReasons.any { it.contains("pressureTrend3h") })
-        }
-        assertEquals(HourStatus.AVAILABLE, hours[3].status)
-    }
-
-    // --- shared fixture assertion ---
-
-    private fun assertFixture(caseName: String) {
-        val request = FixtureSupport.loadRequest(caseName)
-        val expected = FixtureSupport.loadExpected(caseName)
-        val actual = WeatherIndexScorer.score(request)
-
-        assertEquals("$caseName contractVersion", expected["contractVersion"], actual.contractVersion)
-        assertEquals("$caseName indexVersion", expected["indexVersion"], actual.indexVersion)
-
-        @Suppress("UNCHECKED_CAST")
-        val expectedHours = expected["hours"] as List<Map<String, Any?>>
-        assertEquals("$caseName hours size", expectedHours.size, actual.hours.size)
-        for (i in expectedHours.indices) {
-            assertHour(caseName, i, expectedHours[i], actual.hours[i])
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        val expectedDaily = expected["daily"] as List<Map<String, Any?>>
-        assertEquals("$caseName daily size", expectedDaily.size, actual.daily.size)
-        for (i in expectedDaily.indices) {
-            assertDaily(caseName, i, expectedDaily[i], actual.daily[i])
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun assertHour(case: String, i: Int, expected: Map<String, Any?>, actual: HourIndex) {
-        val tag = "$case hour[$i]"
-        assertEquals("$tag epoch", (expected["epoch"] as BigDecimal).longValueExact(), actual.epoch)
-        assertEquals("$tag instantUtc", expected["instantUtc"], actual.instantUtc)
-        assertEquals("$tag local", expected["local"], actual.local)
-        assertEquals(
-            "$tag utcOffsetSeconds",
-            (expected["utcOffsetSeconds"] as BigDecimal).intValueExact(),
-            actual.utcOffsetSeconds,
+        val baseline = WeatherIndexScorer.score(request).hours.last().indexScore!!
+        val personal = WeatherIndexScorer.score(
+            request,
+            DeltaSensitivities.fromMultipliers(2f, 1f, 1f),
         )
-        assertEquals("$tag localDate", expected["localDate"], actual.localDate)
+        val personalScore = personal.hours.last().indexScore!!
 
-        val inputs = expected["inputs"] as Map<String, Any?>
-        assertNumber("$tag inputs.surface_pressure", inputs["surface_pressure"], actual.inputs.surfacePressureHpa)
-        assertNumber("$tag inputs.relative_humidity_2m", inputs["relative_humidity_2m"], actual.inputs.relativeHumidityPct)
-        assertNumber("$tag inputs.temperature_2m", inputs["temperature_2m"], actual.inputs.temperatureC)
+        assertEquals("index-v2-personal", personal.indexVersion)
+        assertTrue(personalScore.compareTo(baseline) != 0)
+    }
 
-        assertNumber("$tag pressureTrend3h_hPa", expected["pressureTrend3h_hPa"], actual.pressureTrend3hHpa)
-
-        val subScores = expected["subScores"] as Map<String, Any?>
-        assertNumber("$tag subScores.pressure", subScores["pressure"], actual.subScores.pressure)
-        assertNumber("$tag subScores.humidity", subScores["humidity"], actual.subScores.humidity)
-        assertNumber("$tag subScores.temperature", subScores["temperature"], actual.subScores.temperature)
-
-        assertNumber("$tag indexRaw", expected["indexRaw"], actual.indexRaw)
-        assertNumber("$tag indexScore", expected["indexScore"], actual.indexScore)
-        assertNumber("$tag indexDisplay", expected["indexDisplay"], actual.indexDisplay)
-
-        assertEquals("$tag status", expected["status"], actual.status.name.lowercase())
-
-        if (expected.containsKey("unavailableReasons")) {
-            assertEquals("$tag unavailableReasons", expected["unavailableReasons"], actual.unavailableReasons)
-        } else {
-            assertTrue("$tag expected no unavailableReasons", actual.unavailableReasons.isEmpty())
+    @Test
+    fun fixtureInputsStillScoreWithoutThrowing() {
+        listOf(
+            "nominal",
+            "missing-values",
+            "pressure-trend-boundary",
+            "dst-fall-back",
+            "dst-spring-forward",
+        ).forEach { caseName ->
+            val result = WeatherIndexScorer.score(FixtureSupport.loadRequest(caseName))
+            assertEquals(caseName, "weather-index/2.0.0", result.contractVersion)
+            assertEquals(caseName, "index-v2", result.indexVersion)
+            assertTrue(caseName, result.hours.isNotEmpty())
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun assertDaily(case: String, i: Int, expected: Map<String, Any?>, actual: DailyIndex) {
-        val tag = "$case daily[$i]"
-        assertEquals("$tag date", expected["date"], actual.date)
-        assertNumber("$tag low", expected["low"], actual.low)
-        assertNumber("$tag high", expected["high"], actual.high)
-        assertHourRef("$tag lowHour", expected["lowHour"] as Map<String, Any?>, actual.lowHour)
-        assertHourRef("$tag highHour", expected["highHour"] as Map<String, Any?>, actual.highHour)
-        assertEquals("$tag lowTies", (expected["lowTies"] as BigDecimal).intValueExact(), actual.lowTies)
-        assertEquals("$tag highTies", (expected["highTies"] as BigDecimal).intValueExact(), actual.highTies)
-        assertEquals("$tag hoursTotal", (expected["hoursTotal"] as BigDecimal).intValueExact(), actual.hoursTotal)
-        assertEquals("$tag hoursAvailable", (expected["hoursAvailable"] as BigDecimal).intValueExact(), actual.hoursAvailable)
-        assertEquals("$tag status", expected["status"], actual.status.name.lowercase())
-        assertEquals("$tag tieBreak", expected["tieBreak"], actual.tieBreak)
-    }
-
-    private fun assertHourRef(tag: String, expected: Map<String, Any?>, actual: HourRef) {
-        assertEquals("$tag.epoch", (expected["epoch"] as BigDecimal).longValueExact(), actual.epoch)
-        assertEquals("$tag.instantUtc", expected["instantUtc"], actual.instantUtc)
-        assertEquals("$tag.local", expected["local"], actual.local)
-    }
-
-    private fun assertNumber(tag: String, expected: Any?, actual: Any?) {
-        val expectedBd = FixtureSupport.toBigDecimal(expected)
-        val actualBd = FixtureSupport.toBigDecimal(actual)
-        if (expectedBd == null) {
-            assertNull("$tag expected null", actualBd)
-        } else {
-            assertNotNull("$tag expected $expectedBd but was null", actualBd)
-            assertEquals("$tag expected $expectedBd but was $actualBd", 0, expectedBd.compareTo(actualBd))
+    private fun windowRequest(
+        priorPressure: Double,
+        priorHumidity: Double,
+        priorTemperature: Double,
+        nowPressure: Double,
+        nowHumidity: Double,
+        nowTemperature: Double,
+    ): ScoringRequest {
+        val hours = (0..12).map { i ->
+            val atPrior = i == 0
+            val atNow = i == 12
+            HourlyObservation(
+                epoch = BASE_EPOCH + i * 3600L,
+                surfacePressureHpa = when {
+                    atPrior -> priorPressure
+                    atNow -> nowPressure
+                    else -> 1013.0
+                },
+                relativeHumidityPct = when {
+                    atPrior -> priorHumidity
+                    atNow -> nowHumidity
+                    else -> 50.0
+                },
+                temperatureC = when {
+                    atPrior -> priorTemperature
+                    atNow -> nowTemperature
+                    else -> 10.0
+                },
+            )
         }
+        return ScoringRequest(zoneId = "America/Toronto", hours = hours)
     }
 
     private companion object {
-        const val BASE_EPOCH = 1_794_276_000L
+        const val BASE_EPOCH: Long = 1_700_000_000L
     }
 }

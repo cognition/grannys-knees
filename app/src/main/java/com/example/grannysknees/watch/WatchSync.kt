@@ -79,7 +79,7 @@ class WatchLogService : WearableListenerService() {
 /** Text the watch tile shows. The watch does not calculate this score. */
 internal fun watchIndexText(state: TodayUiState): String = when (state) {
     is TodayUiState.Available ->
-        "${state.score}\n${state.location}\n${state.lastUpdatedLabel}"
+        "${state.scoreLabel}\n${state.location}\n${state.lastUpdatedLabel}"
     else -> "No index\n${state.location}"
 }
 

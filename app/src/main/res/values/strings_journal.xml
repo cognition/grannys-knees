@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="journal_intro">Only what changed.</string>
-    <string name="journal_also">Also in this report.</string>
+    <string name="journal_also">Also in this check-in.</string>
     <string name="journal_cane">Granny\'s cane</string>
     <string name="journal_granny_head">She says that one is for the weather, not the worry.</string>
     <string name="journal_granny_neck">She looked over her shoulder. The kettle did not.</string>
@@ -26,19 +26,21 @@
     <string name="journal_play_week">Play the past week</string>
     <string name="journal_stop_week">Stop</string>
     <string name="journal_playing_week">%1$s</string>
-    <string name="journal_day_empty">Nothing reported that day.</string>
+    <string name="journal_day_empty">Nothing logged that day.</string>
     <string name="journal_rating_empty">No rating that day</string>
-    <string name="journal_no_yesterday">No report from yesterday.</string>
+    <string name="journal_no_yesterday">No check-in from yesterday.</string>
     <string name="journal_confirm">Confirm it is unchanged</string>
-    <string name="journal_nothing_saved">Nothing was stored. Untouched symptoms stay unreported.</string>
+    <string name="journal_nothing_saved">Nothing was stored. Untouched symptoms stay unlogged.</string>
     <string name="journal_saved">Saved on this phone.</string>
-    <string name="journal_history_empty">No reports yet.</string>
-    <string name="journal_correct">Correct</string>
-    <string name="journal_delete">Delete this report</string>
+    <string name="journal_history_empty">Nothing here yet. Mark a place under Feel.</string>
+    <string name="journal_delete">Remove</string>
     <string name="journal_export">Export</string>
-    <string name="journal_wipe">Delete everything on this phone</string>
-    <string name="journal_last_reported">Last reported %1$s</string>
+    <string name="journal_last_reported">Last logged %1$s</string>
     <string name="journal_open">How you feel</string>
-    <string name="journal_open_history">Your reports</string>
+    <string name="journal_open_history">History</string>
     <string name="journal_open_about">About the index</string>
+    <string name="journal_feel_tune_title">Use these reports to tune real-feel</string>
+    <string name="journal_feel_tune_hint_on">After ten spaced check-ins, Feel can gently tune Personal real-feel.</string>
+    <string name="journal_feel_tune_hint_off">Recording only — Feel will not change real-feel.</string>
+    <string name="journal_feel_no_backdate">You cannot currently go back in time to report earlier in the day. Each save is for now.</string>
 </resources>

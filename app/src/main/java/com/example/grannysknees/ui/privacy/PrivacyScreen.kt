@@ -18,17 +18,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.grannysknees.R
+import com.example.grannysknees.ui.tabDestinationWindowInsets
 
 /**
- * Plain-language explanation of the local-first privacy design.
+ * In-app privacy policy page.
  *
- * This is not a substitute for the externally hosted, publisher-approved
- * privacy policy required by Google Play.
+ * Opened from About. This is the on-device policy text; an externally hosted
+ * publisher copy may still be required for Google Play.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PrivacyScreen(onBack: () -> Unit) {
     Scaffold(
+        contentWindowInsets = tabDestinationWindowInsets(),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.privacy_title)) },

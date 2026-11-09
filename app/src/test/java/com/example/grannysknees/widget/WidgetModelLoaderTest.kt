@@ -159,7 +159,7 @@ class WidgetModelLoaderTest {
         val today = TodayUiState.Available(
             location = "London, Ontario",
             lastUpdatedLabel = "Nov 4, 6:00 p.m.",
-            score = 4,
+            score = BigDecimal("4.0"),
             freshness = ForecastFreshness.Fresh,
         )
 
@@ -175,7 +175,7 @@ class WidgetModelLoaderTest {
         val today = TodayUiState.Available(
             location = "Toronto, ON",
             lastUpdatedLabel = "Nov 4, 6:35 p.m.",
-            score = 4,
+            score = BigDecimal("4.0"),
             freshness = ForecastFreshness.Fresh,
         )
         val outlook = OutlookUiState.Available(

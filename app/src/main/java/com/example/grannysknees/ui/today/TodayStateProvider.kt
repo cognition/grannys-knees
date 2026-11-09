@@ -1,5 +1,7 @@
 package com.example.grannysknees.ui.today
 
+import java.math.BigDecimal
+
 /**
  * Source of [TodayUiState] for the Today screen.
  *
@@ -20,7 +22,7 @@ internal object SampleTodayStates {
     val fresh: TodayUiState.Available = TodayUiState.Available(
         location = "Toronto, ON",
         lastUpdatedLabel = "today at 8:45 AM",
-        score = 7,
+        score = BigDecimal("7.0"),
         freshness = ForecastFreshness.Fresh,
     )
 
@@ -28,7 +30,7 @@ internal object SampleTodayStates {
     val stale: TodayUiState.Available = TodayUiState.Available(
         location = "Toronto, ON",
         lastUpdatedLabel = "today at 5:10 AM",
-        score = 4,
+        score = BigDecimal("4.0"),
         freshness = ForecastFreshness.Stale,
     )
 

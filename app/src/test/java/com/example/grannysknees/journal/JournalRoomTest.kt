@@ -71,10 +71,10 @@ class JournalRoomTest {
         val available = TodayUiState.Available(
             location = "London, Ontario",
             lastUpdatedLabel = "Nov 5, 11:00 a.m.",
-            score = 4,
+            score = java.math.BigDecimal("4.0"),
             freshness = ForecastFreshness.Fresh,
         )
-        assertEquals("4\nLondon, Ontario\nNov 5, 11:00 a.m.", watchIndexText(available))
+        assertEquals("4.0\nLondon, Ontario\nNov 5, 11:00 a.m.", watchIndexText(available))
         val missing = TodayUiState.Unavailable(
             location = "London, Ontario",
             lastUpdatedLabel = "",

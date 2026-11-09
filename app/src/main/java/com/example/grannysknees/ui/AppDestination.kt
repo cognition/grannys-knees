@@ -18,11 +18,15 @@ internal enum class AppDestination(
     ),
     History(
         route = "history",
-        title = "Your reports",
+        title = "History",
     ),
     Privacy(
         route = "privacy",
-        title = "Your privacy",
+        title = "Privacy policy",
+    ),
+    Settings(
+        route = "settings",
+        title = "Settings",
     ),
     About(
         route = "about",

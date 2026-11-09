@@ -1,10 +1,9 @@
 # Weather/index contract fixtures
 
-Deterministic fixtures for the versioned contract in
-[`../weather-index.md`](../weather-index.md). They exist so that downstream
-implementation tasks (T03 Open-Meteo client, T04 scorer) have a fixed,
-reviewable target and so that the documented reference index (`index-v1`) is
-provably consistent with worked examples.
+Deterministic **input** fixtures for weather scoring. Historical
+`*.expected.json` files target `index-v1` and are retained for archive review.
+The live Android scorer follows [`../weather-index-v2.md`](../weather-index-v2.md)
+(`index-v2`, 12-hour deltas); unit tests cover that formula directly.
 
 **These fixtures are not medical data and the index is experimental, not a
 clinical prediction.** See the contract document for the full disclaimer.

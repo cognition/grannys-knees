@@ -22,4 +22,8 @@ internal enum class GrannyTone {
 internal data class GrannySaying(
     val tone: GrannyTone,
     val text: String,
+    /** Only eligible when the personalized and standard scores differ. */
+    val requiresPersonalDifference: Boolean = false,
+    /** Only eligible when the user explicitly enables free-speech mode. */
+    val requiresFreeSpeech: Boolean = false,
 )

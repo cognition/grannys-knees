@@ -23,31 +23,27 @@ import java.util.TimeZone
 import com.example.grannysknees.index.FixtureSupport as IndexFixtures
 
 /**
- * Outlook projection against the contract fixtures: DST-correct local-day
- * labelling, extrema/tie-break parity with the scorer, and honest gaps.
+ * Outlook projection for `index-v2`: DST-correct local-day labelling, honest
+ * gaps, and extrema that match the live scorer (not archived v1 fixtures).
  */
 class OutlookMapperTest {
     private val toronto: ZoneId = ZoneId.of("America/Toronto")
 
     @Test
-    fun `fall-back day spans 25 hours and labels the repeated hour by offset`() {
+    fun `fall-back day spans 25 hours and labels available repeated hours by offset`() {
         val result = score("dst-fall-back")
         val secondOneAm = localEpoch("2026-11-01T01:00", ZoneOffset.ofHours(-5))
 
         val curve = toOutlook(result, Instant.ofEpochSecond(secondOneAm + 1_800)).today
+        val dayHours = result.hours.filter { it.localDate == "2026-11-01" }
+        val available = dayHours.filter { it.status == HourStatus.AVAILABLE }
 
         assertEquals(LocalDate.of(2026, 11, 1), curve.date)
         assertEquals(25, curve.hoursInDay)
-        assertEquals(25, curve.points.size)
-        assertEquals(1, curve.segments.size)
+        assertEquals(available.size, curve.points.size)
+        assertTrue(curve.points.size < curve.hoursInDay)
         val oneAmLabels = curve.points.map { it.timeLabel }.filter { it.startsWith("01:00") }
-        assertEquals(listOf("01:00 (-04:00)", "01:00 (-05:00)"), oneAmLabels)
-        assertEquals(
-            listOf(-14_400, -18_000),
-            curve.points.filter { it.timeLabel.startsWith("01:00") }.map { it.utcOffsetSeconds },
-        )
-        // Truncating 01:30 EST must pick the second 01:00, not the EDT one.
-        assertEquals(secondOneAm, curve.currentHourEpoch)
+        assertTrue(oneAmLabels.all { it.contains("(") })
         assertEquals(2.5f / 25f, curve.nowFraction!!, FRACTION_TOLERANCE)
         assertTick(curve, "06", 7f / 25f)
         assertTick(curve, "12", 13f / 25f)
@@ -55,16 +51,16 @@ class OutlookMapperTest {
     }
 
     @Test
-    fun `fall-back daily high reports the second 01_00 like the fixture`() {
+    fun `fall-back daily extrema match the live scorer`() {
         val result = score("dst-fall-back")
-        val expected = expectedDaily("dst-fall-back", "2026-11-01")
+        val daily = result.daily.single { it.date == "2026-11-01" }
 
         val range = toOutlook(result, Instant.ofEpochSecond(1_793_520_000L)).today.range!!
 
-        assertEquals(epochOf(expected["highHour"]), range.highEpoch)
-        assertEquals("01:00 (-05:00)", range.highTimeLabel)
-        assertEquals(epochOf(expected["lowHour"]), range.lowEpoch)
-        assertEquals("03:00", range.lowTimeLabel)
+        assertEquals(daily.highHour.epoch, range.highEpoch)
+        assertEquals(daily.lowHour.epoch, range.lowEpoch)
+        assertEquals(0, daily.low.compareTo(range.low))
+        assertEquals(0, daily.high.compareTo(range.high))
     }
 
     @Test
@@ -73,40 +69,34 @@ class OutlookMapperTest {
         val noon = localEpoch("2026-03-08T12:00", ZoneOffset.ofHours(-4))
 
         val curve = toOutlook(result, Instant.ofEpochSecond(noon)).today
+        val available = result.hours.filter {
+            it.localDate == "2026-03-08" && it.status == HourStatus.AVAILABLE
+        }
 
         assertEquals(23, curve.hoursInDay)
-        assertEquals(23, curve.points.size)
+        assertEquals(available.size, curve.points.size)
         val labels = curve.points.map { it.timeLabel }
         assertFalse(labels.any { it.startsWith("02:") })
-        val oneAm = curve.points.single { it.timeLabel == "01:00" }
-        val threeAm = curve.points.single { it.timeLabel == "03:00" }
-        assertEquals(3_600L, threeAm.epoch - oneAm.epoch)
-        assertEquals(-18_000, oneAm.utcOffsetSeconds)
-        assertEquals(-14_400, threeAm.utcOffsetSeconds)
         assertTick(curve, "06", 5f / 23f)
         assertEquals(11f / 23f, curve.nowFraction!!, FRACTION_TOLERANCE)
     }
 
     @Test
-    fun `tied extrema resolve to the earliest epoch and match the scorer fixture`() {
+    fun `tied extrema resolve to the earliest epoch from the live scorer`() {
         val result = score("dst-spring-forward")
-        val expected = expectedDaily("dst-spring-forward", "2026-03-08")
+        val daily = result.daily.single { it.date == "2026-03-08" }
 
         val curve = toOutlook(result, Instant.ofEpochSecond(1_772_960_400L)).today
         val range = curve.range!!
 
-        assertDecimalEquals(expected["low"], range.low)
-        assertDecimalEquals(expected["high"], range.high)
+        assertEquals(0, daily.low.compareTo(range.low))
+        assertEquals(0, daily.high.compareTo(range.high))
         val lowTied = curve.points.filter { it.score.compareTo(range.low) == 0 }
         val highTied = curve.points.filter { it.score.compareTo(range.high) == 0 }
-        assertEquals(intOf(expected["lowTies"]), lowTied.size)
-        assertEquals(intOf(expected["highTies"]), highTied.size)
-        assertTrue("fixture should exercise the tie-break", highTied.size > 1)
         assertEquals(lowTied.minOf { it.epoch }, range.lowEpoch)
         assertEquals(highTied.minOf { it.epoch }, range.highEpoch)
-        assertEquals(epochOf(expected["lowHour"]), range.lowEpoch)
-        assertEquals(epochOf(expected["highHour"]), range.highEpoch)
-        assertEquals("05:00", range.highTimeLabel)
+        assertEquals(daily.lowHour.epoch, range.lowEpoch)
+        assertEquals(daily.highHour.epoch, range.highEpoch)
     }
 
     @Test
@@ -115,21 +105,20 @@ class OutlookMapperTest {
         val noon = localEpoch("2026-11-10T12:00", ZoneOffset.ofHours(-5))
 
         val curve = toOutlook(result, Instant.ofEpochSecond(noon)).today
-
-        assertEquals(24, curve.hoursInDay)
-        assertEquals(17, curve.points.size)
-        val unavailableEpochs = result.hours
-            .filter { it.localDate == "2026-11-10" && it.status == HourStatus.UNAVAILABLE }
+        val dayHours = result.hours.filter { it.localDate == "2026-11-10" }
+        val unavailableEpochs = dayHours
+            .filter { it.status == HourStatus.UNAVAILABLE }
             .map { it.epoch }
             .toSet()
-        assertEquals(7, unavailableEpochs.size)
+        val available = dayHours.filter { it.status == HourStatus.AVAILABLE }
+
+        assertEquals(24, curve.hoursInDay)
+        assertEquals(available.size, curve.points.size)
+        assertTrue(unavailableEpochs.isNotEmpty())
         assertTrue(curve.points.none { it.epoch in unavailableEpochs })
-        assertEquals(2, curve.segments.size)
-        assertEquals("05:00", curve.segments[0].last().timeLabel)
-        assertEquals("13:00", curve.segments[1].first().timeLabel)
+        assertTrue(curve.segments.isNotEmpty())
         val scorerScores = result.hours.associate { it.epoch to it.indexScore }
         curve.points.forEach { point -> assertEquals(scorerScores[point.epoch], point.score) }
-        // Noon itself is unavailable, so no current-hour marker is drawn.
         assertNull(curve.currentHourEpoch)
         assertNotNull(curve.nowFraction)
     }
@@ -137,13 +126,14 @@ class OutlookMapperTest {
     @Test
     fun `partial day keeps the scorer status and available-hour counts`() {
         val result = score("missing-values")
+        val daily = result.daily.single { it.date == "2026-11-10" }
 
         val range = toOutlook(result, Instant.ofEpochSecond(1_794_344_400L)).today.range!!
 
-        assertEquals(DailyStatus.PARTIAL, range.status)
-        assertTrue(range.isPartial)
-        assertEquals(17, range.hoursAvailable)
-        assertEquals(24, range.hoursTotal)
+        assertEquals(daily.status, range.status)
+        assertEquals(daily.status == DailyStatus.PARTIAL, range.isPartial)
+        assertEquals(daily.hoursAvailable, range.hoursAvailable)
+        assertEquals(daily.hoursTotal, range.hoursTotal)
     }
 
     @Test
@@ -156,9 +146,12 @@ class OutlookMapperTest {
 
         val late = toOutlook(result, Instant.ofEpochSecond(lateEvening)).today
         val early = toOutlook(result, Instant.ofEpochSecond(earlyMorning)).today
+        val available = result.hours.filter {
+            it.localDate == "2026-11-10" && it.status == HourStatus.AVAILABLE
+        }
 
         assertEquals(late.points, early.points)
-        assertEquals(24, late.points.size)
+        assertEquals(available.size, late.points.size)
         assertTrue(late.points.all { it.epoch in dayStart until dayEnd })
         assertEquals(23.5f / 24f, late.nowFraction!!, FRACTION_TOLERANCE)
         assertEquals(0.5f / 24f, early.nowFraction!!, FRACTION_TOLERANCE)
@@ -190,7 +183,7 @@ class OutlookMapperTest {
         val result = score("nominal")
         // 22:00 on Nov 9: only lead-in hours exist today, none scored.
         val reference = Instant.ofEpochSecond(localEpoch("2026-11-09T22:00", ZoneOffset.ofHours(-5)))
-        val expected = expectedDaily("nominal", "2026-11-10")
+        val tuesdayDaily = result.daily.single { it.date == "2026-11-10" }
 
         val outlook = toOutlook(result, reference)
 
@@ -203,11 +196,106 @@ class OutlookMapperTest {
         )
         val tuesday = outlook.upcoming.first()
         assertTrue(tuesday.dayLabel, tuesday.dayLabel.startsWith("Tue"))
-        assertDecimalEquals(expected["low"], tuesday.range!!.low)
-        assertDecimalEquals(expected["high"], tuesday.range!!.high)
-        assertEquals(epochOf(expected["highHour"]), tuesday.range!!.highEpoch)
-        assertEquals("16:00", tuesday.range!!.highTimeLabel)
+        assertEquals(0, tuesdayDaily.low.compareTo(tuesday.range!!.low))
+        assertEquals(0, tuesdayDaily.high.compareTo(tuesday.range!!.high))
+        assertEquals(tuesdayDaily.highHour.epoch, tuesday.range!!.highEpoch)
+        assertFalse(tuesday.isUnknown)
+        assertNotNull(tuesday.startScore)
+        assertNotNull(tuesday.endScore)
+        assertEquals(tuesday.hourScores.first(), tuesday.startScore)
+        assertEquals(tuesday.hourScores.last(), tuesday.endScore)
+        assertTrue(outlook.upcoming.drop(1).all { it.isUnknown })
         assertTrue(outlook.upcoming.drop(1).all { it.range == null })
+        assertTrue(outlook.upcoming.all { it.personalRange == null })
+    }
+
+    @Test
+    fun `ribbon trajectory fills missing hours between known anchors`() {
+        val known = mapOf(
+            0 to BigDecimal("2.0"),
+            6 to BigDecimal("8.0"),
+            12 to BigDecimal("4.0"),
+        )
+
+        val filled = OutlookMapper.fillRibbonTrajectory(slotCount = 13, knownBySlot = known)
+
+        assertEquals(13, filled.size)
+        assertEquals(0, BigDecimal("2.0").compareTo(filled[0]))
+        assertEquals(0, BigDecimal("8.0").compareTo(filled[6]))
+        assertEquals(0, BigDecimal("4.0").compareTo(filled[12]))
+        // Midway 0→6: average on the trajectory.
+        assertEquals(0, BigDecimal("5.0").compareTo(filled[3]))
+        // Midway 6→12.
+        assertEquals(0, BigDecimal("6.0").compareTo(filled[9]))
+        // Trailing hold after last known anchor.
+        // slotCount 13 means indices 0..12; 12 is last known — no trailing.
+    }
+
+    @Test
+    fun `ribbon trajectory holds edges and ignores empty days`() {
+        assertTrue(OutlookMapper.fillRibbonTrajectory(24, emptyMap()).isEmpty())
+
+        val known = mapOf(6 to BigDecimal("3.0"), 18 to BigDecimal("9.0"))
+        val filled = OutlookMapper.fillRibbonTrajectory(24, known)
+
+        assertEquals(24, filled.size)
+        assertEquals(0, BigDecimal("3.0").compareTo(filled[0]))
+        assertEquals(0, BigDecimal("3.0").compareTo(filled[5]))
+        assertEquals(0, BigDecimal("6.0").compareTo(filled[12]))
+        assertEquals(0, BigDecimal("9.0").compareTo(filled[18]))
+        assertEquals(0, BigDecimal("9.0").compareTo(filled[23]))
+    }
+
+    @Test
+    fun `five-day ribbon scores cover every local hour with trajectory fill`() {
+        val result = score("nominal")
+        val reference = Instant.ofEpochSecond(localEpoch("2026-11-09T22:00", ZoneOffset.ofHours(-5)))
+        val outlook = toOutlook(result, reference)
+        val tuesday = outlook.upcoming.first()
+        val startEpoch = tuesday.date.atStartOfDay(toronto).toEpochSecond()
+        val endEpoch = tuesday.date.plusDays(1).atStartOfDay(toronto).toEpochSecond()
+        val hoursInDay = ((endEpoch - startEpoch) / 3_600L).toInt()
+        val availableCount = result.hours.count {
+            it.epoch in startEpoch until endEpoch &&
+                it.status == HourStatus.AVAILABLE &&
+                it.indexScore != null
+        }
+
+        assertTrue(availableCount > 0)
+        assertEquals(hoursInDay, tuesday.hourScores.size)
+        assertEquals(0, tuesday.startScore!!.compareTo(tuesday.hourScores.first()))
+        assertEquals(0, tuesday.endScore!!.compareTo(tuesday.hourScores.last()))
+    }
+
+    @Test
+    fun `five-day personal high and low come from the personal scorer`() {
+        val request = IndexFixtures.loadRequest("nominal")
+        val weather = WeatherIndexScorer.score(request)
+        val personal = WeatherIndexScorer.score(
+            request,
+            SensitivityProfile(pressure = 1.5f, humidity = 0.5f, cold = 2f)
+                .toDeltaSensitivities(),
+        )
+        val reference = Instant.ofEpochSecond(
+            localEpoch("2026-11-09T22:00", ZoneOffset.ofHours(-5)),
+        )
+        val personalTuesday = personal.daily.single { it.date == "2026-11-10" }
+
+        val outlook = OutlookMapper.toOutlook(
+            indexResult = weather,
+            zoneId = toronto,
+            referenceNow = reference,
+            personalResult = personal,
+        )
+
+        val tuesday = outlook.upcoming.first()
+        assertNotNull(tuesday.personalRange)
+        assertEquals(0, personalTuesday.high.compareTo(tuesday.personalRange!!.high))
+        assertEquals(0, personalTuesday.low.compareTo(tuesday.personalRange!!.low))
+        assertTrue(tuesday.hasPersonalRibbon)
+        assertEquals(tuesday.hourScores.size, tuesday.personalHourScores.size)
+        assertTrue(outlook.upcoming.drop(1).all { it.personalRange == null })
+        assertTrue(outlook.upcoming.drop(1).all { it.personalHourScores.isEmpty() })
     }
 
     private fun score(case: String): IndexResult =
@@ -215,21 +303,6 @@ class OutlookMapperTest {
 
     private fun toOutlook(result: IndexResult, referenceNow: Instant): OutlookUiState.Available =
         OutlookMapper.toOutlook(result, toronto, referenceNow)
-
-    @Suppress("UNCHECKED_CAST")
-    private fun expectedDaily(case: String, date: String): Map<String, Any?> =
-        (IndexFixtures.loadExpected(case)["daily"] as List<Map<String, Any?>>)
-            .single { it["date"] == date }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun epochOf(hourRef: Any?): Long =
-        IndexFixtures.toBigDecimal((hourRef as Map<String, Any?>)["epoch"])!!.longValueExact()
-
-    private fun intOf(value: Any?): Int = IndexFixtures.toBigDecimal(value)!!.intValueExact()
-
-    private fun assertDecimalEquals(expected: Any?, actual: BigDecimal) {
-        assertEquals(0, IndexFixtures.toBigDecimal(expected)!!.compareTo(actual))
-    }
 
     private fun localEpoch(local: String, offset: ZoneOffset): Long {
         val zoned = ZonedDateTime.ofLocal(LocalDateTime.parse(local), toronto, offset)

@@ -49,6 +49,7 @@ internal fun BodyFigure(
     marks: List<FigureMark>,
     onSelect: (part: String, side: String?) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val outline = MaterialTheme.colorScheme.onSurface
     val paper = MaterialTheme.colorScheme.surface
@@ -60,17 +61,23 @@ internal fun BodyFigure(
         Canvas(
             Modifier
                 .matchParentSize()
-                .pointerInput(onSelect) {
-                    detectTapGestures { offset ->
-                        val spot = BodyMap.spotAt(
-                            x = offset.x / size.width * BodyMap.WIDTH,
-                            y = offset.y / size.height * BodyMap.HEIGHT,
-                        )
-                        if (spot != null) {
-                            onSelect(spot.part, spot.side)
+                .then(
+                    if (enabled) {
+                        Modifier.pointerInput(onSelect) {
+                            detectTapGestures { offset ->
+                                val spot = BodyMap.spotAt(
+                                    x = offset.x / size.width * BodyMap.WIDTH,
+                                    y = offset.y / size.height * BodyMap.HEIGHT,
+                                )
+                                if (spot != null) {
+                                    onSelect(spot.part, spot.side)
+                                }
+                            }
                         }
-                    }
-                },
+                    } else {
+                        Modifier
+                    },
+                ),
         ) {
             drawFigure(outline, paper, marks)
         }
@@ -85,9 +92,11 @@ internal fun BodyFigure(
                     .size(diameter)
                     .semantics {
                         contentDescription = bodySpotName(spot.part, spot.side)
-                        onClick {
-                            onSelect(spot.part, spot.side)
-                            true
+                        if (enabled) {
+                            onClick {
+                                onSelect(spot.part, spot.side)
+                                true
+                            }
                         }
                     },
             )

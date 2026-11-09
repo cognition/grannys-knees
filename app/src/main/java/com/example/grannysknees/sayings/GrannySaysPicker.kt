@@ -27,6 +27,8 @@ internal class GrannySaysPicker(
         private set
 
     private var score: Int? = null
+    private var personalDiffers: Boolean = false
+    private var freeSpeechEnabled: Boolean = false
     private var current: GrannySaying? = null
 
     /** Weights used for the next pick of the current score. */
@@ -38,11 +40,20 @@ internal class GrannySaysPicker(
      * When the score is unchanged, returns the existing line. When it changes,
      * resets the wry climb and picks again.
      */
-    fun showForScore(score: Int): GrannySaying? {
-        if (this.score == score && current != null) {
+    fun showForScore(
+        score: Int,
+        personalScore: Int? = null,
+        allowFreeSpeech: Boolean = false,
+    ): GrannySaying? {
+        val nextPersonalDiffers = personalScore != null && personalScore != score
+        if (this.score == score && personalDiffers == nextPersonalDiffers &&
+            freeSpeechEnabled == allowFreeSpeech && current != null
+        ) {
             return current
         }
         this.score = score
+        personalDiffers = nextPersonalDiffers
+        freeSpeechEnabled = allowFreeSpeech
         refreshIndex = 0
         current = pick(currentWeights(), excludeText = null)
         return current
@@ -63,13 +74,22 @@ internal class GrannySaysPicker(
      * line is available in the chosen pool or the full band.
      */
     fun pick(weights: ToneWeights, excludeText: String?): GrannySaying? {
-        val band = bandForScore(score ?: 1)
+        val band = eligibleBand(bandForScore(score ?: 1))
         if (band.isEmpty()) {
             return null
         }
         val tone = drawTone(weights, band) ?: return band.random(excludeText)
         val inTone = band.filter { saying -> saying.tone == tone }
         return inTone.random(excludeText) ?: band.random(excludeText)
+    }
+
+    private fun eligibleBand(band: List<GrannySaying>): List<GrannySaying> {
+        val eligible = band.filter { saying ->
+            (!saying.requiresPersonalDifference || personalDiffers) &&
+                (!saying.requiresFreeSpeech || freeSpeechEnabled)
+        }
+        val clean = band.filter { saying -> !saying.requiresFreeSpeech }
+        return eligible.ifEmpty { clean.ifEmpty { band } }
     }
 
     private fun drawTone(weights: ToneWeights, band: List<GrannySaying>): GrannyTone? {

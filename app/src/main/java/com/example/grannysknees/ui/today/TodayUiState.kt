@@ -1,5 +1,7 @@
 package com.example.grannysknees.ui.today
 
+import java.math.BigDecimal
+
 /**
  * Freshness of the forecast backing the Today screen.
  *
@@ -50,11 +52,24 @@ internal sealed interface TodayUiState {
     data class Available(
         override val location: String,
         override val lastUpdatedLabel: String,
-        val score: Int,
+        /** Shared Weather hourly `indexScore` (1 dp, 0–10). Shown without a "/10" suffix. */
+        val score: BigDecimal,
         val freshness: ForecastFreshness,
+        /**
+         * Personal calibration score for the same hour, when multipliers are
+         * not at defaults. Shown in brackets beside [score].
+         */
+        val personalScore: BigDecimal? = null,
     ) : TodayUiState {
         /** Display band derived from [score]. */
         val band: TodayScoreBand get() = TodayScoreBand.forScore(score)
+
+        /** One-decimal label for the big Today number. */
+        val scoreLabel: String get() = TodayScoreBand.formatScore(score)
+
+        /** One-decimal personal label, or null when calibration is default. */
+        val personalScoreLabel: String?
+            get() = personalScore?.let { TodayScoreBand.formatScore(it) }
 
         /** Whether the stale affordance should be shown. */
         val isStale: Boolean get() = freshness == ForecastFreshness.Stale

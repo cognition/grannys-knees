@@ -1,8 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about_body">Granny\'s Knees turns the hourly forecast into an experimental 0–10 index using temperature, humidity, and surface pressure. A higher number means less comfortable weather in the model. It is not a measurement of your pain, and it does not say the weather caused a flare.\n\nThe evidence that weather and joint symptoms line up is mixed. Correlation is not causation. Your joints may disagree with the number.\n\nIf the index is high and someone wants help moving a sofa, you have something to point at. Granny says: not today. That is a joke, not medical advice.</string>
+    <string name="about_disclaimer_short">Not medical advice.</string>
+    <string name="about_disclaimer_title">Just for curiosity</string>
+    <string name="about_disclaimer_body">Granny\'s Knees is a playful weather-sensitivity indicator, not medical advice, a diagnosis, or a forecast of how you\'ll feel. Weather is only weather.</string>
+    <string name="about_body">Granny\'s Knees turns the hourly forecast into a 1–10 index from twelve-hour changes in temperature, humidity, and surface pressure. A higher number means more provocative weather in the model. It is not a measurement of your pain, and it does not say the weather caused a flare.\n\nThe evidence that weather and joint symptoms line up is mixed. Correlation is not causation. Your joints may disagree with the number.\n\nIf the index is high and someone wants help moving a sofa, you have something to point at.</string>
+    <string name="about_granny_says">Granny says:</string>
+    <string name="about_body_not_today">Not today!</string>
     <string name="onboarding_title">A little science. A little superstition.</string>
     <string name="onboarding_body">This is a playful weather index, not a diagnosis and not a prediction of how you will feel. You can use it without recording symptoms. Anything you do record stays on this phone.</string>
     <string name="onboarding_continue">Continue</string>
-    <string name="about_open_privacy">How data stays on this phone is described in the privacy note shipped with the app.</string>
+    <string name="about_open_privacy">How data stays on this phone is described in the privacy policy.</string>
+    <string name="about_open_privacy_action">Privacy policy</string>
+    <string name="about_calculation_heading">How the index is calculated</string>
+    <string name="about_calculation_body">Each point on the Today curve compares that hour with the same hour twelve hours earlier. The model watches whether pressure, temperature, and humidity are rising or dropping over that stretch.\n\nRising humidity, dropping pressure, and dropping temperature push the index up — the curve climbs. The opposite trends pull it down — the curve falls. Those trends are mapped onto a 1–10 scale (about 5.5 when little has changed).\n\nWeather is the shared baseline. Personal is the real-feel series. Your Settings sliders set base coefficients for pressure, humidity, and cold. When “Use Feel reports to tune real-feel” is on, Feel check-ins can gently adjust those bases after ten consecutive usable reports: saves within fifteen minutes count as one moment; each consecutive counted moment must be at least forty-five minutes apart. Opting out keeps recording but does not change coefficients. If you leave the sliders at no adjustment and opt out of Feel tuning, there is no Personal curve.\n\nFor best results, report every hour on the hour — especially when it feels especially bad or especially good. Those extremes help hone the values. You cannot currently go back in time to file a Feel report for earlier in the day; each save is for now.\n\nBlank spots on the curve mean missing data or no twelve-hour window — never a filled-in zero. The big number and band use Weather; the five-day columns show Standard on the left and Personal on the right when Personal is active. Feel ratings stay separate from the weather number.</string>
+    <string name="about_feel_tune_title">Use Feel reports to tune real-feel</string>
+    <string name="about_feel_tune_hint">When on, spaced Feel check-ins can gently adjust Personal after ten consecutive usable reports. When off, Feel is record-only.</string>
+    <string name="about_granny_speech_heading">Granny’s language</string>
+    <string name="about_granny_speech_title">Let Granny speak her mind freely</string>
+    <string name="about_granny_speech_hint">When on, Granny may use the occasional salty word and a few more theatrical complaints. Off keeps the commentary family-friendly.</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_back">Back</string>
+    <string name="about_sensitivity_heading">Your real-feel index</string>
+    <string name="about_sensitivity_hint">To add a second (real-feel) index beside the standard weather one, use the 0–10 scale on each slider for how much that kind of change usually matters for you.\n\n0 — no adjustment needed; leave this on the standard index.\n10 — this has always been an issue, and it affects you a lot more than other factors.</string>
+    <string name="about_sensitivity_scale_low">0 · no adjustment</string>
+    <string name="about_sensitivity_scale_high">10 · hits you hard</string>
+    <string name="about_sensitivity_pressure">Pressure changes</string>
+    <string name="about_sensitivity_humidity">Humidity changes</string>
+    <string name="about_sensitivity_cold">Cold changes</string>
+    <string name="about_sensitivity_reset">Clear adjustments (back to 0)</string>
+    <string name="about_appearance_heading">Appearance</string>
+    <string name="about_appearance_hint">Choose light or dark, or match the phone.</string>
+    <string name="about_theme_system">Match phone</string>
+    <string name="about_theme_light">Light</string>
+    <string name="about_theme_dark">Dark</string>
+    <string name="about_theme_group">Theme</string>
+    <string name="about_data_heading">Your data on this phone</string>
+    <string name="about_export_reports">Export history</string>
+    <string name="about_reset_all_data">Reset all data</string>
+    <string name="about_reset_all_data_hint">Clears saved history and today\'s draft figure on this phone.</string>
+    <string name="about_reset_done">All local history was cleared.</string>
 </resources>

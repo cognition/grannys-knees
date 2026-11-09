@@ -13,7 +13,7 @@
         },
         {
           "tone": "spicy",
-          "text": "One out of ten. Nothing to complain about. Damn shame."
+          "text": "One out of ten. Nothing to complain about. A terrible inconvenience."
         },
         {
           "tone": "warm",
@@ -71,7 +71,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Three? Hardly worth swearing about."
+          "text": "Three? Hardly worth making a fuss about."
         },
         {
           "tone": "warm",
@@ -141,7 +141,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Five out of ten. Not awful, just enough to be a pain in the arse."
+          "text": "Five out of ten. Not awful, just enough to be a proper nuisance."
         }
       ]
     },
@@ -170,7 +170,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Six out of ten. I'm still going out, but the stairs can piss off."
+          "text": "Six out of ten. I'm still going out, but the stairs can wait outside."
         }
       ]
     },
@@ -245,7 +245,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Nine out of ten. Bugger that. Put the kettle on."
+          "text": "Nine out of ten. Absolutely not. Put the kettle on."
         },
         {
           "tone": "warm",
@@ -257,7 +257,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Nine out of ten. If it requires bending, climbing or enthusiasm, absolutely bugger off."
+          "text": "Nine out of ten. If it requires bending, climbing or enthusiasm, it can reschedule."
         }
       ]
     },
@@ -286,10 +286,354 @@
         },
         {
           "tone": "spicy",
-          "text": "Ten out of ten. Tea here. Blanket here. Everyone else can sod off."
+          "text": "Ten out of ten. Tea here. Blanket here. Everyone else can use the door."
         }
       ]
     }
+  ],
+  "additionalSayings": [
+    {"index": 1, "sayings": [
+      {"tone": "warm", "text": "A very decent day. Try not to frighten it with grand plans."},
+      {"tone": "warm", "text": "The joints are quiet enough to enjoy the small victories."},
+      {"tone": "wry", "text": "The forecast is behaving. Naturally, I remain suspicious."},
+      {"tone": "wry", "text": "One out of ten, and still somehow not a personal triumph."},
+      {"tone": "wry", "text": "The knees have reviewed the weather and declined to comment."},
+      {"tone": "wry", "text": "Standard says one. Personalized says one. Finally, a committee with no argument."},
+      {"tone": "wry", "text": "Standard says one; personalized says two. Someone has been listening to the knees." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "One out of ten. I expect this level of competence from the weather."},
+      {"tone": "spicy", "text": "The knees are fine. Do not make a ceremony of it."},
+      {"tone": "spicy", "text": "A calm forecast. Hide the good biscuits before the day gets ideas."}
+    ]},
+    {"index": 2, "sayings": [
+      {"tone": "warm", "text": "Two out of ten. Plenty of room for tea and a little wandering."},
+      {"tone": "warm", "text": "A gentle day, provided nobody turns it into a project."},
+      {"tone": "wry", "text": "The knees are cooperating. I shall reward them with very modest expectations."},
+      {"tone": "wry", "text": "Two out of ten. The weather has cleared the low bar with confidence."},
+      {"tone": "wry", "text": "Nothing dramatic today. The atmosphere is taking a rare day off."},
+      {"tone": "wry", "text": "Standard says two; personalized says two. We are all pretending this was planned."},
+      {"tone": "wry", "text": "Standard says two, personalized says three. The personal committee has notes." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Two out of ten. Barely worth a formal complaint, so here I am."},
+      {"tone": "spicy", "text": "The day is usable. Please handle it with care."},
+      {"tone": "spicy", "text": "Good enough for errands, as long as errands understand the schedule."}
+    ]},
+    {"index": 3, "sayings": [
+      {"tone": "warm", "text": "Three out of ten. A little creak does not cancel a good day."},
+      {"tone": "warm", "text": "Take the scenic route, provided it has somewhere to sit."},
+      {"tone": "wry", "text": "The knees give this weather three stars and a very small asterisk."},
+      {"tone": "wry", "text": "Three out of ten. We have survived worse and made tea about it."},
+      {"tone": "wry", "text": "The forecast is making promises. The knees are asking for references."},
+      {"tone": "wry", "text": "Standard says three; personalized says three. A rare moment of administrative peace."},
+      {"tone": "wry", "text": "Standard says three; personalized says four. Apparently the knees have their own polling firm." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Three out of ten. I have had more difficult conversations with a jar lid."},
+      {"tone": "spicy", "text": "The joints are making suggestions, not issuing orders. Yet."},
+      {"tone": "spicy", "text": "A manageable day. Do not ruin it by volunteering for nonsense."}
+    ]},
+    {"index": 4, "sayings": [
+      {"tone": "warm", "text": "Four out of ten. Move kindly and leave the heroics to television."},
+      {"tone": "warm", "text": "A little stiff, but there is still plenty of good in the day."},
+      {"tone": "wry", "text": "The knees have opened a case file on the weather."},
+      {"tone": "wry", "text": "Four out of ten. The forecast has entered its mildly irritating era."},
+      {"tone": "wry", "text": "The barometer is being dramatic. The knees are taking minutes."},
+      {"tone": "wry", "text": "Standard says four; personalized says four. Even the fussy numbers agree."},
+      {"tone": "wry", "text": "Standard says four; personalized says five. The personal forecast has union representation." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Four out of ten. Annoying enough to mention, not enough to cancel lunch."},
+      {"tone": "spicy", "text": "If the task needs a deep squat, it can submit a written request."},
+      {"tone": "spicy", "text": "The weather has started something. I have started the kettle."}
+    ]},
+    {"index": 5, "sayings": [
+      {"tone": "warm", "text": "Five out of ten. Slow is still a perfectly respectable speed."},
+      {"tone": "warm", "text": "Meet the middle of the day in the middle of the road."},
+      {"tone": "wry", "text": "Five out of ten. The knees are drafting a strongly worded memo."},
+      {"tone": "wry", "text": "The weather has reached the part where it expects applause for being difficult."},
+      {"tone": "wry", "text": "The knees have noticed the pressure. They would like credit for noticing."},
+      {"tone": "wry", "text": "Standard says five; personalized says five. An astonishing lack of plot twist."},
+      {"tone": "wry", "text": "Standard says five; personalized says six. The personal version has raised an eyebrow." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Five out of ten. We are now accepting fewer unnecessary activities."},
+      {"tone": "spicy", "text": "The knees are offering feedback. It is not especially constructive."},
+      {"tone": "spicy", "text": "Tea first. Ambition can wait in the hallway."}
+    ]},
+    {"index": 6, "sayings": [
+      {"tone": "warm", "text": "Six out of ten. Be gentle with the machinery today."},
+      {"tone": "warm", "text": "There is no prize for making a hard day harder."},
+      {"tone": "wry", "text": "The knees have moved from commentary to editorial."},
+      {"tone": "wry", "text": "Six out of ten. The forecast has acquired a personality, and not a charming one."},
+      {"tone": "wry", "text": "Apparently the air has opinions. Apparently my knees are its press secretary."},
+      {"tone": "wry", "text": "Standard says six; personalized says six. Nobody is happy, but at least we agree."},
+      {"tone": "wry", "text": "Standard says six; personalized says seven. The custom model has chosen honesty." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Six out of ten. I can do it, but I reserve the right to narrate the inconvenience."},
+      {"tone": "spicy", "text": "If it involves stairs, it had better come with a compelling argument."},
+      {"tone": "spicy", "text": "Today is sponsored by sensible shoes and selective enthusiasm."}
+    ]},
+    {"index": 7, "sayings": [
+      {"tone": "warm", "text": "Seven out of ten. Protect your energy like it is the last biscuit."},
+      {"tone": "warm", "text": "A quiet day is not a failed day. It is a day with standards."},
+      {"tone": "wry", "text": "The knees have scheduled a meeting and mysteriously omitted the agenda."},
+      {"tone": "wry", "text": "Seven out of ten. Even the chair looks like a sensible destination."},
+      {"tone": "wry", "text": "The weather has made its case. The knees are preparing a rebuttal."},
+      {"tone": "wry", "text": "Standard says seven; personalized says seven. At least the bureaucracy is efficient."},
+      {"tone": "wry", "text": "Standard says seven; personalized says eight. Personalization has entered the room wearing boots." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Seven out of ten. The bottom shelf can mind its own business."},
+      {"tone": "spicy", "text": "I have one good bend left. It is not available for casual use."},
+      {"tone": "spicy", "text": "If it cannot be done sitting down, it can wait for a better audience."}
+    ]},
+    {"index": 8, "sayings": [
+      {"tone": "warm", "text": "Eight out of ten. Comfort is a plan, not a consolation prize."},
+      {"tone": "warm", "text": "Keep warm, take your time, and let the day be less ambitious."},
+      {"tone": "wry", "text": "The knees have filed paperwork. I assume it is a complaint."},
+      {"tone": "wry", "text": "Eight out of ten. The kettle is now a long-distance relationship."},
+      {"tone": "wry", "text": "The forecast says weather. The knees say consequences."},
+      {"tone": "wry", "text": "Standard says eight; personalized says eight. We have reached numerical solidarity."},
+      {"tone": "wry", "text": "Standard says eight; personalized says nine. The personal forecast has stopped being diplomatic." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Eight out of ten. Anything on the floor is now part of the floor."},
+      {"tone": "spicy", "text": "Today's itinerary: chair, tea, and declining invitations with grace."},
+      {"tone": "spicy", "text": "If the task begins with 'just bend down,' it is already lying."}
+    ]},
+    {"index": 9, "sayings": [
+      {"tone": "warm", "text": "Nine out of ten. Be kind to yourself and impress nobody."},
+      {"tone": "warm", "text": "Warmth, patience, and the shortest route to the sofa."},
+      {"tone": "wry", "text": "The knees have issued a press release. It is mostly punctuation."},
+      {"tone": "wry", "text": "Nine out of ten. The chair has been promoted to essential infrastructure."},
+      {"tone": "wry", "text": "The forecast is loud today. The knees have brought earplugs."},
+      {"tone": "wry", "text": "Standard says nine; personalized says nine. Even the numbers have given up arguing."},
+      {"tone": "wry", "text": "Standard says nine; personalized says ten. The personal model has found the final straw." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Nine out of ten. Fetch it yourself, or discover how badly you wanted it."},
+      {"tone": "spicy", "text": "Anything requiring enthusiasm has been moved to a later century."},
+      {"tone": "spicy", "text": "The knees are not taking requests. Please consult the blanket."}
+    ]},
+    {"index": 10, "sayings": [
+      {"tone": "warm", "text": "Ten out of ten. Today is for care, comfort, and no apologies."},
+      {"tone": "warm", "text": "Keep everything you need close. The rest can wait politely."},
+      {"tone": "wry", "text": "The knees have declared a weather emergency and appointed me spokesperson."},
+      {"tone": "wry", "text": "Ten out of ten. The floor is doing excellent work as a destination."},
+      {"tone": "wry", "text": "The forecast has gone too far. I shall be responding with a blanket."},
+      {"tone": "wry", "text": "Standard says ten; personalized says ten. At last, a unanimous disaster."},
+      {"tone": "wry", "text": "Standard says ten; personalized says nine. Even the personal model is trying diplomacy." , "requiresPersonalDifference": true},
+      {"tone": "spicy", "text": "Ten out of ten. If it is not within reach, it is not essential."},
+      {"tone": "spicy", "text": "Today has been cancelled by a very small but influential committee."},
+      {"tone": "spicy", "text": "The knees have the final word. They are saying 'sit down.'"}
+    ]}
+  ],
+  "freeSpeechSayings": [
+    {"index": 1, "sayings": [
+      {"tone": "warm", "text": "A fine little day, like a comedian who knows when to leave the stage."},
+      {"tone": "wry", "text": "The knees are doing a quiet encore. Nobody request a tougher number."},
+      {"tone": "warm", "text": "If the weather were a vaudeville act, this one gets a polite chuckle."},
+      {"tone": "wry", "text": "One out of ten. Even the forecast has remembered its manners."},
+      {"tone": "warm", "text": "A good day for a stroll, a smile, and pretending the errands are optional."},
+      {"tone": "spicy", "text": "One out of ten. Damn near pleasant." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are fine, which is bloody suspicious." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Nothing hurts enough to justify the performance. Tragic." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The weather has behaved. I suppose hell does freeze over occasionally." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If this is a trap, it is a very comfortable one." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast is sweet as pie. I remain the suspicious filling." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The joints are cooperating. Don't get cocky, sunshine." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "A quiet day. The knees have apparently run out of gossip." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "One out of ten and still I find something to complain about. Talent." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The weather has brought flowers; the knees have brought paperwork." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Lovely day. I hate how little material it gives me." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The barometer says calm. The knees say don't be an idiot." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "A one out of ten. Put that in your pipe and smoke it, forecast." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The joints are behaving like they expect a medal." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "No drama today. What a bloody inconvenience." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 2, "sayings": [
+      {"tone": "warm", "text": "Two out of ten. A modest little comedy with a happy ending."},
+      {"tone": "wry", "text": "The knees have accepted the weather's apology, provisionally."},
+      {"tone": "warm", "text": "A day for small errands and large cups of tea."},
+      {"tone": "wry", "text": "The forecast has cleared the bar. The bar was on the floor."},
+      {"tone": "warm", "text": "Not every day needs a plot. This one can be a pleasant intermission."},
+      {"tone": "spicy", "text": "Two out of ten. The weather is getting away with something." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are fine. Don't make a bloody announcement." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Barely troublesome. I may have to invent a complaint." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Two out of ten, and the forecast still thinks it is the main act." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "A little nuisance, nothing worth throwing a slipper over." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees have sent a postcard: wish you were sitting down." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Not bad. Don't let it go to its head, the smug little cloud." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "This day is so respectable it could host a church raffle." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Two out of ten. I have endured worse from a stubborn jam jar." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The atmosphere is trying to be dramatic. The knees are unimpressed." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If the day gets any nicer, I shall become unbearable." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast has a clean record today. Suspicious, but useful." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Two out of ten. A damn near competent performance." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Nothing to report except my disappointment at having nothing to report." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The knees are quiet. Everybody keep your bloody hands off the weather." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 3, "sayings": [
+      {"tone": "warm", "text": "Three out of ten. A little creak is just comic timing."},
+      {"tone": "wry", "text": "The knees give the forecast a tiny hat and a polite nod."},
+      {"tone": "warm", "text": "A good day to putter about with the confidence of a man in a funny hat."},
+      {"tone": "wry", "text": "The joints have found a minor subplot and will not be rushed."},
+      {"tone": "warm", "text": "Three out of ten leaves plenty of room for a treat."},
+      {"tone": "spicy", "text": "Three out of ten. I have had more trouble opening a biscuit tin." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are grumbling, but they are bloody amateurs at it." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The weather is being cheeky. I can be cheekier." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Three out of ten. A damn fine excuse for a slow morning." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If the joints want a meeting, they can book a room." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast is delivering a routine, and the knees are heckling from the balcony." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "A manageable day, which is another way of saying don't get clever." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The sky has a grin on it. I know that look." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Three out of ten. Nothing to write home about, unless home has tea." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are taking requests and rejecting anything athletic." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "No heroics, no nonsense, no bloody surprise stairs." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "A small creak for a small audience. Please tip your joints." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The forecast can behave itself, or it can explain itself to Granny." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Three out of ten: the knees' version of a standing ovation." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "I can handle this. I simply refuse to make it look easy." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 4, "sayings": [
+      {"tone": "warm", "text": "Four out of ten. A little stiffness gives the day character."},
+      {"tone": "wry", "text": "The joints have entered their second act, with fewer stairs."},
+      {"tone": "warm", "text": "Take the day at a sensible pace and let the scenery do the work."},
+      {"tone": "wry", "text": "The weather has begun its little vaudeville routine."},
+      {"tone": "warm", "text": "Four is manageable. Even the fussy days have a punchline."},
+      {"tone": "spicy", "text": "Four out of ten. Irritating, but not worth flipping the table." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees have noticed the pressure and are being bloody theatrical." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If the weather wants a quarrel, it can get in line." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "A four out of ten: the forecast's way of saying 'don't push it, genius.'" , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The knees are not broken; they are merely being difficult on purpose." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The barometer has a punchline, and unfortunately I am it." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Four out of ten. Enough to cancel nonsense, not lunch." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast is wearing a false moustache and calling itself a crisis." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "A little creak never stopped me. It has, however, slowed negotiations." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The joints have formed a committee. Naturally, there is no chair." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The stairs may kindly bugger off until after tea." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Four out of ten and already the knees want top billing." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "I have survived family dinners with less atmosphere." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The weather has arrived with a tiny trumpet and no invitation." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Not a disaster. Just a damn nuisance with clouds." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 5, "sayings": [
+      {"tone": "warm", "text": "Five out of ten. Middle of the road, with a bench nearby."},
+      {"tone": "wry", "text": "The knees have reached the intermission and would like refreshments."},
+      {"tone": "warm", "text": "A slower pace is still a pace. The day is not going anywhere."},
+      {"tone": "wry", "text": "The forecast is now doing a full routine with props."},
+      {"tone": "warm", "text": "Five means listen to yourself and save the grand finale."},
+      {"tone": "spicy", "text": "Five out of ten. The joints have begun their damn commentary." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The air has changed its mind, and the knees are bloody copy editors." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Today is not awful. It is simply being a pain with excellent timing." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Five out of ten. The weather has put on its little hat of trouble." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The kettle is a priority. Everything else can form a queue." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are giving the forecast two stars and a stern look." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it requires enthusiasm, put it on tomorrow's bloody list." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The day has a punchline. I am waiting for the part where it improves." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Five out of ten: enough trouble to be interesting, not enough to be impressive." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The joints are consulting the rule book and finding loopholes." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The weather can keep its surprises. I have enough character already." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees have asked for a smaller stage and a larger chair." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Tea first. Then we decide whether the day deserves our company." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Five out of ten and the forecast is already fishing for applause." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The middle of the scale is a bloody lot of negotiation." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 6, "sayings": [
+      {"tone": "warm", "text": "Six out of ten. Be kind to the machinery; it is doing its best."},
+      {"tone": "wry", "text": "The knees have gone from comic relief to featured performer."},
+      {"tone": "warm", "text": "Choose the easy route and call it excellent judgment."},
+      {"tone": "wry", "text": "The weather has developed a strong personality and no references."},
+      {"tone": "warm", "text": "Six asks for patience, not perfection."},
+      {"tone": "spicy", "text": "Six out of ten. The knees are making a damn persuasive case for sitting." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The barometer moved and the joints filed a bloody grievance." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "I can do it. I simply won't do it at the weather's preferred speed." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Six out of ten: the forecast's way of heckling from the cheap seats." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If there is no parking near the door, that errand is buggered." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees have hired a press agent and are demanding better lighting." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "A sensible shoe is worth ten foolish promises." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast is doing slapstick with my cartilage." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "No heroics today. We are not being paid enough for the sequel." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Six out of ten and suddenly every cupboard is a high-risk venture." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The stairs can wait. They have been waiting for centuries, apparently." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "My knees have become unpaid meteorologists with attitude." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The weather is a nuisance with a forecast subscription." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Six out of ten: a fine day for a dramatic chair entrance." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it bends, climbs, or hurries, it can get stuffed in tomorrow's drawer." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 7, "sayings": [
+      {"tone": "warm", "text": "Seven out of ten. Rest is a perfectly respectable appointment."},
+      {"tone": "wry", "text": "The knees have taken the stage and forgotten the next line."},
+      {"tone": "warm", "text": "Keep warm, keep close to comfort, and let the world fetch itself."},
+      {"tone": "wry", "text": "The forecast has become a one-joint comedy duo."},
+      {"tone": "warm", "text": "A quiet day can still have a very good punchline."},
+      {"tone": "spicy", "text": "Seven out of ten. The joints have filed a damn manifesto." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are not refusing work; they are negotiating bloody terms." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it lives on the bottom shelf, it lives there now." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Seven out of ten: even the chair has started looking smug." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The day can take its ambitious little plans and reschedule them." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The weather has brought a prop, a spotlight, and absolutely no talent." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "I have one good bend left, and it is not for your nonsense." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The joints are heckling every staircase in the building." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Seven out of ten. Fetch your own biscuits, you energetic fool." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast says go gently. The knees say it with stronger punctuation." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If the task starts with 'just,' it is probably a bloody trap." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Seven out of ten and the sofa has received a standing ovation." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The knees have unionized. Management is making tea." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Today's comedy is physical, which feels unnecessarily personal." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "I am not avoiding the stairs. We have mutually agreed to bugger off." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 8, "sayings": [
+      {"tone": "warm", "text": "Eight out of ten. Comfort is the main event today."},
+      {"tone": "wry", "text": "The knees have submitted a formal request for fewer destinations."},
+      {"tone": "warm", "text": "Let the world be busy somewhere else for a while."},
+      {"tone": "wry", "text": "The kettle is now a long-distance challenge with no prize."},
+      {"tone": "warm", "text": "Take good care. The day can manage its own expectations."},
+      {"tone": "spicy", "text": "Eight out of ten. The joints have made a damn compelling argument for blankets." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast is loud, and the knees are bloody tired of the encore." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Anything on the floor has entered a permanent relationship with the floor." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Eight out of ten: the chair has become a five-star resort." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it requires a ladder, it requires another volunteer." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are doing tragic theatre, and I paid for the front row." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Today has been placed on hold until further bloody notice." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The weather has a punchline. Unfortunately, it is 'stand up again.'" , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Eight out of ten. Ambition may kindly wait outside." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The joints have declared a small state of emergency, with tea." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it is not within reach, it can bugger off until tomorrow." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The sofa has better attendance than I do." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "I am conserving cartilage and refusing to feel guilty about it." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Eight out of ten: a grand day for sitting with purpose." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The knees say no. The knees have excellent bloody points." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 9, "sayings": [
+      {"tone": "warm", "text": "Nine out of ten. Be gentle and let the day lower its voice."},
+      {"tone": "wry", "text": "The knees have issued a press release and it is mostly commas."},
+      {"tone": "warm", "text": "Warmth, patience, and no need to impress the furniture."},
+      {"tone": "wry", "text": "The chair has been promoted to essential infrastructure."},
+      {"tone": "warm", "text": "Today is for care, not proving a point to a staircase."},
+      {"tone": "spicy", "text": "Nine out of ten. The knees have reached their damn limit." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast is putting on a tragedy; the joints want royalties." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it needs bending, climbing, or cheerfulness, it can wait." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Nine out of ten: even the rocking chair looks bloody ambitious." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Fetch it yourself, or discover how badly you wanted it." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are delivering a monologue and refusing edits." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The day can take its heroic nonsense and file it elsewhere." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Nine out of ten and the remote has become a sacred object." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "No, I will not 'just pop out.' That phrase is a bloody menace." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The weather has front-row tickets to my knees' complaint department." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "A nine out of ten. We are now accepting visitors bearing tea." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The floor is close, the stairs are smug, and the plot is thin." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it is urgent, it can come over here and explain itself." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees have gone method actor. Nobody knows when they will stop." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Nine out of ten. I have no bloody interest in your obstacle course." , "requiresFreeSpeech": true}
+    ]},
+    {"index": 10, "sayings": [
+      {"tone": "warm", "text": "Ten out of ten. Essential movement only, and kindness throughout."},
+      {"tone": "wry", "text": "The knees have closed the theatre and kept the ticket money."},
+      {"tone": "warm", "text": "Keep everything important close. The rest can wait its turn."},
+      {"tone": "wry", "text": "The floor is now a fully accredited destination."},
+      {"tone": "warm", "text": "Today asks for comfort, not courage. Courage is overrated."},
+      {"tone": "spicy", "text": "Ten out of ten. The knees have made a damn executive decision." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The forecast has gone to hell and sent no forwarding address." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it is not within reach, it is not essential. Bloody simple." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "Ten out of ten: the blanket is now senior management." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Everyone may keep their grand plans and shove them in a drawer." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The joints have delivered the final punchline: sit down." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Today is cancelled. Bugger the schedule." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The weather is doing slapstick, but I am not volunteering for the pratfall." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Ten out of ten. Bring tea, or bring a better argument." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The sofa has won the election by a landslide." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "If it involves stairs, it can get stuffed until next week." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The knees are taking a curtain call and ignoring the encore." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "Ten out of ten. I have officially run out of polite bloody gestures." , "requiresFreeSpeech": true},
+      {"tone": "wry", "text": "The final act is tea, blanket, and absolutely no sudden movements." , "requiresFreeSpeech": true},
+      {"tone": "spicy", "text": "The day can wait. The knees have spoken, and they are not taking questions." , "requiresFreeSpeech": true}
+    ]}
   ],
   "bonusSayings": [
     {
@@ -392,19 +736,19 @@
       "minIndex": 9,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "The forecast says nine. My knees say the forecast can shove it."
+      "text": "The forecast says nine. My knees say the forecast can take a seat."
     },
     {
       "minIndex": 9,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "I told my knees we had things to do. They told me to piss off. Fair enough."
+      "text": "I told my knees we had things to do. They requested a postponement. Fair enough."
     },
     {
       "minIndex": 9,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "The weather's gone to hell. Fortunately, I've got biscuits."
+      "text": "The weather's gone spectacularly sideways. Fortunately, I've got biscuits."
     },
     {
       "minIndex": 10,
@@ -562,7 +906,7 @@
       "minIndex": 7,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "No, I haven't tried yoga. Thanks for asking for the eight-hundredth bloody time."
+      "text": "No, I haven't tried yoga. Thanks for asking for the eight-hundredth time."
     },
     {
       "minIndex": 5,
@@ -754,7 +1098,7 @@
       "minIndex": 9,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "If anybody needs me, they can bloody well come over here."
+      "text": "If anybody needs me, they can come over here and make a convincing case."
     },
     {
       "minIndex": 1,
@@ -784,7 +1128,7 @@
       "minIndex": 7,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "If that tomato wants picking, it can bloody well climb up here."
+      "text": "If that tomato wants picking, it can make its case from up there."
     },
     {
       "minIndex": 8,
@@ -874,7 +1218,7 @@
       "minIndex": 8,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "Grandpa asked if I wanted to go out. I asked if he'd lost his bloody mind."
+      "text": "Grandpa asked if I wanted to go out. I asked if he had reviewed the forecast."
     },
     {
       "minIndex": 1,
@@ -958,7 +1302,7 @@
       "minIndex": 9,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "Shopping can wait. We've got bread, tea and no bloody reason to leave."
+      "text": "Shopping can wait. We've got bread, tea and no convincing reason to leave."
     },
     {
       "minIndex": 1,
@@ -1228,7 +1572,7 @@
       "minIndex": 7,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "I survived shoulder pads. I can survive this bloody weather."
+      "text": "I survived shoulder pads. I can survive this weather."
     },
     {
       "minIndex": 7,
@@ -1558,7 +1902,7 @@
       "minIndex": 7,
       "maxIndex": 10,
       "tone": "spicy",
-      "text": "If nobody's bleeding and nothing's on fire, it can bloody well wait."
+      "text": "If nobody's bleeding and nothing's on fire, it can wait."
     },
     {
       "minIndex": 8,
@@ -1738,7 +2082,7 @@
       "minIndex": 4,
       "maxIndex": 8,
       "tone": "spicy",
-      "text": "If everything is a priority, nothing bloody well is."
+      "text": "If everything is a priority, nothing is."
     },
     {
       "minIndex": 5,

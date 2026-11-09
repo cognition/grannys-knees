@@ -48,6 +48,7 @@ internal class SelectedCityStore(
             put("timezone", city.timezone)
             put("admin1", city.admin1)
             put("countryCode", city.countryCode)
+            put("placeSource", city.placeSource.name)
         }.toString()
         file.writeText(payload, Charsets.UTF_8)
     }
@@ -67,6 +68,11 @@ internal class SelectedCityStore(
         val admin1 = root.string("admin1") ?: return null
         val countryCode = root.string("countryCode") ?: return null
         if (label.isBlank() || timezone.isBlank()) return null
+        val placeSource = root.string("placeSource")
+            ?.let { raw ->
+                runCatching { PlaceSource.valueOf(raw) }.getOrNull()
+            }
+            ?: PlaceSource.Search
         return SelectedCity(
             label = label,
             latitude = latitude,
@@ -74,6 +80,7 @@ internal class SelectedCityStore(
             timezone = timezone,
             admin1 = admin1,
             countryCode = countryCode,
+            placeSource = placeSource,
         )
     }
 

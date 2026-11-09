@@ -6,8 +6,8 @@ import java.time.LocalDate
 
 /**
  * Outlook shown beneath the Today index: a curve of the hourly `indexScore`
- * across the current **local calendar day**, plus index low/high for the next
- * five local days (contract §8).
+ * across the current **local calendar day**, plus start→end columns for the
+ * next five local days (contract §8).
  *
  * Only presented while the cache is fresh or stale (§6.1); expired or empty
  * caches hide it rather than showing old values as current.
@@ -46,12 +46,21 @@ internal data class DayCurve(
     val currentHourEpoch: Long?,
     /** Today's index low/high, or `null` when no hour is available. */
     val range: DayRange?,
+    /**
+     * Personal (sensitivity-weighted) series for the same hours.
+     *
+     * Empty when the profile matches baseline, so the chart shows one line.
+     */
+    val personalSegments: List<List<CurvePoint>> = emptyList(),
 ) {
     /** Wall-clock hours in this local day: 23, 24 or 25. */
     val hoursInDay: Int get() = ((endEpoch - startEpoch) / SECONDS_PER_HOUR).toInt()
 
-    /** All available points in epoch order. */
+    /** All available baseline points in epoch order. */
     val points: List<CurvePoint> get() = segments.flatten()
+
+    /** All available personal points in epoch order. */
+    val personalPoints: List<CurvePoint> get() = personalSegments.flatten()
 
     /** Horizontal position (0–1) of [epoch] within the day. */
     fun fractionOf(epoch: Long): Float = fraction(epoch, startEpoch, endEpoch)
@@ -102,11 +111,34 @@ internal data class DayRange(
 }
 
 /**
- * One row of the five-day outlook. [range] is `null` when the scorer produced
- * no available hour for that date — the row says so instead of inventing one.
+ * One column of the five-day outlook. [range] is `null` when the scorer
+ * produced no available hour for that date — the column shows "?" instead of
+ * inventing values.
+ *
+ * [startScore]/[endScore] are the first and last available hourly scores of
+ * the local day (chronological), so a falling day reads high→low top to
+ * bottom. [hourScores] are Standard samples per local hour for the left
+ * ribbon; [personalHourScores] are the Personal (adjusted) samples for the
+ * right ribbon when calibration is active. Missing hours are filled along
+ * each series' trajectory so clock ticks align.
+ *
+ * [personalRange] is the sensitivity-weighted high/low for the same day, or
+ * `null` when the profile is baseline (no personal series).
  */
 internal data class OutlookDay(
     val date: LocalDate,
     val dayLabel: String,
     val range: DayRange?,
-)
+    val startScore: BigDecimal? = null,
+    val endScore: BigDecimal? = null,
+    val hourScores: List<BigDecimal> = emptyList(),
+    val personalRange: DayRange? = null,
+    val personalHourScores: List<BigDecimal> = emptyList(),
+) {
+    /** True when no scored hour exists for this local day. */
+    val isUnknown: Boolean get() = hourScores.isEmpty()
+
+    /** True when a Personal ribbon sits beside Standard. */
+    val hasPersonalRibbon: Boolean
+        get() = personalRange != null && personalHourScores.isNotEmpty()
+}

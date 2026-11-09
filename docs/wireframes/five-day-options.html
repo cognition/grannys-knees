@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Five-day index — three layout options</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --ink: light-dark(#1c1915, #f6e7d4);
+      --muted: light-dark(#5c564c, #c4bbae);
+      --line: light-dark(#d4c0a6, #3a342c);
+      --rule: light-dark(#c9b396, #4a4036);
+      --paper: light-dark(#fbf3e8, #1a1612);
+      --page: light-dark(#f6e7d4, #161310);
+      --mark: light-dark(#1c1915, #f6e7d4);
+      --ribbon: light-dark(#5c564c, #c4bbae);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font: 400 15px/1.4 "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font: 500 1.5rem/1.2 Georgia, "Times New Roman", serif;
+    }
+    .lede {
+      margin: 0 0 24px;
+      color: var(--muted);
+      max-width: 48rem;
+    }
+    .options {
+      display: grid;
+      gap: 28px;
+      max-width: 28rem;
+    }
+    .option { display: grid; gap: 8px; }
+    .option h2 {
+      margin: 0;
+      font: 600 1rem/1.3 system-ui, sans-serif;
+    }
+    .option .why {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .title {
+      margin: 0 0 4px;
+      font: 500 0.8rem/1.2 system-ui, sans-serif;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .caption {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--paper) 92%, var(--ink) 2%);
+    }
+    .day {
+      min-width: 0;
+      padding: 8px 3px 10px;
+      text-align: center;
+      border-right: 1px solid var(--rule);
+    }
+    .day:last-child { border-right: 0; }
+    .day .heading {
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 6px;
+      display: grid;
+      gap: 1px;
+      justify-items: center;
+    }
+    .day .name { font: 500 0.75rem/1.2 system-ui, sans-serif; }
+    .day .date {
+      font: 400 0.65rem/1.2 system-ui, sans-serif;
+      color: var(--muted);
+    }
+    .day.is-unknown {
+      background: color-mix(in srgb, var(--paper) 88%, var(--muted) 12%);
+    }
+    .day .miss {
+      color: var(--muted);
+      font: 600 1.1rem/1 Georgia, "Times New Roman", serif;
+      padding: 36px 0;
+    }
+
+    /* Shared ribbon bits */
+    .plot {
+      position: relative;
+      height: 92px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .plot .axis {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      transform: translateX(-50%);
+      background: var(--rule);
+    }
+    .plot .ribbon {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .plot .ribbon path {
+      fill: color-mix(in srgb, var(--ribbon) 46%, transparent);
+      stroke: color-mix(in srgb, var(--mark) 40%, transparent);
+      stroke-width: 0.7;
+      stroke-linejoin: round;
+    }
+    .plot .ribbon.partial path {
+      fill: color-mix(in srgb, var(--ribbon) 26%, transparent);
+      stroke-dasharray: 2.5 2.5;
+    }
+    .plot .ribbon.flat path {
+      fill: color-mix(in srgb, var(--ribbon) 40%, transparent);
+    }
+    .plot .ribbon.lava path {
+      /* soft bulb edges; path itself is L/R mirrored */
+      filter: url(#soft-edge);
+    }
+    .when {
+      display: block;
+      font: 400 0.55rem/1 system-ui, sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* A — High/Low stacked left, graph right */
+    .a-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      gap: 2px;
+      align-items: stretch;
+      min-height: 110px;
+    }
+    .a-scale {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      align-content: space-between;
+      justify-items: start;
+      padding: 2px 0 2px 2px;
+      text-align: left;
+    }
+    .a-scale .pair { display: grid; gap: 1px; }
+    .a-scale .val {
+      font: 600 0.9rem/1 system-ui, sans-serif;
+    }
+    .a-scale .pair.low .val {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* B — range chip left, graph right */
+    .b-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 2px;
+      align-items: center;
+      min-height: 110px;
+    }
+    .b-chip {
+      font: 600 0.8rem/1.1 system-ui, sans-serif;
+      letter-spacing: -0.02em;
+    }
+    .b-chip .sep { color: var(--muted); font-weight: 400; }
+
+    /* C — ticks on the ribbon at high/low times */
+    .c-body { display: grid; min-height: 118px; }
+    .c-plot { height: 110px; }
+    .tick {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      display: grid;
+      justify-items: center;
+      gap: 1px;
+      pointer-events: none;
+    }
+    .tick .bar {
+      width: 14px;
+      height: 2px;
+      background: var(--mark);
+      border-radius: 1px;
+    }
+    .tick .lbl {
+      font: 600 0.7rem/1 system-ui, sans-serif;
+      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      padding: 0 2px;
+    }
+    .tick.low .bar { opacity: 0.75; width: 12px; height: 1.5px; }
+    .tick.low .lbl {
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .tick .tag {
+      font: 400 0.5rem/1 system-ui, sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .legend {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <h1>Five-day index — three options</h1>
+  <p class="lede">
+    Same five sample days in each sketch. Graph always reads <strong>morning → night</strong>
+    top to bottom. Width follows the hourly index (skinny when low, wider when high;
+    a rectangle when high and low are the same). Unknown day stays <strong>?</strong>.
+  </p>
+
+  <div class="options">
+
+    <!-- A (chosen) — lava-lamp mirrored ribbon -->
+    <section class="option" id="option-a">
+      <h2>A — High / Low beside a lava-lamp day graph</h2>
+      <p class="why">
+        Left: day’s high and low. Right: morning→night blob, <strong>mirrored</strong> L/R,
+        soft bulbs and pinches like a lava lamp. Flat day → rounded capsule.
+      </p>
+      <div class="panel">
+        <p class="title">Five-day index</p>
+        <p class="caption">High and low for the day. Shape is morning to night.</p>
+        <svg width="0" height="0" aria-hidden="true">
+          <filter id="soft-edge" x="-20%" y="-10%" width="140%" height="120%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.35" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </svg>
+        <div class="calendar" role="img" aria-label="Option A with mirrored lava-lamp day graphs">
+          <div class="day">
+            <div class="heading"><span class="name">Wed</span><span class="date">11</span></div>
+            <div class="a-body">
+              <div class="a-scale">
+                <div class="pair"><span class="val">7</span><span class="when">high</span></div>
+                <div class="pair low"><span class="val">4</span><span class="when">low</span></div>
+              </div>
+              <div class="plot">
+                <svg class="ribbon lava" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- mirrored lava: fat morning bulb, waist, small evening drop -->
+                  <path d="M20,2
+                    C30,2 38,11 38,26
+                    C38,38 32,45 26,52
+                    C21,58 17,65 16,76
+                    C15,88 17,95 20,98
+                    C23,95 25,88 24,76
+                    C23,65 19,58 14,52
+                    C8,45 2,38 2,26
+                    C2,11 10,2 20,2 Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Thu</span><span class="date">12</span></div>
+            <div class="a-body">
+              <div class="a-scale">
+                <div class="pair"><span class="val">7</span><span class="when">high</span></div>
+                <div class="pair low"><span class="val">4</span><span class="when">low</span></div>
+              </div>
+              <div class="plot">
+                <svg class="ribbon lava partial" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- mirrored lava: small morning seed → neck → fat evening blob -->
+                  <path d="M20,2
+                    C26,2 28,9 27,18
+                    C26,28 22,34 19,42
+                    C16,50 14,58 16,68
+                    C19,82 28,88 35,93
+                    C33,98 27,99 20,98
+                    C13,99 7,98 5,93
+                    C12,88 21,82 24,68
+                    C26,58 24,50 21,42
+                    C18,34 14,28 13,18
+                    C12,9 14,2 20,2 Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="day is-unknown">
+            <div class="heading"><span class="name">Fri</span><span class="date">13</span></div>
+            <div class="miss" aria-label="Unknown">?</div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Sat</span><span class="date">14</span></div>
+            <div class="a-body">
+              <div class="a-scale">
+                <div class="pair"><span class="val">8</span><span class="when">high</span></div>
+                <div class="pair low"><span class="val">3</span><span class="when">low</span></div>
+              </div>
+              <div class="plot">
+                <svg class="ribbon lava" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- mirrored lava: huge top blob, deep pinch, tiny bottom bead -->
+                  <path d="M20,2
+                    C32,1 39,10 39,25
+                    C39,37 31,44 24,50
+                    C18,56 13,64 12,76
+                    C11,87 15,94 20,98
+                    C25,94 29,87 28,76
+                    C27,64 22,56 16,50
+                    C9,44 1,37 1,25
+                    C1,10 8,1 20,2 Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Sun</span><span class="date">15</span></div>
+            <div class="a-body">
+              <div class="a-scale">
+                <div class="pair"><span class="val">5</span><span class="when">high</span></div>
+                <div class="pair low"><span class="val">5</span><span class="when">low</span></div>
+              </div>
+              <div class="plot">
+                <svg class="ribbon lava flat" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- flat day = mirrored capsule -->
+                  <path d="M13,12
+                    C13,4 16,2 20,2
+                    C24,2 27,4 27,12
+                    L27,88
+                    C27,96 24,98 20,98
+                    C16,98 13,96 13,88
+                    Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="legend">Mirrored L/R · soft bulbs · Sun flat → capsule.</p>
+      </div>
+    </section>
+
+    <!-- B -->
+    <section class="option" id="option-b">
+      <h2>B — Compact range chip beside the graph</h2>
+      <p class="why">Left is just <code>7–4</code>. More room for the shape; less explicit High/Low wording.</p>
+      <div class="panel">
+        <p class="title">Five-day index</p>
+        <p class="caption">Daily high–low. Shape is morning to night.</p>
+        <div class="calendar" role="img" aria-label="Option B: range chip beside morning to night graph">
+          <div class="day">
+            <div class="heading"><span class="name">Wed</span><span class="date">11</span></div>
+            <div class="b-body">
+              <div class="b-chip">7<span class="sep">–</span>4</div>
+              <div class="plot">
+                <span class="axis"></span>
+                <svg class="ribbon" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M20,0 C30,8 32,22 28,40 C22,58 16,78 14,100
+                    C18,78 20,58 22,40 C24,22 22,8 20,0 Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Thu</span><span class="date">12</span></div>
+            <div class="b-body">
+              <div class="b-chip">7<span class="sep">–</span>4</div>
+              <div class="plot">
+                <span class="axis"></span>
+                <svg class="ribbon partial" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M20,0 C22,12 18,30 16,48 C20,66 28,84 30,100
+                    C24,84 18,66 16,48 C16,30 18,12 20,0 Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="day is-unknown">
+            <div class="heading"><span class="name">Fri</span><span class="date">13</span></div>
+            <div class="miss">?</div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Sat</span><span class="date">14</span></div>
+            <div class="b-body">
+              <div class="b-chip">8<span class="sep">–</span>3</div>
+              <div class="plot">
+                <span class="axis"></span>
+                <svg class="ribbon" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M20,0 C34,6 34,18 30,28 C18,48 12,70 14,100
+                    C18,70 20,48 24,28 C26,18 24,6 20,0 Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Sun</span><span class="date">15</span></div>
+            <div class="b-body">
+              <div class="b-chip">5<span class="sep">–</span>5</div>
+              <div class="plot">
+                <span class="axis"></span>
+                <svg class="ribbon flat" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M12,0 H28 V100 H12 Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- C -->
+    <section class="option" id="option-c">
+      <h2>C — High / Low ticks on the day graph</h2>
+      <p class="why">Numbers sit at the time they happened. Shows <em>when</em> it peaked, but harder to compare days at a glance.</p>
+      <div class="panel">
+        <p class="title">Five-day index</p>
+        <p class="caption">Shape is morning to night. Marks show high and low where they fell.</p>
+        <div class="calendar" role="img" aria-label="Option C: high and low ticks on morning to night graph">
+          <div class="day">
+            <div class="heading"><span class="name">Wed</span><span class="date">11</span></div>
+            <div class="c-body">
+              <div class="plot c-plot">
+                <span class="axis"></span>
+                <svg class="ribbon" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M20,0 C30,8 32,22 28,40 C22,58 16,78 14,100
+                    C18,78 20,58 22,40 C24,22 22,8 20,0 Z" />
+                </svg>
+                <div class="tick" style="top:12%;">
+                  <span class="tag">high</span>
+                  <span class="bar"></span>
+                  <span class="lbl">7</span>
+                </div>
+                <div class="tick low" style="top:88%;">
+                  <span class="bar"></span>
+                  <span class="lbl">4</span>
+                  <span class="tag">low</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Thu</span><span class="date">12</span></div>
+            <div class="c-body">
+              <div class="plot c-plot">
+                <span class="axis"></span>
+                <svg class="ribbon partial" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M20,0 C22,12 18,30 16,48 C20,66 28,84 30,100
+                    C24,84 18,66 16,48 C16,30 18,12 20,0 Z" />
+                </svg>
+                <div class="tick low" style="top:18%;">
+                  <span class="tag">low</span>
+                  <span class="bar"></span>
+                  <span class="lbl">4</span>
+                </div>
+                <div class="tick" style="top:90%;">
+                  <span class="bar"></span>
+                  <span class="lbl">7</span>
+                  <span class="tag">high</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="day is-unknown">
+            <div class="heading"><span class="name">Fri</span><span class="date">13</span></div>
+            <div class="miss">?</div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Sat</span><span class="date">14</span></div>
+            <div class="c-body">
+              <div class="plot c-plot">
+                <span class="axis"></span>
+                <svg class="ribbon" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M20,0 C34,6 34,18 30,28 C18,48 12,70 14,100
+                    C18,70 20,48 24,28 C26,18 24,6 20,0 Z" />
+                </svg>
+                <div class="tick" style="top:8%;">
+                  <span class="tag">high</span>
+                  <span class="bar"></span>
+                  <span class="lbl">8</span>
+                </div>
+                <div class="tick low" style="top:92%;">
+                  <span class="bar"></span>
+                  <span class="lbl">3</span>
+                  <span class="tag">low</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="day">
+            <div class="heading"><span class="name">Sun</span><span class="date">15</span></div>
+            <div class="c-body">
+              <div class="plot c-plot">
+                <span class="axis"></span>
+                <svg class="ribbon flat" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M12,0 H28 V100 H12 Z" />
+                </svg>
+                <div class="tick" style="top:50%;">
+                  <span class="bar"></span>
+                  <span class="lbl">5</span>
+                  <span class="tag">flat</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>

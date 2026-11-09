@@ -6,6 +6,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.booleanOrNull
 import java.io.InputStream
 
 /**
@@ -33,7 +34,9 @@ internal class GrannySaysCatalog(
         /** Parses the `grannySays` document from [text]. */
         fun parse(text: String): GrannySaysCatalog {
             val root = json.parseToJsonElement(text).jsonObject
-            val rows = root["grannySays"]?.jsonArray.orEmpty()
+            val rows = (root["grannySays"]?.jsonArray.orEmpty() +
+                root["additionalSayings"]?.jsonArray.orEmpty() +
+                root["freeSpeechSayings"]?.jsonArray.orEmpty())
             val bands = linkedMapOf<Int, List<GrannySaying>>()
             rows.forEach { element ->
                 val row = element.jsonObject
@@ -45,10 +48,17 @@ internal class GrannySaysCatalog(
                     val tone = GrannyTone.fromLabel(toneLabel) ?: return@mapNotNull null
                     val body = saying["text"]?.jsonPrimitive?.contentOrNull?.trim().orEmpty()
                     if (body.isEmpty()) return@mapNotNull null
-                    GrannySaying(tone = tone, text = body)
+                    GrannySaying(
+                        tone = tone,
+                        text = body,
+                        requiresPersonalDifference = saying["requiresPersonalDifference"]
+                            ?.jsonPrimitive?.booleanOrNull == true,
+                        requiresFreeSpeech = saying["requiresFreeSpeech"]
+                            ?.jsonPrimitive?.booleanOrNull == true,
+                    )
                 }
                 if (sayings.isNotEmpty()) {
-                    bands[index] = sayings
+                    bands[index] = bands[index].orEmpty() + sayings
                 }
             }
             return GrannySaysCatalog(bands)

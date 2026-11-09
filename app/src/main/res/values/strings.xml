@@ -7,8 +7,8 @@
     <string name="today_location_eyebrow">Forecast for</string>
     <string name="today_location_content_description">Forecast location: %1$s</string>
     <string name="today_index_heading">Today\'s knee-weather index</string>
-    <string name="today_index_out_of">/ %1$d</string>
-    <string name="today_index_content_description">Knee-weather index %1$d out of %2$d: %3$s</string>
+    <string name="today_index_content_description">Knee-weather index %1$s: %2$s</string>
+    <string name="today_index_personal_content_description">Knee-weather index %1$s, personal %2$s: %3$s</string>
 
     <!-- Index bands (match the weather/index contract) -->
     <string name="today_band_calm">Calm</string>
@@ -28,13 +28,13 @@
     <!-- Freshness and offline affordances -->
     <string name="today_more">More</string>
     <string name="nav_today">Today</string>
-    <string name="nav_report">Report</string>
-    <string name="nav_reports">Reports</string>
+    <string name="nav_report">Feel</string>
+    <string name="nav_reports">History</string>
+    <string name="nav_settings">Settings</string>
     <string name="nav_about">About</string>
     <string name="today_updated">Updated %1$s</string>
     <string name="today_stale_line">Stale forecast, %1$s</string>
     <string name="today_last_updated">Last updated %1$s</string>
-    <string name="today_disclaimer_short">Experimental. Not medical advice.</string>
     <string name="today_stale_badge">Stale</string>
     <string name="today_stale_detail">Showing the last forecast we managed to fetch.</string>
     <string name="today_loading_title">Fetching the forecast…</string>
@@ -42,16 +42,15 @@
     <string name="today_offline_title">No forecast just yet</string>
     <string name="today_offline_body">We haven\'t fetched the weather yet. Pop back once you\'re online and we\'ll take a look.</string>
     <string name="today_expired_title">Forecast expired</string>
-    <string name="today_expired_body">The cached forecast is too old to show as current. Connect and reopen the app for a fresh pull.</string>
+    <string name="today_expired_body">The cached forecast is too old to show as current. Refresh when you are online.</string>
+    <string name="today_refresh">Refresh</string>
+    <string name="today_refresh_content_description">Refresh the forecast</string>
     <string name="today_invalid_hour_title">No score this hour</string>
     <string name="today_invalid_hour_body">The weather is incomplete, so nothing is filled in.</string>
     <string name="today_location_temporary_note">Temporary default location (no GPS yet).</string>
 
-    <!-- Experimental disclaimer -->
-    <string name="today_disclaimer_title">Experimental — just for curiosity</string>
-    <string name="today_disclaimer_body">Granny\'s Knees is a playful weather-sensitivity indicator, not medical advice, a diagnosis, or a forecast of how you\'ll feel. Weather is only weather.</string>
     <!-- Plain-language privacy screen; full legal policy remains a release deliverable. -->
-    <string name="privacy_title">Your privacy</string>
+    <string name="privacy_title">Privacy policy</string>
     <string name="privacy_back">Back</string>
     <string name="privacy_line_forecast">The forecast sends your city\'s coordinates to Open-Meteo.</string>
     <string name="privacy_line_journal">Notes stay on this phone. There is no account.</string>
@@ -69,5 +68,5 @@
     <string name="privacy_watch_body">A future version may share information between your paired phone and watch. Watch synchronization is not part of the current Android release.</string>
     <string name="privacy_backup_heading">Android backups</string>
     <string name="privacy_backup_body">Android may back up some app data depending on your device settings and the app\'s backup configuration. We are reviewing backup behaviour before the Play Store release.</string>
-    <string name="privacy_footer">The weather index is experimental, not medical advice. A complete privacy policy will be provided before public release.</string>
+    <string name="privacy_footer">The weather index is not medical advice.</string>
 </resources>

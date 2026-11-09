@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.os.Looper
 import androidx.core.content.ContextCompat
+import com.example.grannysknees.data.PlaceSource
 import com.example.grannysknees.data.SelectedCity
 import java.io.IOException
 import java.time.ZoneId
@@ -129,6 +130,7 @@ internal class OptionalGpsPlaceSource(
                 timezone = zone,
                 admin1 = named.admin1,
                 countryCode = named.countryCode,
+                placeSource = PlaceSource.Gps,
             )
         }
         return SelectedCity(
@@ -138,6 +140,7 @@ internal class OptionalGpsPlaceSource(
             timezone = zone,
             admin1 = "",
             countryCode = "",
+            placeSource = PlaceSource.Gps,
         )
     }
 

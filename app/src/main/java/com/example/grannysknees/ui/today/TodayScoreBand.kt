@@ -1,5 +1,8 @@
 package com.example.grannysknees.ui.today
 
+import java.math.BigDecimal
+import java.math.RoundingMode
+
 /**
  * Presentational 0–10 band for the experimental knee-weather index.
  *
@@ -23,8 +26,16 @@ internal enum class TodayScoreBand(val scores: IntRange) {
         /** Highest value of the experimental 0–10 index. */
         const val MAX_SCORE: Int = 10
 
+        private val ONE_DP = 1
+
         /**
-         * Map a score to its display band.
+         * Formats the index for on-screen use: one decimal, no "/10".
+         */
+        fun formatScore(score: BigDecimal): String =
+            score.setScale(ONE_DP, RoundingMode.HALF_UP).toPlainString()
+
+        /**
+         * Map a whole-number score to its display band.
          *
          * Out-of-range input is clamped into the supported 0–10 window so the
          * UI always has a band to show, even when handed unexpected fake data.
@@ -33,5 +44,12 @@ internal enum class TodayScoreBand(val scores: IntRange) {
             val clamped = score.coerceIn(MIN_SCORE, MAX_SCORE)
             return entries.first { clamped in it.scores }
         }
+
+        /**
+         * Map a one-decimal index to its band via half-up whole number.
+         */
+        fun forScore(score: BigDecimal): TodayScoreBand =
+            forScore(score.setScale(0, RoundingMode.HALF_UP).intValueExact())
     }
 }
+
