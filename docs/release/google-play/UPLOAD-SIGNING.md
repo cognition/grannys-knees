@@ -50,6 +50,8 @@ keyPassword=<your-key-password>
 
 Ensure `signing/upload-keystore.jks` exists at the path you configured. The repo already ignores `*.jks`, `*.keystore`, and `keystore.properties`.
 
+Passwords are read as plain text (not Java `Properties` escaping), so characters such as `\`, `:`, and `#` may appear literally. Do not wrap values in quotes.
+
 ## Play App Signing
 
 In Play Console, enable **Play App Signing** for the app. Google holds the **app signing key** used for installs; you upload builds signed with the **upload key** configured above. Register the upload key certificate in Console when prompted (export with `keytool -list -v -keystore signing/upload-keystore.jks`).
