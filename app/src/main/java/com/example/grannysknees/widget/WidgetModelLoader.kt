@@ -2,9 +2,12 @@ package com.example.grannysknees.widget
 
 import android.content.Context
 import com.example.grannysknees.data.DefaultLocation
+import com.example.grannysknees.data.FeelCalibrationStore
 import com.example.grannysknees.data.ForecastCacheStore
 import com.example.grannysknees.data.ForecastRepository
+import com.example.grannysknees.data.LocalPressureStore
 import com.example.grannysknees.data.SelectedCityStore
+import com.example.grannysknees.data.SensitivityProfileStore
 import java.io.File
 import java.time.Clock
 import java.time.Instant
@@ -21,7 +24,7 @@ internal class WidgetModelLoader(
     private val mapper: WidgetModelMapper = WidgetModelMapper(),
     private val clock: Clock = Clock.systemUTC(),
 ) {
-    /** Creates a loader for the same app-private cache file used by Today. */
+    /** Creates a loader for the same app-private cache and personal stores as Today. */
     constructor(context: Context) : this(
         repository = ForecastRepository(
             store = ForecastCacheStore(
@@ -29,6 +32,15 @@ internal class WidgetModelLoader(
             ),
             cityStore = SelectedCityStore(
                 File(context.filesDir, CITY_FILE_NAME),
+            ),
+            sensitivityStore = SensitivityProfileStore(
+                File(context.filesDir, SENSITIVITY_FILE_NAME),
+            ),
+            localPressureStore = LocalPressureStore(
+                File(context.filesDir, LOCAL_PRESSURE_FILE_NAME),
+            ),
+            feelCalibrationStore = FeelCalibrationStore(
+                File(context.filesDir, FEEL_CALIBRATION_FILE_NAME),
             ),
         ),
     )
@@ -52,8 +64,11 @@ internal class WidgetModelLoader(
         )
 
     private companion object {
-        /** Must match the cache file opened by MainActivity. */
+        /** Must match the cache files opened by MainActivity. */
         const val CACHE_FILE_NAME: String = "forecast-cache.json"
         const val CITY_FILE_NAME: String = "selected-city.json"
+        const val SENSITIVITY_FILE_NAME: String = "sensitivity-profile.json"
+        const val LOCAL_PRESSURE_FILE_NAME: String = "local-pressure.json"
+        const val FEEL_CALIBRATION_FILE_NAME: String = "feel-calibration.json"
     }
 }

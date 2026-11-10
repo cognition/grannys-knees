@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
@@ -61,6 +62,7 @@ internal fun GrannysKneesApp(
     feelCalibrationStore: FeelCalibrationStore? = null,
     onboardingStore: OnboardingStore? = null,
     themePreferenceStore: ThemePreferenceStore? = null,
+    onPresentationChanged: () -> Unit = {},
 ) {
     val systemDark = isSystemInDarkTheme()
     var themePreference by remember {
@@ -80,6 +82,12 @@ internal fun GrannysKneesApp(
     }
     var sensitivityEpoch by remember { mutableStateOf(0) }
     var journalDataEpoch by remember { mutableIntStateOf(0) }
+    LaunchedEffect(sensitivityEpoch) {
+        if (sensitivityEpoch == 0) {
+            return@LaunchedEffect
+        }
+        onPresentationChanged()
+    }
     GrannysKneesTheme(darkTheme = themePreference.resolveDark(systemDark)) {
         var showOnboarding by remember { mutableStateOf(onboardingStore?.seen() == false) }
         if (showOnboarding && onboardingStore != null) {

@@ -78,8 +78,15 @@ class WatchLogService : WearableListenerService() {
 
 /** Text the watch tile shows. The watch does not calculate this score. */
 internal fun watchIndexText(state: TodayUiState): String = when (state) {
-    is TodayUiState.Available ->
-        "${state.scoreLabel}\n${state.location}\n${state.lastUpdatedLabel}"
+    is TodayUiState.Available -> {
+        val personal = state.personalScoreLabel
+        val scoreLine = if (personal != null && personal != state.scoreLabel) {
+            "${state.scoreLabel} / $personal"
+        } else {
+            state.scoreLabel
+        }
+        "$scoreLine\n${state.location}\n${state.lastUpdatedLabel}"
+    }
     else -> "No index\n${state.location}"
 }
 

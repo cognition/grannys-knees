@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -310,154 +312,82 @@ internal fun JournalScreen(
                     )
                 }
             }
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                SYMPTOMS.forEach { option ->
-                    InkChoice(
-                        label = option.replaceFirstChar { it.titlecase() },
-                        selected = hasPlace && place.symptom == option,
-                        enabled = editing && hasPlace,
-                        onClick = { replaceFocus(place.copy(symptom = option)) },
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    SYMPTOMS.forEach { option ->
+                        InkChoice(
+                            label = option.replaceFirstChar { it.titlecase() },
+                            selected = hasPlace && place.symptom == option,
+                            enabled = editing && hasPlace,
+                            onClick = { replaceFocus(place.copy(symptom = option)) },
+                        )
+                    }
+                }
+                if (displayed.size > 1) {
+                    Text(
+                        displayed.joinToString(separator = ", ") { item ->
+                            quietReportTitle(item.side, item.part, item.symptom)
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
-            }
-            if (displayed.size > 1) {
                 Text(
-                    displayed.joinToString(separator = ", ") { item ->
-                        quietReportTitle(item.side, item.part, item.symptom)
+                    if (hasPlace) {
+                        stringResource(R.string.journal_rating, place.rating)
+                    } else {
+                        stringResource(R.string.journal_rating_empty)
                     },
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-            }
-            Text(
-                if (hasPlace) {
-                    stringResource(R.string.journal_rating, place.rating)
-                } else {
-                    stringResource(R.string.journal_rating_empty)
-                },
-                style = MaterialTheme.typography.labelLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Slider(
-                value = if (hasPlace) place.rating.toFloat() else 0f,
-                onValueChange = { value ->
-                    if (!editing || !hasPlace) {
-                        return@Slider
-                    }
-                    chosen = chosen.mapIndexed { index, item ->
-                        if (index == focus) item.copy(rating = value.toInt()) else item
-                    }
-                },
-                enabled = editing && hasPlace,
-                valueRange = 0f..10f,
-                steps = 9,
-                colors = SliderDefaults.colors(
-                    thumbColor = accent,
-                    activeTrackColor = accent,
-                    inactiveTrackColor = quietLine,
-                    activeTickColor = MaterialTheme.colorScheme.onPrimary,
-                    inactiveTickColor = accent.copy(alpha = 0.35f),
-                ),
-                modifier = Modifier.semantics {
-                    contentDescription = ratingDescription
-                },
-            )
-            Button(
-                onClick = {
-                    scope.launch {
-                        val edits = chosen.map { item ->
-                            SeriesEdit(item.part, item.side, item.symptom, item.rating)
+                Slider(
+                    value = if (hasPlace) place.rating.toFloat() else 0f,
+                    onValueChange = { value ->
+                        if (!editing || !hasPlace) {
+                            return@Slider
                         }
-                        val now = Instant.now()
-                        val wrote = withContext(Dispatchers.IO) {
-                            val observation = journalRepository.save(
-                                committedAt = now,
-                                edits = edits,
-                                confirmations = emptyList(),
-                            )
-                            if (observation != null) {
-                                recordFeelCalibration(
-                                    forecastRepository = forecastRepository,
-                                    feelCalibrationStore = feelCalibrationStore,
-                                    observationId = observation.id,
-                                    observedAt = now,
-                                    ratings = edits.map { it.rating },
-                                )
-                            }
-                            observation
-                        }
-                        notice = if (wrote == null) nothing else saved
-                        if (wrote != null) {
-                            onFeelSaved()
-                        }
-                    }
-                },
-                enabled = editing,
-                shape = GrannyCorner,
-                contentPadding = ACTION_PADDING,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(COMPACT_BUTTON_HEIGHT),
-            ) {
-                Text(
-                    text = stringResource(R.string.journal_save_change),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp),
-            ) {
-                QuietAction(
-                    label = stringResource(
-                        if (playing) R.string.journal_stop_week else R.string.journal_play_week,
-                    ),
-                    onClick = { playing = !playing },
-                )
-                QuietAction(
-                    label = stringResource(R.string.journal_same_as_yesterday),
-                    enabled = editing,
-                    onClick = {
-                        if (!editing) {
-                            return@QuietAction
-                        }
-                        scope.launch {
-                            val places = withContext(Dispatchers.IO) {
-                                placesFromYesterday(journalRepository.all(), Instant.now(), zone)
-                            }
-                            if (places.isEmpty()) {
-                                notice = noYesterday
-                            } else {
-                                chosen = places
-                                focus = places.lastIndex
-                                notice = null
-                            }
+                        chosen = chosen.mapIndexed { index, item ->
+                            if (index == focus) item.copy(rating = value.toInt()) else item
                         }
                     },
+                    enabled = editing && hasPlace,
+                    valueRange = 0f..10f,
+                    steps = 9,
+                    colors = SliderDefaults.colors(
+                        thumbColor = accent,
+                        activeTrackColor = accent,
+                        inactiveTrackColor = quietLine,
+                        activeTickColor = MaterialTheme.colorScheme.onPrimary,
+                        inactiveTickColor = accent.copy(alpha = 0.35f),
+                    ),
+                    modifier = Modifier.semantics {
+                        contentDescription = ratingDescription
+                    },
                 )
-                QuietAction(
-                    label = stringResource(R.string.journal_unchanged),
-                    enabled = editing,
+                Button(
                     onClick = {
-                        if (!editing) {
-                            return@QuietAction
-                        }
                         scope.launch {
-                            val keys = chosen.map { item ->
-                                SeriesKey(item.part, item.side, item.symptom)
+                            val edits = chosen.map { item ->
+                                SeriesEdit(item.part, item.side, item.symptom, item.rating)
                             }
                             val now = Instant.now()
                             val wrote = withContext(Dispatchers.IO) {
                                 val observation = journalRepository.save(
                                     committedAt = now,
-                                    edits = emptyList(),
-                                    confirmations = keys,
+                                    edits = edits,
+                                    confirmations = emptyList(),
                                 )
                                 if (observation != null) {
                                     recordFeelCalibration(
@@ -465,7 +395,7 @@ internal fun JournalScreen(
                                         feelCalibrationStore = feelCalibrationStore,
                                         observationId = observation.id,
                                         observedAt = now,
-                                        ratings = observation.measurements.map { it.rating },
+                                        ratings = edits.map { it.rating },
                                     )
                                 }
                                 observation
@@ -476,42 +406,121 @@ internal fun JournalScreen(
                             }
                         }
                     },
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(NOTICE_HEIGHT),
-                contentAlignment = Alignment.CenterStart,
-            ) {
-                if (notice != null) {
+                    enabled = editing,
+                    shape = GrannyCorner,
+                    contentPadding = ACTION_PADDING,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(COMPACT_BUTTON_HEIGHT),
+                ) {
                     Text(
-                        notice.orEmpty(),
-                        style = MaterialTheme.typography.labelMedium,
+                        text = stringResource(R.string.journal_save_change),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                ) {
+                    QuietAction(
+                        label = stringResource(
+                            if (playing) R.string.journal_stop_week else R.string.journal_play_week,
+                        ),
+                        onClick = { playing = !playing },
+                    )
+                    QuietAction(
+                        label = stringResource(R.string.journal_same_as_yesterday),
+                        enabled = editing,
+                        onClick = {
+                            if (!editing) {
+                                return@QuietAction
+                            }
+                            scope.launch {
+                                val places = withContext(Dispatchers.IO) {
+                                    placesFromYesterday(journalRepository.all(), Instant.now(), zone)
+                                }
+                                if (places.isEmpty()) {
+                                    notice = noYesterday
+                                } else {
+                                    chosen = places
+                                    focus = places.lastIndex
+                                    notice = null
+                                }
+                            }
+                        },
+                    )
+                    QuietAction(
+                        label = stringResource(R.string.journal_unchanged),
+                        enabled = editing,
+                        onClick = {
+                            if (!editing) {
+                                return@QuietAction
+                            }
+                            scope.launch {
+                                val keys = chosen.map { item ->
+                                    SeriesKey(item.part, item.side, item.symptom)
+                                }
+                                val now = Instant.now()
+                                val wrote = withContext(Dispatchers.IO) {
+                                    val observation = journalRepository.save(
+                                        committedAt = now,
+                                        edits = emptyList(),
+                                        confirmations = keys,
+                                    )
+                                    if (observation != null) {
+                                        recordFeelCalibration(
+                                            forecastRepository = forecastRepository,
+                                            feelCalibrationStore = feelCalibrationStore,
+                                            observationId = observation.id,
+                                            observedAt = now,
+                                            ratings = observation.measurements.map { it.rating },
+                                        )
+                                    }
+                                    observation
+                                }
+                                notice = if (wrote == null) nothing else saved
+                                if (wrote != null) {
+                                    onFeelSaved()
+                                }
+                            }
+                        },
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(NOTICE_HEIGHT),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    if (notice != null) {
+                        Text(
+                            notice.orEmpty(),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.journal_feel_tune_compact),
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Switch(
+                        checked = feelCalibrationEnabled,
+                        onCheckedChange = onFeelCalibrationEnabledChange,
+                        modifier = Modifier.scale(0.55f),
                     )
                 }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.journal_feel_tune_compact),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
-                )
-                Switch(
-                    checked = feelCalibrationEnabled,
-                    onCheckedChange = onFeelCalibrationEnabledChange,
-                    modifier = Modifier.scale(0.55f),
-                )
             }
         }
     }

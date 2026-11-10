@@ -20,6 +20,8 @@ import java.io.File
 
 class MainActivity : ComponentActivity() {
     private lateinit var localBarometerSensor: LocalBarometerSensor
+    private lateinit var repository: ForecastRepository
+    private lateinit var watchPublisher: WatchIndexPublisher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +36,7 @@ class MainActivity : ComponentActivity() {
         val cities = SelectedCityStore(cityFile)
         val sensitivityStore = SensitivityProfileStore(sensitivityFile)
         val feelCalibrationStore = FeelCalibrationStore(feelCalibrationFile)
-        val repository = ForecastRepository(
+        repository = ForecastRepository(
             store = ForecastCacheStore(cacheFile),
             cityStore = cities,
             fetchStampStore = DailyFetchStampStore(stampFile),
@@ -42,6 +44,7 @@ class MainActivity : ComponentActivity() {
             localPressureStore = localPressureStore,
             feelCalibrationStore = feelCalibrationStore,
         )
+        watchPublisher = WatchIndexPublisher(this)
         setContent {
             GrannysKneesApp(
                 repository = repository,
@@ -52,9 +55,10 @@ class MainActivity : ComponentActivity() {
                 themePreferenceStore = ThemePreferenceStore(
                     File(filesDir, "theme-preference.txt"),
                 ),
+                onPresentationChanged = { publishWatchIndex() },
             )
         }
-        WatchIndexPublisher(this).publish(repository.presentFromCache())
+        publishWatchIndex()
     }
 
     override fun onStart() {
@@ -62,8 +66,21 @@ class MainActivity : ComponentActivity() {
         localBarometerSensor.start()
     }
 
+    override fun onResume() {
+        super.onResume()
+        publishWatchIndex()
+    }
+
     override fun onStop() {
         localBarometerSensor.stop()
         super.onStop()
+    }
+
+    /** Writes the latest Today presentation for the watch tile and payload file. */
+    private fun publishWatchIndex() {
+        if (!::repository.isInitialized || !::watchPublisher.isInitialized) {
+            return
+        }
+        watchPublisher.publish(repository.presentFromCache())
     }
 }

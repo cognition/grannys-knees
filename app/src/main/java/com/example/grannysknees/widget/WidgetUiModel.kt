@@ -24,6 +24,8 @@ internal sealed interface WidgetUiModel {
         val freshness: ForecastFreshness,
         val hours: List<WidgetHourScore>,
         val days: List<WidgetDayScore>,
+        /** Personal score for the same hour, when Today would show one. */
+        val personalScore: BigDecimal? = null,
         /** Position of now across the local day, when the curve can mark it. */
         val nowFraction: Float? = null,
     ) : WidgetUiModel {
@@ -82,6 +84,7 @@ internal class WidgetModelMapper {
                 freshness = state.freshness,
                 hours = hoursFrom(outlook),
                 days = daysFrom(outlook),
+                personalScore = state.personalScore,
                 nowFraction = (outlook as? OutlookUiState.Available)?.today?.nowFraction,
             )
 
@@ -96,11 +99,16 @@ internal class WidgetModelMapper {
             )
         }
 
-    /** Available curve points only, in the order Today already sorted them. */
+    /**
+     * Available curve points only, in the order Today already sorted them.
+     * When Personal segments exist, those points are used so the widget curve
+     * matches the Personal ribbon on Today.
+     */
     private fun hoursFrom(outlook: OutlookUiState): List<WidgetHourScore> {
         val available = outlook as? OutlookUiState.Available ?: return emptyList()
         val curve = available.today
-        return curve.points.map { point ->
+        val source = curve.personalPoints.ifEmpty { curve.points }
+        return source.map { point ->
             WidgetHourScore(
                 timeLabel = point.timeLabel,
                 score = point.score,
