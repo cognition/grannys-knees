@@ -16,6 +16,15 @@ class ReportDummyTest {
     private val toronto: ZoneId = ZoneId.of("America/Toronto")
 
     @Test
+    fun `ache ratings start at one when zero would have been used`() {
+        assertEquals(1, ratingForSymptom("ache", 0))
+        assertEquals(1, ratingForSymptom("ache", 1))
+        assertEquals(7, ratingForSymptom("ache", 7))
+        assertEquals(0, ratingForSymptom("stiffness", 0))
+        assertEquals(1, defaultReportPlaces().single().rating)
+    }
+
+    @Test
     fun `just before 3 am still belongs to the previous reporting day`() {
         val at = Instant.parse("2026-11-06T07:59:00Z")
         assertEquals(LocalDate.of(2026, 11, 5), ReportDay.reportingDay(at, toronto))
@@ -70,7 +79,8 @@ class ReportDummyTest {
         val read = store.read(Instant.parse("2026-11-06T08:00:00Z"), toronto)
         assertEquals("knee", read.places.single().part)
         assertEquals("left", read.places.single().side)
-        assertEquals(0, read.places.single().rating)
+        assertEquals("ache", read.places.single().symptom)
+        assertEquals(1, read.places.single().rating)
         assertFalse(ReportDay.sameReportingDay(read.savedAt, Instant.parse("2026-11-06T07:30:00Z"), toronto))
         assertTrue(ReportDay.sameReportingDay(read.savedAt, Instant.parse("2026-11-06T08:00:00Z"), toronto))
     }
@@ -90,6 +100,18 @@ class ReportDummyTest {
         assertEquals(listOf("knee", "hip"), places.map { place -> place.part })
         assertEquals(6, places.first().rating)
         assertEquals(3, places.last().rating)
+    }
+
+    @Test
+    fun `same as yesterday raises legacy ache zero to one`() {
+        val places = placesFromYesterday(
+            observations = listOf(
+                report("legacy", "2026-11-05T20:00:00Z", ChosenPlace("knee", "left", "ache", 0)),
+            ),
+            now = Instant.parse("2026-11-06T15:00:00Z"),
+            zone = toronto,
+        )
+        assertEquals(1, places.single().rating)
     }
 
     @Test

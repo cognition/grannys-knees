@@ -3,6 +3,7 @@ package com.example.grannysknees.watch
 import android.content.Context
 import com.example.grannysknees.journal.JournalRepository
 import com.example.grannysknees.journal.SeriesEdit
+import com.example.grannysknees.journal.ratingForSymptom
 import com.example.grannysknees.ui.today.TodayUiState
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.PutDataMapRequest
@@ -67,7 +68,7 @@ class WatchLogService : WearableListenerService() {
                     bodyPart = report.bodyPart,
                     side = report.side,
                     symptom = report.symptom,
-                    rating = report.rating,
+                    rating = ratingForSymptom(report.symptom, report.rating),
                 ),
             ),
             confirmations = emptyList(),

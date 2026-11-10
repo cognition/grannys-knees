@@ -32,6 +32,21 @@ internal data class ChosenPlace(
 )
 
 /**
+ * Bounds a rating for [symptom].
+ *
+ * Ache cannot be zero — choosing it raises a clear 0 to at least 1. Stiffness
+ * still allows an explicit zero.
+ */
+internal fun ratingForSymptom(symptom: String, rating: Int): Int {
+    val bounded = rating.coerceIn(0, 10)
+    return if (symptom == "ache") {
+        bounded.coerceAtLeast(1)
+    } else {
+        bounded
+    }
+}
+
+/**
  * The figure the person is filling in, and when it was last kept.
  */
 internal data class ReportDummy(
@@ -74,7 +89,14 @@ internal object ReportDay {
 
 /** The figure shown before anything has been marked today. */
 internal fun defaultReportPlaces(): List<ChosenPlace> {
-    return listOf(ChosenPlace(part = "knee", side = "left", symptom = "ache", rating = 0))
+    return listOf(
+        ChosenPlace(
+            part = "knee",
+            side = "left",
+            symptom = "ache",
+            rating = ratingForSymptom("ache", 0),
+        ),
+    )
 }
 
 /**
@@ -165,7 +187,7 @@ internal class ReportDummyStore(
                 part = part,
                 side = side,
                 symptom = symptom,
-                rating = rating.coerceIn(0, 10),
+                rating = ratingForSymptom(symptom, rating),
             )
         } ?: return null
         if (places.isEmpty()) {
@@ -214,7 +236,7 @@ internal fun placesAsOf(
                 part = measurement.bodyPart,
                 side = measurement.side,
                 symptom = measurement.symptom,
-                rating = measurement.rating,
+                rating = ratingForSymptom(measurement.symptom, measurement.rating),
             )
         }
     }

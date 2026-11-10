@@ -10,8 +10,9 @@ import java.time.Instant
 import java.util.UUID
 
 /**
- * Room-backed journal. History is append-only except for a full wipe, which
- * is the only destructive delete and stays on this device.
+ * Room-backed journal. History is append-only: removals write corrections or
+ * tombstones. A full wipe is the only table-clearing delete and stays on this
+ * device.
  */
 internal class JournalRepository(
     private val dao: JournalDao,
@@ -63,6 +64,33 @@ internal class JournalRepository(
             deletedAt = deletedAt,
             newId = UUID.randomUUID().toString(),
         )
+        insert(marker, snapshot = null)
+        return marker
+    }
+
+    /**
+     * Removes one measurement from a current observation.
+     *
+     * Other measurements in the same save stay visible. Returns null when the
+     * observation or series is no longer current.
+     */
+    fun deleteMeasurement(
+        observationId: String,
+        bodyPart: String,
+        side: String?,
+        symptom: String,
+        deletedAt: Instant,
+    ): JournalObservation? {
+        val target = current().firstOrNull { observation -> observation.id == observationId }
+            ?: return null
+        val marker = JournalCommitter.removeMeasurement(
+            target = target,
+            bodyPart = bodyPart,
+            side = side,
+            symptom = symptom,
+            deletedAt = deletedAt,
+            newId = UUID.randomUUID().toString(),
+        ) ?: return null
         insert(marker, snapshot = null)
         return marker
     }
