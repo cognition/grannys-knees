@@ -1,18 +1,29 @@
 package com.example.grannysknees.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 
 /**
- * Window insets for screens shown above the app bottom navigation.
+ * Window insets for screens shown beside or above the app tab chrome.
  *
- * The outer [GrannysKneesApp] Scaffold already reserves space for the tab bar
- * (and the bar itself pads for system navigation). Including bottom
- * [safeDrawing] here again left a blank band above the menu.
+ * Portrait: the outer Scaffold bottom bar owns system-nav / bottom insets.
+ * Landscape: the left side rail owns start insets. Including those sides again
+ * here left a blank band next to the menu.
  */
 @Composable
-internal fun tabDestinationWindowInsets(): WindowInsets =
-    WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+internal fun tabDestinationWindowInsets(): WindowInsets {
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    return if (isLandscape) {
+        WindowInsets.safeDrawing.only(
+            WindowInsetsSides.Top + WindowInsetsSides.End + WindowInsetsSides.Bottom,
+        )
+    } else {
+        WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+    }
+}
