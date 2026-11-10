@@ -12,8 +12,10 @@ import androidx.compose.ui.platform.LocalConfiguration
  * Window insets for screens shown beside or above the app tab chrome.
  *
  * Portrait: the outer Scaffold bottom bar owns system-nav / bottom insets.
- * Landscape: the left side rail owns start insets. Including those sides again
- * here left a blank band next to the menu.
+ * Landscape: the left side rail owns start insets for itself (plus top/bottom
+ * so rail icons clear the system bars). Destination content still needs top /
+ * end / bottom safe drawing; repeating start here left a blank band next to
+ * the menu.
  */
 @Composable
 internal fun tabDestinationWindowInsets(): WindowInsets {

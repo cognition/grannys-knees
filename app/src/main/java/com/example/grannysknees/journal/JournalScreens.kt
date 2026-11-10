@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -75,8 +76,9 @@ private const val WEEK_FRAME_MILLIS: Long = 1200L
 private val NOTICE_HEIGHT = 18.dp
 private val ACTION_PADDING = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
 private val COMPACT_BUTTON_HEIGHT = 36.dp
-private val HISTORY_THUMB_HEIGHT = 104.dp
-private val HISTORY_CARD_CORNER = 10.dp
+private val HISTORY_THUMB_HEIGHT = 72.dp
+private val HISTORY_CARD_CORNER = 8.dp
+private val HISTORY_ROW_GAP = 4.dp
 
 /** Partial symptom entry. Chosen places add together, and only those are written. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -161,8 +163,7 @@ internal fun JournalScreen(
     val displayed = framePlaces ?: chosen
     val editing = framePlaces == null
     val displayedFocus = if (editing) focus else 0
-    val place = displayed.getOrNull(displayedFocus) ?: defaultReportPlaces().first()
-    val hasPlace = displayed.isNotEmpty()
+    val place = displayed.getOrNull(displayedFocus)
     fun addOrFocus(part: String, side: String?) {
         if (!editing || chosen.isEmpty()) {
             return
@@ -172,7 +173,12 @@ internal fun JournalScreen(
             focus = existing
         } else {
             val current = chosen.getOrNull(focus.coerceIn(0, chosen.lastIndex)) ?: return
-            chosen = chosen + ChosenPlace(part, side, current.symptom, current.rating)
+            chosen = chosen + ChosenPlace(
+                part,
+                side,
+                current.symptom,
+                ratingForSymptom(current.symptom, current.rating),
+            )
             focus = chosen.lastIndex
         }
     }
@@ -180,19 +186,22 @@ internal fun JournalScreen(
         if (!editing) {
             return
         }
-        chosen = chosen.mapIndexed { index, item -> if (index == focus) next else item }
+        val adjusted = next.copy(
+            rating = ratingForSymptom(next.symptom, next.rating),
+        )
+        chosen = chosen.mapIndexed { index, item -> if (index == focus) adjusted else item }
     }
 
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val reportTitle = if (hasPlace) {
+    val reportTitle = if (place != null) {
         quietReportTitle(place.side, place.part, place.symptom)
     } else {
         stringResource(R.string.journal_day_empty)
     }
     val accent = MaterialTheme.colorScheme.primary
     val quietLine = MaterialTheme.colorScheme.outlineVariant
-    val ratingDescription = if (hasPlace) {
+    val ratingDescription = if (place != null) {
         stringResource(R.string.journal_rating, place.rating)
     } else {
         stringResource(R.string.journal_rating_empty)
@@ -269,11 +278,9 @@ internal fun JournalScreen(
                     modifier = Modifier.semantics { heading() },
                 )
                 Text(
-                    if (hasPlace) {
-                        stringResource(grannyAside(place.part, place.side))
-                    } else {
-                        "\u00a0"
-                    },
+                    place?.let { current ->
+                        stringResource(grannyAside(current.part, current.side))
+                    } ?: "\u00a0",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
@@ -287,9 +294,17 @@ internal fun JournalScreen(
                 SYMPTOMS.forEach { option ->
                     InkChoice(
                         label = option.replaceFirstChar { it.titlecase() },
-                        selected = hasPlace && place.symptom == option,
-                        enabled = editing && hasPlace,
-                        onClick = { replaceFocus(place.copy(symptom = option)) },
+                        selected = place?.symptom == option,
+                        enabled = editing && place != null,
+                        onClick = {
+                            val current = place ?: return@InkChoice
+                            replaceFocus(
+                                current.copy(
+                                    symptom = option,
+                                    rating = ratingForSymptom(option, current.rating),
+                                ),
+                            )
+                        },
                     )
                 }
             }
@@ -305,28 +320,30 @@ internal fun JournalScreen(
                 )
             }
             Text(
-                if (hasPlace) {
-                    stringResource(R.string.journal_rating, place.rating)
-                } else {
-                    stringResource(R.string.journal_rating_empty)
-                },
+                place?.let { current ->
+                    stringResource(R.string.journal_rating, current.rating)
+                } ?: stringResource(R.string.journal_rating_empty),
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Slider(
-                value = if (hasPlace) place.rating.toFloat() else 0f,
+                value = place?.rating?.toFloat() ?: 0f,
                 onValueChange = { value ->
-                    if (!editing || !hasPlace) {
+                    if (!editing || place == null) {
                         return@Slider
                     }
                     chosen = chosen.mapIndexed { index, item ->
-                        if (index == focus) item.copy(rating = value.toInt()) else item
+                        if (index == focus) {
+                            item.copy(rating = ratingForSymptom(item.symptom, value.toInt()))
+                        } else {
+                            item
+                        }
                     }
                 },
-                enabled = editing && hasPlace,
-                valueRange = 0f..10f,
-                steps = 9,
+                enabled = editing && place != null,
+                valueRange = if (place?.symptom == "ache") 1f..10f else 0f..10f,
+                steps = if (place?.symptom == "ache") 8 else 9,
                 colors = SliderDefaults.colors(
                     thumbColor = accent,
                     activeTrackColor = accent,
@@ -342,7 +359,12 @@ internal fun JournalScreen(
                 onClick = {
                     scope.launch {
                         val edits = chosen.map { item ->
-                            SeriesEdit(item.part, item.side, item.symptom, item.rating)
+                            SeriesEdit(
+                                item.part,
+                                item.side,
+                                item.symptom,
+                                ratingForSymptom(item.symptom, item.rating),
+                            )
                         }
                         val now = Instant.now()
                         val wrote = withContext(Dispatchers.IO) {
@@ -404,8 +426,12 @@ internal fun JournalScreen(
                             if (places.isEmpty()) {
                                 notice = noYesterday
                             } else {
-                                chosen = places
-                                focus = places.lastIndex
+                                chosen = places.map { item ->
+                                    item.copy(
+                                        rating = ratingForSymptom(item.symptom, item.rating),
+                                    )
+                                }
+                                focus = chosen.lastIndex
                                 notice = null
                             }
                         }
@@ -592,11 +618,9 @@ internal fun JournalScreen(
                             modifier = Modifier.semantics { heading() },
                         )
                         Text(
-                            if (hasPlace) {
-                                stringResource(grannyAside(place.part, place.side))
-                            } else {
-                                "\u00a0"
-                            },
+                            place?.let { current ->
+                                stringResource(grannyAside(current.part, current.side))
+                            } ?: "\u00a0",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 2,
@@ -617,7 +641,9 @@ internal fun JournalScreen(
                         .fillMaxWidth(),
                 )
                 JournalControls(
-                    panelModifier = Modifier.fillMaxWidth(),
+                    panelModifier = Modifier
+                        .weight(1f, fill = false)
+                        .fillMaxWidth(),
                     showReportHeading = false,
                 )
             }
@@ -707,8 +733,11 @@ internal fun HistoryScreen(
         DateTimeFormatter.ofPattern("EEE d MMM · HH:mm", Locale.CANADA)
             .withZone(ZoneId.systemDefault())
     }
+    fun loadNewestFirst(): List<JournalObservation> =
+        repository.current().sortedByDescending { observation -> observation.observedAt }
+
     LaunchedEffect(Unit) {
-        rows = withContext(Dispatchers.IO) { repository.current() }
+        rows = withContext(Dispatchers.IO) { loadNewestFirst() }
     }
     Scaffold(
         modifier = modifier,
@@ -739,10 +768,10 @@ internal fun HistoryScreen(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
-                        horizontal = 14.dp,
-                        vertical = 10.dp,
+                        horizontal = 12.dp,
+                        vertical = 6.dp,
                     ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(HISTORY_ROW_GAP),
                 ) {
                     items(
                         items = rows,
@@ -751,12 +780,29 @@ internal fun HistoryScreen(
                         HistoryObservationCard(
                             observation = observation,
                             formatter = formatter,
-                            onRemove = {
+                            onRemoveMeasurement = { measurement ->
                                 scope.launch {
                                     withContext(Dispatchers.IO) {
-                                        repository.deleteReport(observation.id, Instant.now())
+                                        val liveId = repository.current()
+                                            .firstOrNull { row ->
+                                                row.measurements.any { item ->
+                                                    item.bodyPart == measurement.bodyPart &&
+                                                        item.side == measurement.side &&
+                                                        item.symptom == measurement.symptom
+                                                }
+                                            }
+                                            ?.id
+                                        if (liveId != null) {
+                                            repository.deleteMeasurement(
+                                                observationId = liveId,
+                                                bodyPart = measurement.bodyPart,
+                                                side = measurement.side,
+                                                symptom = measurement.symptom,
+                                                deletedAt = Instant.now(),
+                                            )
+                                        }
                                     }
-                                    rows = withContext(Dispatchers.IO) { repository.current() }
+                                    rows = withContext(Dispatchers.IO) { loadNewestFirst() }
                                 }
                             },
                         )
@@ -771,37 +817,23 @@ internal fun HistoryScreen(
 private fun HistoryObservationCard(
     observation: JournalObservation,
     formatter: DateTimeFormatter,
-    onRemove: () -> Unit,
+    onRemoveMeasurement: (JournalMeasurement) -> Unit,
 ) {
     val panel = MaterialTheme.colorScheme.surfaceContainerLowest
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(panel, RoundedCornerShape(HISTORY_CARD_CORNER))
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(HISTORY_ROW_GAP),
     ) {
         observation.measurements.forEach { measurement ->
             HistoryReportRow(
                 measurement = measurement,
                 observedAt = measurement.previousObservedAt ?: observation.observedAt,
                 formatter = formatter,
+                onRemove = { onRemoveMeasurement(measurement) },
             )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-        ) {
-            TextButton(
-                onClick = onRemove,
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.journal_delete),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
     }
 }
@@ -835,8 +867,24 @@ private fun HistoryReportRow(
     measurement: JournalMeasurement,
     observedAt: Instant,
     formatter: DateTimeFormatter,
+    onRemove: () -> Unit,
 ) {
     val whenLabel = formatter.format(observedAt)
+    val label = quietReportTitle(
+        measurement.side,
+        measurement.bodyPart,
+        measurement.symptom,
+    )
+    val headline = quietHistoryHeadline(
+        measurement.side,
+        measurement.bodyPart,
+        measurement.symptom,
+        measurement.rating,
+        whenLabel,
+    )
+    val detail = quietReportDetail(measurement.reportKind)
+    val ratingSpoken = stringResource(R.string.journal_rating, measurement.rating)
+    val spoken = "$label, $ratingSpoken, $whenLabel, $detail"
     val thumbMark = FigureMark(
         part = measurement.bodyPart,
         side = measurement.side,
@@ -844,9 +892,13 @@ private fun HistoryReportRow(
         ache = measurement.symptom == "ache",
     )
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clearAndSetSemantics {
+                contentDescription = spoken
+            },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Box(
             modifier = Modifier
@@ -863,28 +915,30 @@ private fun HistoryReportRow(
         }
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                text = quietReportTitle(
-                    measurement.side,
-                    measurement.bodyPart,
-                    measurement.symptom,
-                ),
-                style = MaterialTheme.typography.titleMedium,
+                text = headline,
+                style = MaterialTheme.typography.titleSmall,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = quietReportDetail(
-                    measurement.rating,
-                    measurement.reportKind,
-                    whenLabel,
-                ),
-                style = MaterialTheme.typography.bodyMedium,
+                text = detail,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+            )
+        }
+        TextButton(
+            onClick = onRemove,
+            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.journal_delete),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

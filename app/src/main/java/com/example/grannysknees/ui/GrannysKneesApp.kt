@@ -1,6 +1,7 @@
 package com.example.grannysknees.ui
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,11 +11,15 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,11 +31,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -38,10 +46,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -66,8 +70,14 @@ import com.example.grannysknees.ui.theme.ThemePreference
 import com.example.grannysknees.ui.theme.ThemePreferenceStore
 import com.example.grannysknees.ui.today.TodayRoute
 
-/** Narrow icon-only rail width in landscape. */
-private val SideRailWidth = 56.dp
+/** Landscape icon-only rail: wide enough for a 48 dp touch target. */
+private val SideRailWidth = 72.dp
+
+/** Keep landscape rail icons readable on short phone heights. */
+private val SideRailIconSize = 24.dp
+
+/** Vertical gap between rail items before scrolling kicks in. */
+private val SideRailItemSpacing = 8.dp
 
 @Composable
 internal fun GrannysKneesApp(
@@ -396,9 +406,12 @@ private fun BottomTabs(
 }
 
 /**
- * Landscape tab chrome: icons only, evenly spaced to fill the short height.
+ * Landscape tab chrome: icons only, inset from system bars, scrollable when short.
  *
- * Labels stay on TalkBack via each icon's content description.
+ * Labels stay on TalkBack via each icon's content description. Start/top/bottom
+ * [WindowInsets.safeDrawing] keep items clear of cutouts and the system nav /
+ * gesture bar (Galaxy landscape especially). Fixed icon size avoids unreadably
+ * tiny targets; scroll when vertical space is tight after insets.
  */
 @Composable
 private fun SideTabs(
@@ -410,28 +423,39 @@ private fun SideTabs(
     Surface(
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 3.dp,
-        modifier = Modifier
-            .fillMaxHeight()
-            .width(SideRailWidth)
-            .windowInsetsPadding(
-                WindowInsets.safeDrawing.only(WindowInsetsSides.Start),
-            ),
+        modifier = Modifier.fillMaxHeight(),
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 8.dp),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .fillMaxHeight()
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Start +
+                            WindowInsetsSides.Top +
+                            WindowInsetsSides.Bottom,
+                    ),
+                )
+                .width(SideRailWidth),
+            contentAlignment = Alignment.Center,
         ) {
-            bottomTabs.forEach { tab ->
-                val isSelected = currentRoute == tab.destination.route
-                IconButton(onClick = { onSelect(tab.destination.route) }) {
-                    Icon(
-                        painter = painterResource(tab.icon),
-                        contentDescription = stringResource(tab.label),
-                        tint = if (isSelected) selected else quiet,
-                    )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(SideRailItemSpacing),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                bottomTabs.forEach { tab ->
+                    val isSelected = currentRoute == tab.destination.route
+                    IconButton(onClick = { onSelect(tab.destination.route) }) {
+                        Icon(
+                            painter = painterResource(tab.icon),
+                            contentDescription = stringResource(tab.label),
+                            modifier = Modifier.size(SideRailIconSize),
+                            tint = if (isSelected) selected else quiet,
+                        )
+                    }
                 }
             }
         }

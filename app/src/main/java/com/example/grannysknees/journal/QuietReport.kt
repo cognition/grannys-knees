@@ -38,13 +38,28 @@ internal fun grannyAside(part: String, side: String?): Int {
 }
 
 /**
- * One detail line: the rating, whether it changed, and when it was written.
+ * History title line with rating beside the label, then the date.
+ *
+ * Example: "Left wrist stiffness, 8 - Tue 10 Nov · 14:30".
  */
-internal fun quietReportDetail(rating: Int, reportKind: String, whenLabel: String): String {
-    val kind = if (reportKind == JournalCommitter.CONFIRMED_UNCHANGED) {
+internal fun quietHistoryHeadline(
+    side: String?,
+    bodyPart: String,
+    symptom: String,
+    rating: Int,
+    whenLabel: String,
+): String {
+    val label = quietReportTitle(side, bodyPart, symptom)
+    return "$label, $rating - $whenLabel"
+}
+
+/**
+ * Secondary history line: whether the report changed or stayed the same.
+ */
+internal fun quietReportDetail(reportKind: String): String {
+    return if (reportKind == JournalCommitter.CONFIRMED_UNCHANGED) {
         "unchanged"
     } else {
         "changed"
     }
-    return "$rating · $kind · $whenLabel"
 }

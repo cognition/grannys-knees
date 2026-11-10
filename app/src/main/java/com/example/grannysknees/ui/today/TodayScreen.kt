@@ -63,6 +63,7 @@ import com.example.grannysknees.location.OptionalGpsPlaceSource
 import com.example.grannysknees.sayings.GrannySaysCatalog
 import com.example.grannysknees.sayings.GrannySaysPicker
 import com.example.grannysknees.sayings.GrannySeason
+import com.example.grannysknees.sayings.SayingPlaceholders
 import com.example.grannysknees.ui.place.CitySearchScreen
 import com.example.grannysknees.weather.OpenMeteoGeocodingClient
 import com.example.grannysknees.ui.outlook.OutlookSection
@@ -702,7 +703,8 @@ private fun GrannySayingBlock(
     val picker = remember {
         loadGrannySaysPicker(context.assets)
     }
-    val season = GrannySeason.current(LocalDate.now().monthValue)
+    val today = LocalDate.now()
+    val season = GrannySeason.current(today.monthValue)
     var sayingText by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(
         state.score,
@@ -711,6 +713,7 @@ private fun GrannySayingBlock(
         state.forecastHasSnow,
         picker,
         season,
+        today,
     ) {
         sayingText = picker?.showForScore(
             score = state.score.setScale(0, RoundingMode.HALF_UP).intValueExact(),
@@ -718,7 +721,7 @@ private fun GrannySayingBlock(
             allowFreeSpeech = grannySpeaksFreely,
             season = season,
             snowInForecast = state.forecastHasSnow,
-        )?.text
+        )?.text?.let(SayingPlaceholders::render)
     }
     // Always reserve two saying lines so Another saying never shifts the layout.
     if (picker != null) {
@@ -729,7 +732,7 @@ private fun GrannySayingBlock(
         ) {
             CircularRefreshButton(
                 onClick = {
-                    val next = picker.refresh()?.text
+                    val next = picker.refresh()?.text?.let(SayingPlaceholders::render)
                     if (next != null) {
                         sayingText = next
                     }

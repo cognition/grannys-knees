@@ -91,6 +91,49 @@ internal object JournalCommitter {
     )
 
     /**
+     * Removes one measurement from [target] without wiping the rest of the set.
+     *
+     * The last remaining measurement becomes a tombstone. Otherwise a
+     * correction keeps the other rows and preserves their displayed times.
+     * Returns null when [target] does not contain that series.
+     */
+    fun removeMeasurement(
+        target: JournalObservation,
+        bodyPart: String,
+        side: String?,
+        symptom: String,
+        deletedAt: Instant,
+        newId: String,
+    ): JournalObservation? {
+        val remaining = target.measurements.filterNot { measurement ->
+            measurement.bodyPart == bodyPart &&
+                measurement.side == side &&
+                measurement.symptom == symptom
+        }
+        if (remaining.size == target.measurements.size) {
+            return null
+        }
+        if (remaining.isEmpty()) {
+            return delete(
+                targetId = target.id,
+                deletedAt = deletedAt,
+                newId = newId,
+            )
+        }
+        return JournalObservation(
+            id = newId,
+            observedAt = deletedAt,
+            correctsObservationId = target.id,
+            deletedAt = null,
+            measurements = remaining.map { measurement ->
+                measurement.copy(
+                    previousObservedAt = measurement.previousObservedAt ?: target.observedAt,
+                )
+            },
+        )
+    }
+
+    /**
      * Reports that are still current: not a tombstone, and not the target of
      * a later correction or deletion.
      */
@@ -101,15 +144,14 @@ internal object JournalCommitter {
         }
     }
 
-    /** Latest non-deleted measurement for a series, without rewriting history. */
+    /** Latest current measurement for a series, without rewriting history. */
     fun latestMeasurement(
         observations: List<JournalObservation>,
         bodyPart: String,
         side: String?,
         symptom: String,
     ): Pair<JournalObservation, JournalMeasurement>? {
-        return observations
-            .filter { observation -> observation.deletedAt == null }
+        return current(observations)
             .sortedBy { observation -> observation.observedAt }
             .mapNotNull { observation ->
                 val measurement = observation.measurements.firstOrNull { item ->

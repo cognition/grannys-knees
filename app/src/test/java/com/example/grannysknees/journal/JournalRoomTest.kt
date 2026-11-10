@@ -67,6 +67,35 @@ class JournalRoomTest {
     }
 
     @Test
+    fun `removing one history report keeps the other measurements`() {
+        val repository = repository()
+        val saved = requireNotNull(
+            repository.save(
+                committedAt = Instant.parse("2026-11-10T15:00:00Z"),
+                edits = listOf(
+                    SeriesEdit("wrist", "left", "stiffness", 8),
+                    SeriesEdit("knee", "right", "ache", 5),
+                ),
+                confirmations = emptyList(),
+            ),
+        )
+
+        repository.deleteMeasurement(
+            observationId = saved.id,
+            bodyPart = "wrist",
+            side = "left",
+            symptom = "stiffness",
+            deletedAt = Instant.parse("2026-11-10T16:00:00Z"),
+        )
+
+        val remaining = repository.current().single().measurements
+        assertEquals(1, remaining.size)
+        assertEquals("knee", remaining.single().bodyPart)
+        assertEquals("right", remaining.single().side)
+        assertEquals(5, remaining.single().rating)
+    }
+
+    @Test
     fun `watch text copies the phone score and hides a missing index`() {
         val available = TodayUiState.Available(
             location = "London, Ontario",

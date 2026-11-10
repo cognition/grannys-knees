@@ -2021,7 +2021,7 @@
     },
     {
       "tone": "wry",
-      "text": "You call it atmospheric pressure. My knees call it Tuesday.",
+      "text": "You call it atmospheric pressure. My knees call it {weekday}.",
       "minIndex": 3,
       "maxIndex": 7
     },
