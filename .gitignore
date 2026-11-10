@@ -44,9 +44,9 @@ google-services.json
 # Local Play Store screenshot capture scaffolding (do not commit; not for release)
 # A proper Paparazzi / Compose screenshot test suite may be added later under
 # conventional androidTest paths — these ignores target ad-hoc debug-export only.
-/app/src/main/java/com/example/grannysknees/screenshot/
-/app/src/debug/java/com/example/grannysknees/screenshot/
-/app/src/androidTest/java/com/example/grannysknees/screenshot/
+/app/src/main/java/ca/aeo3/grannysknees/screenshot/
+/app/src/debug/java/ca/aeo3/grannysknees/screenshot/
+/app/src/androidTest/java/ca/aeo3/grannysknees/screenshot/
 /scripts/capture_primary_screenshots.py
 
 # Generated Play listing screenshots (local capture output; not store assets in Git)

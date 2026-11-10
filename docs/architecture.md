@@ -40,4 +40,4 @@ A separate sensor snapshot is linked to the event by ID. Each reading stores val
 
 ## Delivery status
 
-The current committed app is a browser prototype with an older 0–100 index and full-entry symptom form. The native 0–10 index, partial observation persistence, sensor snapshots and widgets described here are **requirements, not yet implemented**.
+The committed Android app implements the 0–10 weather index, Canadian city selection, on-device symptom journal, home-screen widget and Wear OS companion described above. Treat this document as the architectural target; verify behaviour against the current release checklist before Play upload.

@@ -37,7 +37,7 @@
 
 ## Current code baseline
 
-Observed on commit `33fe033`: `applicationId` `com.example.grannysknees` (placeholder until owner selects permanent ID), `targetSdk=37`, `versionName=0.3.81.1`. Weather uses Open-Meteo forecast and geocoding; city selection and optional GPS are implemented. Journal, watch sync, widget, and privacy UI are present in source. These are review observations, not Play acceptance. Owner must still run device regression and policy sign-off before submission.
+Observed on commit `33fe033`: `applicationId` `ca.aeo3.grannysknees` (placeholder until owner selects permanent ID), `targetSdk=37`, `versionName=0.3.81.1`. Weather uses Open-Meteo forecast and geocoding; city selection and optional GPS are implemented. Journal, watch sync, widget, and privacy UI are present in source. These are review observations, not Play acceptance. Owner must still run device regression and policy sign-off before submission.
 
 ## Gates
 

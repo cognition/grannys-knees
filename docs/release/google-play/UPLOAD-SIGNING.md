@@ -92,7 +92,7 @@ Alternatively, unzip the AAB and inspect the signing block with `apksigner` / Pl
 
 ## Owner follow-ups
 
-- Decide the permanent `applicationId` before the first Play upload (still `com.example.grannysknees` in source until changed).
+- Decide the permanent `applicationId` before the first Play upload (still `ca.aeo3.grannysknees` in source until changed).
 - Bump `versionCode` / `versionName` in a dedicated release commit when shipping.
 - Wire CI to inject `RELEASE_*` secrets on any job that runs `bundleRelease` (CI currently uses `assembleDebug` only).
 - Back up the upload keystore and document recovery with Play Console.

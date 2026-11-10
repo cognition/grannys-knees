@@ -3,16 +3,16 @@ plugins {
 }
 
 android {
-    namespace = "com.example.grannysknees.wear"
+    namespace = "ca.aeo3.grannysknees.wear"
     compileSdk = 37
 
     defaultConfig {
-        // Separate from the phone id, which stays com.example.grannysknees.
-        applicationId = "com.example.grannysknees.wear"
+        // Separate from the phone id, which stays ca.aeo3.grannysknees.
+        applicationId = "ca.aeo3.grannysknees.wear"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.3.6.0"
+        versionCode = 2
+        versionName = "0.3.82.0"
     }
 
     compileOptions {

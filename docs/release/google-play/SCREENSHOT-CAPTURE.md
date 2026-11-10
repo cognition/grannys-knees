@@ -4,7 +4,7 @@
 
 ## Release rule
 
-**Release and production builds must not ship debug-only screenshot export code.** In particular, do not merge `ScreenshotTodayActivity`, `PrimaryScreenshotMatrix`, or companion debug manifests/tests under `com.example.grannysknees.screenshot`. Those paths existed only as local scaffolding and broke release compilation when left untracked on a developer machine.
+**Release and production builds must not ship debug-only screenshot export code.** In particular, do not merge `ScreenshotTodayActivity`, `PrimaryScreenshotMatrix`, or companion debug manifests/tests under `ca.aeo3.grannysknees.screenshot`. Those paths existed only as local scaffolding and broke release compilation when left untracked on a developer machine.
 
 Use owner-approved screenshots from a **signed release-like build** on a real device or emulator, matching [PUBLICATION-CHECKLIST.md](./PUBLICATION-CHECKLIST.md) Gate 3.
 

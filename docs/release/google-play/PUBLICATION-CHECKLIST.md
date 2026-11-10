@@ -2,7 +2,7 @@
 
 **Updated:** 2026-11-10. **Decisions:** personal developer account; Canada-only initial release; free, no ads; weather-index phone app, Glance widget, Canadian city search, optional GPS, on-device symptom journal, Wear OS companion sync, and in-app privacy summary. **Status:** checklist, not proof of completion.
 
-**Latest reviewed commit:** `33fe033` (`feature/play-store-readiness`). Reconcile store copy and policy text against this branch before upload. Review `docs/traycer/CURRENT-STATE.md` and `DEVICE-ACCEPTANCE.md` before asserting current functionality.
+**Latest reviewed commit:** `feature/play-store-readiness`. Reconcile store copy and policy text against this branch before upload. Review `docs/traycer/DEVICE-ACCEPTANCE.md` before asserting current functionality.
 
 ## Rules for checking boxes
 

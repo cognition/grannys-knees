@@ -15,7 +15,7 @@ Screenshots are under `docs/traycer/device-evidence/`. `uiautomator dump` could 
 | `ANDROID_AVD_HOME=/home/rbrooker/.config/.android/avd emulator -list-avds` | `Galaxy_S24_FE` and `Medium_Phone`. |
 | Running process | `qemu-system-x86_64 -avd Galaxy_S24_FE`, started from Android Studio. `ro.boot.qemu.avd_name=Galaxy_S24_FE`. |
 | Image | `system-images/android-35/google_apis/x86_64/`, `ro.build.version.sdk=35`, release 15, 1080×2340, density 320. |
-| App under test | `com.example.grannysknees` debug APK, `versionName` 0.3.0. Installed and launched on API 35 even though `compileSdk`/`targetSdk` are 37. |
+| App under test | `ca.aeo3.grannysknees` debug APK, `versionName` 0.3.0. Installed and launched on API 35 even though `compileSdk`/`targetSdk` are 37. |
 
 The AVD is a Galaxy S24 FE **profile**, not the physical phone named in the cycle note.
 
@@ -24,10 +24,10 @@ The AVD is a Galaxy S24 FE **profile**, not the physical phone named in the cycl
 ```sh
 ANDROID_HOME=/home/rbrooker/Android/Sdk ./gradlew assembleDebug --offline
 adb -s emulator-5554 install -r app/build/outputs/apk/debug/app-debug.apk
-adb -s emulator-5554 shell am start -n com.example.grannysknees/.MainActivity
+adb -s emulator-5554 shell am start -n ca.aeo3.grannysknees/.MainActivity
 ```
 
-`assembleDebug --offline` finished `BUILD SUCCESSFUL in 1s`. Install printed `Success`. Logcat: `Displayed com.example.grannysknees/.MainActivity for user 0: +1s118ms` at 18:35:45, and again `+1s63ms` at 18:37:53 after a data clear. No app fatal exception in those launches.
+`assembleDebug --offline` finished `BUILD SUCCESSFUL in 1s`. Install printed `Success`. Logcat: `Displayed ca.aeo3.grannysknees/.MainActivity for user 0: +1s118ms` at 18:35:45, and again `+1s63ms` at 18:37:53 after a data clear. No app fatal exception in those launches.
 
 ## Live Open-Meteo
 
@@ -96,7 +96,7 @@ Unit tests after the widget change: **76 tests, 0 failures**, including `WidgetM
 
 ## Full product lanes (5 November 2026, same emulator)
 
-Debug build `0.3.6.0` (versionCode 9), application id `com.example.grannysknees`. Galaxy S24 FE emulator profile, API 35. Not a physical phone. Unit tests: **90 tests, 0 failures**.
+Debug build `0.3.6.0` (versionCode 9), application id `ca.aeo3.grannysknees`. Galaxy S24 FE emulator profile, API 35. Not a physical phone. Unit tests: **90 tests, 0 failures**.
 
 | Check | Screenshot | Result |
 | --- | --- | --- |

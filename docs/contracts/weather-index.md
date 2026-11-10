@@ -16,8 +16,7 @@ live under [`fixtures/`](fixtures/).
 
 Downstream tasks: T03 (Open-Meteo client and models) and T04 (pure Kotlin
 scorer) must satisfy this contract and reproduce the fixtures. This document is
-normative; the committed `index.html` prototype is **not** — it is cited only
-as behaviour to avoid.
+normative for the native Android scorer and fixtures.
 
 ---
 
@@ -187,8 +186,7 @@ and `surface_pressure[i − 3]` are present (non-null). Otherwise it is
 
 - **Do not** use differences of **daily mean** pressure
   (`surface_pressure_mean[d] − surface_pressure_mean[d−1]`) as a proxy for an
-  hourly pressure change. The committed `index.html` prototype does exactly
-  this (and sets today's delta to 0); `docs/architecture.md` forbids it.
+  hourly pressure change; `docs/architecture.md` forbids it.
 - **Do not** substitute `0` for an unavailable trend. An unavailable trend
   makes the hour's index `unavailable` (§7); it does not make it calm.
 
@@ -400,8 +398,6 @@ stable (a deferred decision in `docs/delivery-plan.md`):
   bump MAJOR of `contractVersion` and/or `N` of `indexVersion`, and **all**
   `*.expected.json` fixtures are regenerated in the same change.
 - Fixtures carry both version strings so a reviewer can detect drift.
-- `index.html` is explicitly **outside** this versioning; it is legacy
-  prototype behaviour.
 
 ---
 
@@ -425,21 +421,7 @@ stable (a deferred decision in `docs/delivery-plan.md`):
 
 ---
 
-## 12. Prototype behaviour to avoid (non-normative)
-
-From the committed `index.html` (see `docs/traycer/BASELINE.md`), **do not**
-carry these into the native product:
-
-| Prototype behaviour | Contract rule |
-| --- | --- |
-| 0–**100** index scale | 0–**10** (§8). |
-| Daily-**mean** pressure delta `mean[i] − mean[i−1]`, today = 0 | 3-h trend from comparable hourly timestamps (§5). |
-| Seven daily cards, one daily index each | Five-day **low/high** from the hourly index curve (§8.2). |
-| Index conflated with symptom entry | Forecast index and self-reported discomfort are distinct (§1.1). |
-
----
-
-## 13. Fixtures
+## 12. Fixtures
 
 See [`fixtures/README.md`](fixtures/README.md). Pairs of
 `<case>.input.json` (Open-Meteo-shaped, `timeformat=unixtime`) and
@@ -450,7 +432,7 @@ See [`fixtures/README.md`](fixtures/README.md). Pairs of
 
 ---
 
-## 14. References
+## 13. References
 
 - Open-Meteo Weather Forecast API documentation — <https://open-meteo.com/en/docs>
   (variable names, units, `utc_offset_seconds`, `timeformat`, `null` for missing
@@ -464,4 +446,3 @@ See [`fixtures/README.md`](fixtures/README.md). Pairs of
   observation (self-report) semantics.
 - `docs/delivery-plan.md` — product definition, 0–10 scale, low/high-from-hourly
   requirement, deferred scoring-formula decision.
-- `docs/traycer/BASELINE.md` — T00 repository reality check and live API probe.
