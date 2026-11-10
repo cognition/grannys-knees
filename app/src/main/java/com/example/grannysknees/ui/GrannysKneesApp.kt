@@ -1,19 +1,29 @@
 package com.example.grannysknees.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -23,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +42,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -53,6 +65,9 @@ import com.example.grannysknees.ui.theme.GrannysKneesTheme
 import com.example.grannysknees.ui.theme.ThemePreference
 import com.example.grannysknees.ui.theme.ThemePreferenceStore
 import com.example.grannysknees.ui.today.TodayRoute
+
+/** Narrow icon-only rail width in landscape. */
+private val SideRailWidth = 56.dp
 
 @Composable
 internal fun GrannysKneesApp(
@@ -101,7 +116,7 @@ internal fun GrannysKneesApp(
         }
         val navController = rememberNavController()
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-        // Privacy stays inside the About tab shell (same bottom bar area).
+        // Privacy stays inside the About tab shell (same bottom / side bar area).
         val showTabs = currentRoute == null ||
             currentRoute == AppDestination.Privacy.route ||
             bottomTabs.any { it.destination.route == currentRoute }
@@ -109,124 +124,226 @@ internal fun GrannysKneesApp(
             AppDestination.Privacy.route -> AppDestination.About.route
             else -> currentRoute
         }
-        // Zero content insets here: the bottom bar owns system-nav padding, and
+        val onSelectTab: (String) -> Unit = { route ->
+            navController.navigate(route) {
+                popUpTo(AppDestination.Today.route) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+        val isLandscape =
+            LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+        // Zero content insets here: the tab chrome owns system-nav padding, and
         // each destination Scaffold owns status-bar / top insets. Applying
         // safeDrawing again on the outer Scaffold doubled the gap above the tabs.
-        Scaffold(
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            bottomBar = {
+        if (isLandscape) {
+            Row(modifier = Modifier.fillMaxSize()) {
                 if (showTabs) {
-                    BottomTabs(
+                    SideTabs(
                         currentRoute = selectedTabRoute,
-                        onSelect = { route ->
-                            navController.navigate(route) {
-                                popUpTo(AppDestination.Today.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
+                        onSelect = onSelectTab,
                     )
                 }
-            },
-        ) { innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = AppDestination.Today.route,
-                modifier = Modifier.padding(innerPadding),
-            ) {
-                composable(AppDestination.Today.route) {
-                    TodayRoute(
-                        repository = repository,
-                        cityStore = cityStore,
-                        sensitivityEpoch = sensitivityEpoch,
-                        grannySpeaksFreely = grannySpeaksFreely,
-                    )
-                }
-                composable(AppDestination.Home.route) {
-                    FoundationShell()
-                }
-                composable(AppDestination.Journal.route) {
-                    key(journalDataEpoch) {
-                        JournalScreen(
-                            repository = repository,
-                            feelCalibrationStore = feelCalibrationStore,
-                            feelCalibrationEnabled = feelCalibrationEnabled,
-                            onFeelCalibrationEnabledChange = { enabled ->
-                                feelCalibrationEnabled = enabled
-                                sensitivityStore?.writeFeelCalibrationEnabled(enabled)
-                                sensitivityEpoch += 1
-                            },
-                            onFeelSaved = { sensitivityEpoch += 1 },
+                AppNavHost(
+                    navController = navController,
+                    repository = repository,
+                    cityStore = cityStore,
+                    feelCalibrationStore = feelCalibrationStore,
+                    themePreference = themePreference,
+                    onThemePreferenceChange = { next ->
+                        themePreference = next
+                        themePreferenceStore?.write(next)
+                    },
+                    sensitivityProfile = sensitivityProfile,
+                    onSensitivityProfileChange = { next ->
+                        sensitivityProfile = next
+                        sensitivityStore?.write(next)
+                        sensitivityEpoch += 1
+                    },
+                    feelCalibrationEnabled = feelCalibrationEnabled,
+                    onFeelCalibrationEnabledChange = { enabled ->
+                        feelCalibrationEnabled = enabled
+                        sensitivityStore?.writeFeelCalibrationEnabled(enabled)
+                        sensitivityEpoch += 1
+                    },
+                    grannySpeaksFreely = grannySpeaksFreely,
+                    onGrannySpeaksFreelyChange = { enabled ->
+                        grannySpeaksFreely = enabled
+                        sensitivityStore?.writeGrannySpeaksFreely(enabled)
+                    },
+                    localPressureEnabled = localPressureEnabled,
+                    onLocalPressureEnabledChange = { enabled ->
+                        localPressureEnabled = enabled
+                        sensitivityStore?.writeLocalPressureEnabled(enabled)
+                        sensitivityEpoch += 1
+                    },
+                    sensitivityEpoch = sensitivityEpoch,
+                    onFeelCleared = { sensitivityEpoch += 1 },
+                    journalDataEpoch = journalDataEpoch,
+                    onDataReset = {
+                        journalDataEpoch += 1
+                        sensitivityEpoch += 1
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                )
+            }
+        } else {
+            Scaffold(
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                bottomBar = {
+                    if (showTabs) {
+                        BottomTabs(
+                            currentRoute = selectedTabRoute,
+                            onSelect = onSelectTab,
                         )
                     }
-                }
-                composable(AppDestination.History.route) {
-                    key(journalDataEpoch) {
-                        HistoryScreen()
-                    }
-                }
-                composable(AppDestination.Privacy.route) {
-                    PrivacyScreen(
-                        onBack = {
-                            if (!navController.popBackStack()) {
-                                navController.navigate(AppDestination.About.route) {
-                                    launchSingleTop = true
-                                }
-                            }
-                        },
-                    )
-                }
-                composable(AppDestination.Settings.route) {
-                    SettingsScreen(
-                        themePreference = themePreference,
-                        onThemePreferenceChange = { next ->
-                            themePreference = next
-                            themePreferenceStore?.write(next)
-                        },
-                        sensitivityProfile = sensitivityProfile,
-                        onSensitivityProfileChange = { next ->
-                            sensitivityProfile = next
-                            sensitivityStore?.write(next)
-                            sensitivityEpoch += 1
-                        },
-                        feelCalibrationEnabled = feelCalibrationEnabled,
-                        onFeelCalibrationEnabledChange = { enabled ->
-                            feelCalibrationEnabled = enabled
-                            sensitivityStore?.writeFeelCalibrationEnabled(enabled)
-                            sensitivityEpoch += 1
-                        },
-                        grannySpeaksFreely = grannySpeaksFreely,
-                        onGrannySpeaksFreelyChange = { enabled ->
-                            grannySpeaksFreely = enabled
-                            sensitivityStore?.writeGrannySpeaksFreely(enabled)
-                        },
-                        localPressureEnabled = localPressureEnabled,
-                        onLocalPressureEnabledChange = { enabled ->
-                            localPressureEnabled = enabled
-                            sensitivityStore?.writeLocalPressureEnabled(enabled)
-                            sensitivityEpoch += 1
-                        },
-                        feelCalibrationStore = feelCalibrationStore,
-                        onFeelCleared = { sensitivityEpoch += 1 },
-                        onDataReset = {
-                            journalDataEpoch += 1
-                            sensitivityEpoch += 1
-                        },
-                    )
-                }
-                composable(AppDestination.About.route) {
-                    AboutScreen(
-                        onBack = { navController.popBackStack() },
-                        onOpenPrivacy = {
-                            navController.navigate(AppDestination.Privacy.route) {
-                                launchSingleTop = true
-                            }
-                        },
-                    )
-                }
+                },
+            ) { innerPadding ->
+                AppNavHost(
+                    navController = navController,
+                    repository = repository,
+                    cityStore = cityStore,
+                    feelCalibrationStore = feelCalibrationStore,
+                    themePreference = themePreference,
+                    onThemePreferenceChange = { next ->
+                        themePreference = next
+                        themePreferenceStore?.write(next)
+                    },
+                    sensitivityProfile = sensitivityProfile,
+                    onSensitivityProfileChange = { next ->
+                        sensitivityProfile = next
+                        sensitivityStore?.write(next)
+                        sensitivityEpoch += 1
+                    },
+                    feelCalibrationEnabled = feelCalibrationEnabled,
+                    onFeelCalibrationEnabledChange = { enabled ->
+                        feelCalibrationEnabled = enabled
+                        sensitivityStore?.writeFeelCalibrationEnabled(enabled)
+                        sensitivityEpoch += 1
+                    },
+                    grannySpeaksFreely = grannySpeaksFreely,
+                    onGrannySpeaksFreelyChange = { enabled ->
+                        grannySpeaksFreely = enabled
+                        sensitivityStore?.writeGrannySpeaksFreely(enabled)
+                    },
+                    localPressureEnabled = localPressureEnabled,
+                    onLocalPressureEnabledChange = { enabled ->
+                        localPressureEnabled = enabled
+                        sensitivityStore?.writeLocalPressureEnabled(enabled)
+                        sensitivityEpoch += 1
+                    },
+                    sensitivityEpoch = sensitivityEpoch,
+                    onFeelCleared = { sensitivityEpoch += 1 },
+                    journalDataEpoch = journalDataEpoch,
+                    onDataReset = {
+                        journalDataEpoch += 1
+                        sensitivityEpoch += 1
+                    },
+                    modifier = Modifier.padding(innerPadding),
+                )
             }
+        }
+    }
+}
+
+/**
+ * Shared tab destinations for portrait bottom bar and landscape side rail.
+ */
+@Composable
+private fun AppNavHost(
+    navController: NavHostController,
+    repository: ForecastRepository?,
+    cityStore: SelectedCityStore?,
+    feelCalibrationStore: FeelCalibrationStore?,
+    themePreference: ThemePreference,
+    onThemePreferenceChange: (ThemePreference) -> Unit,
+    sensitivityProfile: SensitivityProfile,
+    onSensitivityProfileChange: (SensitivityProfile) -> Unit,
+    feelCalibrationEnabled: Boolean,
+    onFeelCalibrationEnabledChange: (Boolean) -> Unit,
+    grannySpeaksFreely: Boolean,
+    onGrannySpeaksFreelyChange: (Boolean) -> Unit,
+    localPressureEnabled: Boolean,
+    onLocalPressureEnabledChange: (Boolean) -> Unit,
+    sensitivityEpoch: Int,
+    onFeelCleared: () -> Unit,
+    journalDataEpoch: Int,
+    onDataReset: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = AppDestination.Today.route,
+        modifier = modifier,
+    ) {
+        composable(AppDestination.Today.route) {
+            TodayRoute(
+                repository = repository,
+                cityStore = cityStore,
+                sensitivityEpoch = sensitivityEpoch,
+                grannySpeaksFreely = grannySpeaksFreely,
+            )
+        }
+        composable(AppDestination.Home.route) {
+            FoundationShell()
+        }
+        composable(AppDestination.Journal.route) {
+            key(journalDataEpoch) {
+                JournalScreen(
+                    repository = repository,
+                    feelCalibrationStore = feelCalibrationStore,
+                    feelCalibrationEnabled = feelCalibrationEnabled,
+                    onFeelCalibrationEnabledChange = onFeelCalibrationEnabledChange,
+                    onFeelSaved = onFeelCleared,
+                )
+            }
+        }
+        composable(AppDestination.History.route) {
+            key(journalDataEpoch) {
+                HistoryScreen()
+            }
+        }
+        composable(AppDestination.Privacy.route) {
+            PrivacyScreen(
+                onBack = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(AppDestination.About.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                },
+            )
+        }
+        composable(AppDestination.Settings.route) {
+            SettingsScreen(
+                themePreference = themePreference,
+                onThemePreferenceChange = onThemePreferenceChange,
+                sensitivityProfile = sensitivityProfile,
+                onSensitivityProfileChange = onSensitivityProfileChange,
+                feelCalibrationEnabled = feelCalibrationEnabled,
+                onFeelCalibrationEnabledChange = onFeelCalibrationEnabledChange,
+                grannySpeaksFreely = grannySpeaksFreely,
+                onGrannySpeaksFreelyChange = onGrannySpeaksFreelyChange,
+                localPressureEnabled = localPressureEnabled,
+                onLocalPressureEnabledChange = onLocalPressureEnabledChange,
+                feelCalibrationStore = feelCalibrationStore,
+                onFeelCleared = onFeelCleared,
+                onDataReset = onDataReset,
+            )
+        }
+        composable(AppDestination.About.route) {
+            AboutScreen(
+                onBack = { navController.popBackStack() },
+                onOpenPrivacy = {
+                    navController.navigate(AppDestination.Privacy.route) {
+                        launchSingleTop = true
+                    }
+                },
+            )
         }
     }
 }
@@ -274,6 +391,49 @@ private fun BottomTabs(
                 },
                 label = { Text(stringResource(tab.label)) },
             )
+        }
+    }
+}
+
+/**
+ * Landscape tab chrome: icons only, evenly spaced to fill the short height.
+ *
+ * Labels stay on TalkBack via each icon's content description.
+ */
+@Composable
+private fun SideTabs(
+    currentRoute: String?,
+    onSelect: (String) -> Unit,
+) {
+    val selected = MaterialTheme.colorScheme.primary
+    val quiet = MaterialTheme.colorScheme.onSurfaceVariant
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 3.dp,
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(SideRailWidth)
+            .windowInsetsPadding(
+                WindowInsets.safeDrawing.only(WindowInsetsSides.Start),
+            ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            bottomTabs.forEach { tab ->
+                val isSelected = currentRoute == tab.destination.route
+                IconButton(onClick = { onSelect(tab.destination.route) }) {
+                    Icon(
+                        painter = painterResource(tab.icon),
+                        contentDescription = stringResource(tab.label),
+                        tint = if (isSelected) selected else quiet,
+                    )
+                }
+            }
         }
     }
 }

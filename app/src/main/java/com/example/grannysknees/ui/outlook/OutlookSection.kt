@@ -139,32 +139,56 @@ private val WEEKDAY_FORMATTER: DateTimeFormatter =
  *
  * A short trailing spacer (about twice the card gap) keeps a little air above
  * the tab bar so the pair reads as complete.
+ *
+ * When [fillAvailableHeight] is false (landscape scroll), charts keep a readable
+ * minimum height and the parent may scroll instead of stretching to fill.
  */
 @Composable
 internal fun OutlookSection(
     state: OutlookUiState.Available,
     modifier: Modifier = Modifier,
+    fillAvailableHeight: Boolean = true,
 ) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(OUTLOOK_CARD_GAP),
-    ) {
-        TodayCurveCard(
-            curve = state.today,
-            modifier = Modifier
-                .weight(TODAY_CURVE_WEIGHT, fill = true)
-                .fillMaxWidth(),
-        )
-        FiveDayCard(
-            days = state.upcoming,
-            modifier = Modifier
-                .weight(FIVE_DAY_WEIGHT, fill = true)
-                .fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(OUTLOOK_BOTTOM_AIR))
+    if (fillAvailableHeight) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(OUTLOOK_CARD_GAP),
+        ) {
+            TodayCurveCard(
+                curve = state.today,
+                modifier = Modifier
+                    .weight(TODAY_CURVE_WEIGHT, fill = true)
+                    .fillMaxWidth(),
+            )
+            FiveDayCard(
+                days = state.upcoming,
+                modifier = Modifier
+                    .weight(FIVE_DAY_WEIGHT, fill = true)
+                    .fillMaxWidth(),
+            )
+            Spacer(modifier = Modifier.height(OUTLOOK_BOTTOM_AIR))
+        }
+    } else {
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(OUTLOOK_CARD_GAP),
+        ) {
+            TodayCurveCard(
+                curve = state.today,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(MIN_CHART_HEIGHT * 3),
+            )
+            FiveDayCard(
+                days = state.upcoming,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(MIN_RIBBON_HEIGHT * 4),
+            )
+            Spacer(modifier = Modifier.height(OUTLOOK_BOTTOM_AIR))
+        }
     }
 }
-
 @Composable
 private fun TodayCurveCard(
     curve: DayCurve,

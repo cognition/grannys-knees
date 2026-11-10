@@ -1,5 +1,6 @@
 package com.example.grannysknees.ui.today
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -223,6 +227,248 @@ internal fun TodayScreen(
     onChangeCity: (() -> Unit)? = null,
     grannySpeaksFreely: Boolean = false,
 ) {
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    if (isLandscape) {
+        LandscapeTodayScreen(
+            state = state,
+            modifier = modifier,
+            outlook = outlook,
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            onChangeCity = onChangeCity,
+            grannySpeaksFreely = grannySpeaksFreely,
+        )
+    } else {
+        PortraitTodayScreen(
+            state = state,
+            modifier = modifier,
+            outlook = outlook,
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            onChangeCity = onChangeCity,
+            grannySpeaksFreely = grannySpeaksFreely,
+        )
+    }
+}
+
+/**
+ * Landscape Today: one-line title · location · index; saying and graphs scroll.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LandscapeTodayScreen(
+    state: TodayUiState,
+    modifier: Modifier = Modifier,
+    outlook: OutlookUiState = OutlookUiState.Hidden,
+    isRefreshing: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
+    onChangeCity: (() -> Unit)? = null,
+    grannySpeaksFreely: Boolean = false,
+) {
+    Scaffold(
+        modifier = modifier,
+        contentWindowInsets = tabDestinationWindowInsets(),
+    ) { innerPadding ->
+        val body: @Composable () -> Unit = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                LandscapeChrome(
+                    state = state,
+                    isRefreshing = isRefreshing,
+                    onRefresh = onRefresh,
+                    onChangeCity = onChangeCity,
+                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f, fill = true)
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    when (state) {
+                        is TodayUiState.Loading -> LoadingNotice()
+                        is TodayUiState.Available -> {
+                            GrannySayingBlock(
+                                state = state,
+                                grannySpeaksFreely = grannySpeaksFreely,
+                            )
+                            LastUpdated(
+                                label = state.lastUpdatedLabel,
+                                isStale = state.isStale,
+                            )
+                        }
+                        is TodayUiState.Unavailable -> {
+                            OfflineNotice(
+                                state = state,
+                                onRefresh = onRefresh,
+                                isRefreshing = isRefreshing,
+                            )
+                        }
+                    }
+                    if (outlook is OutlookUiState.Available) {
+                        OutlookSection(
+                            state = outlook,
+                            fillAvailableHeight = false,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+            }
+        }
+        if (onRefresh == null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            ) {
+                body()
+            }
+        } else {
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = onRefresh,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            ) {
+                body()
+            }
+        }
+    }
+}
+
+/**
+ * Fixed landscape chrome: Today title, location, and index on one line.
+ */
+@Composable
+private fun LandscapeChrome(
+    state: TodayUiState,
+    isRefreshing: Boolean,
+    onRefresh: (() -> Unit)?,
+    onChangeCity: (() -> Unit)?,
+) {
+    val location = state.location
+    val locationDescription =
+        stringResource(R.string.today_location_content_description, location)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.today_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            softWrap = false,
+        )
+        Text(
+            text = location,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .weight(1f, fill = true)
+                .semantics {
+                    contentDescription = locationDescription
+                },
+        )
+        if (onChangeCity != null) {
+            val changeDescription = stringResource(R.string.place_change_content_description)
+            TextButton(
+                onClick = onChangeCity,
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
+                modifier = Modifier
+                    .defaultMinSize(minHeight = 1.dp)
+                    .heightIn(max = 28.dp)
+                    .semantics { contentDescription = changeDescription },
+            ) {
+                Text(
+                    text = stringResource(R.string.place_change),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
+        if (state is TodayUiState.Available) {
+            LandscapeIndexInline(state = state)
+        }
+        if (onRefresh != null) {
+            CircularRefreshButton(
+                onClick = onRefresh,
+                contentDescription = stringResource(R.string.today_refresh_content_description),
+                busy = isRefreshing,
+                buttonSize = 28.dp,
+                iconSize = 16.dp,
+            )
+        }
+    }
+}
+
+/** Compact score + band for the landscape chrome row. */
+@Composable
+private fun LandscapeIndexInline(state: TodayUiState.Available) {
+    val bandLabel = bandLabel(state.band)
+    val scoreLabel = state.scoreLabel
+    val personalLabel = state.personalScoreLabel
+    val scoreDescription = if (personalLabel == null) {
+        stringResource(
+            R.string.today_index_content_description,
+            scoreLabel,
+            bandLabel,
+        )
+    } else {
+        stringResource(
+            R.string.today_index_personal_content_description,
+            scoreLabel,
+            personalLabel,
+            bandLabel,
+        )
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.clearAndSetSemantics {
+            contentDescription = scoreDescription
+        },
+    ) {
+        Text(
+            text = scoreLabel,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            softWrap = false,
+        )
+        if (personalLabel != null) {
+            Text(
+                text = "($personalLabel)",
+                style = MaterialTheme.typography.titleMedium,
+                color = personalIndexColour(),
+                maxLines = 1,
+                softWrap = false,
+            )
+        }
+        BandPill(band = state.band, label = bandLabel)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PortraitTodayScreen(
+    state: TodayUiState,
+    modifier: Modifier = Modifier,
+    outlook: OutlookUiState = OutlookUiState.Hidden,
+    isRefreshing: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
+    onChangeCity: (() -> Unit)? = null,
+    grannySpeaksFreely: Boolean = false,
+) {
     Scaffold(
         modifier = modifier,
         contentWindowInsets = tabDestinationWindowInsets(),
@@ -402,28 +648,6 @@ private fun IndexCard(
             bandLabel,
         )
     }
-    val context = LocalContext.current
-    val picker = remember {
-        loadGrannySaysPicker(context.assets)
-    }
-    val season = GrannySeason.current(LocalDate.now().monthValue)
-    var sayingText by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(
-        state.score,
-        state.personalScore,
-        grannySpeaksFreely,
-        state.forecastHasSnow,
-        picker,
-        season,
-    ) {
-        sayingText = picker?.showForScore(
-            score = state.score.setScale(0, RoundingMode.HALF_UP).intValueExact(),
-            personalScore = state.personalScore?.setScale(0, RoundingMode.HALF_UP)?.intValueExact(),
-            allowFreeSpeech = grannySpeaksFreely,
-            season = season,
-            snowInForecast = state.forecastHasSnow,
-        )?.text
-    }
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -458,43 +682,79 @@ private fun IndexCard(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        // Always reserve two saying lines so Another saying never shifts the layout.
-        if (picker != null) {
-            Row(
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.padding(top = 6.dp),
-            ) {
-                CircularRefreshButton(
-                    onClick = {
-                        val next = picker.refresh()?.text
-                        if (next != null) {
-                            sayingText = next
-                        }
-                    },
-                    contentDescription = stringResource(R.string.today_another_saying),
-                    buttonSize = 28.dp,
-                    iconSize = 16.dp,
-                    enabled = sayingText != null,
-                )
-                Text(
-                    text = sayingText.orEmpty(),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Medium,
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    softWrap = true,
-                    minLines = 2,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = true),
-                )
-            }
-        }
+        GrannySayingBlock(
+            state = state,
+            grannySpeaksFreely = grannySpeaksFreely,
+        )
     }
 }
 
+/**
+ * Granny Says line with refresh. Lives under the index in portrait, and inside
+ * the scroll stack in landscape so graphs keep the leftover height.
+ */
+@Composable
+private fun GrannySayingBlock(
+    state: TodayUiState.Available,
+    grannySpeaksFreely: Boolean = false,
+) {
+    val context = LocalContext.current
+    val picker = remember {
+        loadGrannySaysPicker(context.assets)
+    }
+    val season = GrannySeason.current(LocalDate.now().monthValue)
+    var sayingText by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(
+        state.score,
+        state.personalScore,
+        grannySpeaksFreely,
+        state.forecastHasSnow,
+        picker,
+        season,
+    ) {
+        sayingText = picker?.showForScore(
+            score = state.score.setScale(0, RoundingMode.HALF_UP).intValueExact(),
+            personalScore = state.personalScore?.setScale(0, RoundingMode.HALF_UP)?.intValueExact(),
+            allowFreeSpeech = grannySpeaksFreely,
+            season = season,
+            snowInForecast = state.forecastHasSnow,
+        )?.text
+    }
+    // Always reserve two saying lines so Another saying never shifts the layout.
+    if (picker != null) {
+        Row(
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.padding(top = 6.dp),
+        ) {
+            CircularRefreshButton(
+                onClick = {
+                    val next = picker.refresh()?.text
+                    if (next != null) {
+                        sayingText = next
+                    }
+                },
+                contentDescription = stringResource(R.string.today_another_saying),
+                buttonSize = 28.dp,
+                iconSize = 16.dp,
+                enabled = sayingText != null,
+            )
+            Text(
+                text = sayingText.orEmpty(),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Medium,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                softWrap = true,
+                minLines = 2,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = true),
+            )
+        }
+    }
+}
 /** Round refresh control shared by the top bar and Another saying. */
 @Composable
 private fun CircularRefreshButton(
