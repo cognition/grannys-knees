@@ -1,6 +1,6 @@
 # Android build
 
-The native Android project is a minimal Jetpack Compose and Material 3 shell. It deliberately contains no weather client, scoring, persistence, widget or Wear OS feature yet. The existing HTML prototype remains separate and unchanged.
+The native Android project is a Jetpack Compose and Material 3 app with weather forecast fetch, experimental index scoring, on-device journal, Glance widget and a Wear OS companion module.
 
 ## Pinned toolchain
 
@@ -52,7 +52,7 @@ Open the repository in Android Studio, select the `app` run configuration, and d
 
 ## Deferred application ID
 
-Both the namespace and application ID are temporarily `com.example.grannysknees`. The final reverse-domain identifier and Play Store publisher identity remain an explicit product/release decision. Change them before any store build; published application IDs cannot be changed in place.
+Both the namespace and application ID are temporarily `ca.aeo3.grannysknees`. The final reverse-domain identifier and Play Store publisher identity remain an explicit product/release decision. Change them before any store build; published application IDs cannot be changed in place.
 
 ## Branding boundary
 

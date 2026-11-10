@@ -87,9 +87,9 @@ Applies across Today, Report (journal), Outlook (curve + five-day), About, Priva
 
 ## Implementation touchpoints
 
-- [`app/src/main/java/com/example/grannysknees/ui/theme/Theme.kt`](app/src/main/java/com/example/grannysknees/ui/theme/Theme.kt) — colour schemes, typography, shapes, `GrannyCorner`.
+- [`app/src/main/java/ca/aeo3/grannysknees/ui/theme/Theme.kt`](app/src/main/java/ca/aeo3/grannysknees/ui/theme/Theme.kt) — colour schemes, typography, shapes, `GrannyCorner`.
 - [`app/src/main/res/values/colors.xml`](app/src/main/res/values/colors.xml) — paper/night/logo companions.
-- [`app/src/main/java/com/example/grannysknees/widget/GrannysKneesWidget.kt`](app/src/main/java/com/example/grannysknees/widget/GrannysKneesWidget.kt) — Glance colour providers.
+- [`app/src/main/java/ca/aeo3/grannysknees/widget/GrannysKneesWidget.kt`](app/src/main/java/ca/aeo3/grannysknees/widget/GrannysKneesWidget.kt) — Glance colour providers.
 - Screens that hard-code ink/paper assumptions (journal slider/button colours that already use `colorScheme`) should pick up the theme automatically; re-check any remaining hardcoded hex.
 - Feature version bump on the phone app when this ships (current `0.3.32.0` → next feature increment).
 

@@ -21,9 +21,9 @@
 ### Task 1: PlaceSource + daily stamp + gated loadToday
 
 **Files:**
-- Create: `app/src/main/java/com/example/grannysknees/data/PlaceSource.kt`
-- Create: `app/src/main/java/com/example/grannysknees/data/DailyFetchStampStore.kt`
-- Create: `app/src/test/java/com/example/grannysknees/data/DailyFetchStampStoreTest.kt`
+- Create: `app/src/main/java/ca/aeo3/grannysknees/data/PlaceSource.kt`
+- Create: `app/src/main/java/ca/aeo3/grannysknees/data/DailyFetchStampStore.kt`
+- Create: `app/src/test/java/ca/aeo3/grannysknees/data/DailyFetchStampStoreTest.kt`
 - Modify: `SelectedCity.kt`, `SelectedCityStore.kt`, `ForecastRepository.kt`, `MainActivity.kt`
 - Modify/extend: `ForecastRepositoryTest.kt`, city store tests if any
 - Modify: `OptionalGpsPlaceSource.kt`, `CitySearchScreen.kt` (tag Gps vs Search)

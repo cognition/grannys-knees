@@ -7,8 +7,6 @@
 
 This document defines local, append-only symptom observations and the sensor snapshot linked to them. Deterministic cases live under [`fixtures/symptom-observations/`](fixtures/symptom-observations/).
 
-The HTML prototype (`index.html`) stores one pain value and one stiffness value per day in `localStorage`. That store is **not** normative. Do not migrate it field-for-field.
-
 ## 1. Disclaimer
 
 A symptom rating is the user’s own report. It is not a diagnosis, not a treatment recommendation, and not the weather index. The forecast index (`weather-index` / `index-v1`) and a self-report both use 0–10 and must never be added, averaged, or labelled as the same quantity. Nothing in this contract claims that weather caused a symptom.
