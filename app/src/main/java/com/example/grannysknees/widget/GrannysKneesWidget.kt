@@ -102,6 +102,7 @@ class GrannysKneesWidgetReceiver : GlanceAppWidgetReceiver() {
 private object WidgetContentRenderer {
     private val backgroundColour = ColorProvider(Color(0xFFF4F8F9))
     private val primaryColour = ColorProvider(Color(0xFF0E7C86))
+    private val personalColour = ColorProvider(Color(0xFFC24E2D))
     private val secondaryColour = ColorProvider(Color(0xFF5E7380))
     private val badgeBackgroundColour = ColorProvider(Color(0xFFF8E4E1))
     private val badgeTextColour = ColorProvider(Color(0xFFC24E2D))
@@ -158,15 +159,7 @@ private object WidgetContentRenderer {
             Row(
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
-                Text(
-                    text = TodayScoreBand.formatScore(model.score),
-                    style = TextStyle(
-                        color = primaryColour,
-                        fontSize = SCORE_TEXT_SIZE,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                    maxLines = 1,
-                )
+                ScorePair(model)
                 Spacer(modifier = GlanceModifier.width(8.dp))
                 Text(
                     text = context.getString(bandLabelResource(model.band)),
@@ -257,15 +250,7 @@ private object WidgetContentRenderer {
     private fun ScoreLine(model: WidgetUiModel.Available) {
         val context = LocalContext.current
         Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
-            Text(
-                text = TodayScoreBand.formatScore(model.score),
-                style = TextStyle(
-                    color = primaryColour,
-                    fontSize = SCORE_TEXT_SIZE,
-                    fontWeight = FontWeight.Bold,
-                ),
-                maxLines = 1,
-            )
+            ScorePair(model)
             Spacer(modifier = GlanceModifier.width(8.dp))
             Text(
                 text = context.getString(bandLabelResource(model.band)),
@@ -280,6 +265,33 @@ private object WidgetContentRenderer {
                 Spacer(modifier = GlanceModifier.width(8.dp))
                 StaleBadge()
             }
+        }
+    }
+
+    /** Standard score, plus Personal in brackets when Today would show one. */
+    @Composable
+    private fun ScorePair(model: WidgetUiModel.Available) {
+        Text(
+            text = TodayScoreBand.formatScore(model.score),
+            style = TextStyle(
+                color = primaryColour,
+                fontSize = SCORE_TEXT_SIZE,
+                fontWeight = FontWeight.Bold,
+            ),
+            maxLines = 1,
+        )
+        val personal = model.personalScore
+        if (personal != null) {
+            Spacer(modifier = GlanceModifier.width(4.dp))
+            Text(
+                text = "(${TodayScoreBand.formatScore(personal)})",
+                style = TextStyle(
+                    color = personalColour,
+                    fontSize = SCORE_TEXT_SIZE,
+                    fontWeight = FontWeight.Bold,
+                ),
+                maxLines = 1,
+            )
         }
     }
 

@@ -75,6 +75,8 @@ class JournalRoomTest {
             freshness = ForecastFreshness.Fresh,
         )
         assertEquals("4.0\nLondon, Ontario\nNov 5, 11:00 a.m.", watchIndexText(available))
+        val withPersonal = available.copy(personalScore = java.math.BigDecimal("2.0"))
+        assertEquals("4.0 / 2.0\nLondon, Ontario\nNov 5, 11:00 a.m.", watchIndexText(withPersonal))
         val missing = TodayUiState.Unavailable(
             location = "London, Ontario",
             lastUpdatedLabel = "",

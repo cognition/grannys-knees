@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 134
-        versionName = "0.3.73.9"
+        versionCode = 135
+        versionName = "0.3.74.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
