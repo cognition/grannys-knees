@@ -30,9 +30,24 @@ render.experimental.xml
 # Keystore files
 *.jks
 *.keystore
+keystore.properties
 
 # Google Services (e.g. APIs or Firebase)
 google-services.json
 
 # Android Profiling
 *.hprof
+
+# Git worktrees (local checkouts beside the main clone)
+.worktrees/
+
+# Local Play Store screenshot capture scaffolding (do not commit; not for release)
+# A proper Paparazzi / Compose screenshot test suite may be added later under
+# conventional androidTest paths — these ignores target ad-hoc debug-export only.
+/app/src/main/java/com/example/grannysknees/screenshot/
+/app/src/debug/java/com/example/grannysknees/screenshot/
+/app/src/androidTest/java/com/example/grannysknees/screenshot/
+/scripts/capture_primary_screenshots.py
+
+# Generated Play listing screenshots (local capture output; not store assets in Git)
+/samples/primary/

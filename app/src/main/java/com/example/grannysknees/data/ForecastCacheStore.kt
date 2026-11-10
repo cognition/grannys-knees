@@ -37,10 +37,6 @@ internal class ForecastCacheStore(
     }
 
     fun write(envelope: ForecastCacheEnvelope) {
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs()
-        }
         val payload = buildJsonObject {
             put("fetchedAtEpochMs", envelope.fetchedAt.toEpochMilli())
             put("locationLabel", envelope.locationLabel)
@@ -49,7 +45,7 @@ internal class ForecastCacheStore(
             put("timezone", envelope.timezone)
             put("rawBody", envelope.rawBody)
         }.toString()
-        file.writeText(payload, Charsets.UTF_8)
+        AtomicFileWriter.writeText(file, payload)
     }
 
     fun clear() {

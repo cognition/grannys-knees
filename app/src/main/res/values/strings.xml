@@ -54,7 +54,7 @@
     <string name="privacy_back">Back</string>
     <string name="privacy_line_forecast">The forecast sends your city\'s coordinates to Open-Meteo.</string>
     <string name="privacy_line_journal">Notes stay on this phone. There is no account.</string>
-    <string name="privacy_line_later">Watch sync and backup are not part of this release.</string>
+    <string name="privacy_line_later">Watch sync is not part of this release.</string>
     <string name="privacy_intro">Granny\'s Knees is designed to keep your information on your devices, not send it to the app\'s developer.</string>
     <string name="privacy_weather_heading">How we get the weather</string>
     <string name="privacy_weather_body">To get a forecast, your phone sends the coordinates and time zone of your selected city to Open-Meteo. It downloads temperature, humidity and air pressure information and calculates the knee-weather index on your phone.</string>
@@ -67,7 +67,7 @@
     <string name="privacy_watch_heading">Phone and watch</string>
     <string name="privacy_watch_body">A future version may share information between your paired phone and watch. Watch synchronization is not part of the current Android release.</string>
     <string name="privacy_backup_heading">Android backups</string>
-    <string name="privacy_backup_body">Android may back up some app data depending on your device settings and the app\'s backup configuration. We are reviewing backup behaviour before the Play Store release.</string>
+    <string name="privacy_backup_body">Google Auto Backup is off for this app. Your city, forecast cache and symptom journal stay on this phone and are not copied to cloud backup. Uninstalling removes local data. You can export journal entries with the share sheet when that option is available.</string>
     <string name="privacy_footer">The weather index is not medical advice.</string>
     <string name="about_local_pressure_title">Blend local pressure into Personal</string>
     <string name="about_local_pressure_hint">Uses a smoothed phone barometer reading for the nearest hour. The Standard score stays forecast-based.</string>

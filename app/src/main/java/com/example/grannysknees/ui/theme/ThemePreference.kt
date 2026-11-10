@@ -1,5 +1,6 @@
 package com.example.grannysknees.ui.theme
 
+import com.example.grannysknees.data.AtomicFileWriter
 import java.io.File
 import java.io.IOException
 
@@ -46,15 +47,11 @@ internal class ThemePreferenceStore(
 
     /** Replaces the saved appearance choice. */
     fun write(preference: ThemePreference) {
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs()
-        }
         val token = when (preference) {
             ThemePreference.SYSTEM -> "system"
             ThemePreference.LIGHT -> "light"
             ThemePreference.DARK -> "dark"
         }
-        file.writeText(token, Charsets.UTF_8)
+        AtomicFileWriter.writeText(file, token)
     }
 }

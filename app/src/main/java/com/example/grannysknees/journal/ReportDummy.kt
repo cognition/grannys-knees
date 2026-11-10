@@ -11,6 +11,7 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import com.example.grannysknees.data.AtomicFileWriter
 import kotlinx.serialization.json.put
 import java.io.File
 import java.io.IOException
@@ -120,10 +121,6 @@ internal class ReportDummyStore(
 
     /** Replaces the stored figure. */
     fun write(dummy: ReportDummy) {
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs()
-        }
         val payload = buildJsonObject {
             put("savedAt", dummy.savedAt.truncatedTo(ChronoUnit.MILLIS).toString())
             put("focus", dummy.focus)
@@ -143,7 +140,7 @@ internal class ReportDummyStore(
                 },
             )
         }.toString()
-        file.writeText(payload, Charsets.UTF_8)
+        AtomicFileWriter.writeText(file, payload)
     }
 
     /** The starting figure, stamped at [now]. */

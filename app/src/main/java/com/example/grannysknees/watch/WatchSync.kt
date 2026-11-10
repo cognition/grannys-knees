@@ -11,6 +11,7 @@ import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import androidx.room.Room
 import com.example.grannysknees.journal.JournalDatabase
+import com.example.grannysknees.data.AtomicFileWriter
 import java.io.File
 import java.time.Instant
 
@@ -33,7 +34,7 @@ internal class WatchIndexPublisher(
     /** Sends [state] to the local payload file and, when available, the data layer. */
     fun publish(state: TodayUiState) {
         val payload = watchIndexText(state)
-        File(context.filesDir, "watch-index.txt").writeText(payload, Charsets.UTF_8)
+        AtomicFileWriter.writeText(File(context.filesDir, "watch-index.txt"), payload)
         try {
             val request = PutDataMapRequest.create(WatchPaths.INDEX).run {
                 dataMap.putString(WatchPaths.PAYLOAD_KEY, payload)

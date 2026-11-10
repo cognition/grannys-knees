@@ -37,10 +37,6 @@ internal class SelectedCityStore(
 
     /** Replaces the saved city. */
     fun write(city: SelectedCity) {
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs()
-        }
         val payload = buildJsonObject {
             put("label", city.label)
             put("latitude", city.latitude)
@@ -50,7 +46,7 @@ internal class SelectedCityStore(
             put("countryCode", city.countryCode)
             put("placeSource", city.placeSource.name)
         }.toString()
-        file.writeText(payload, Charsets.UTF_8)
+        AtomicFileWriter.writeText(file, payload)
     }
 
     fun clear() {

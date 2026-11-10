@@ -71,10 +71,6 @@ internal class SensitivityProfileStore(
     /** Replaces Adj and Feel opt-in together. */
     fun writeState(state: SensitivityPreferences) {
         val safe = state.copy(profile = state.profile.clamped())
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs()
-        }
         val payload = buildJsonObject {
             put("pressure", safe.profile.pressure)
             put("humidity", safe.profile.humidity)
@@ -83,7 +79,7 @@ internal class SensitivityProfileStore(
             put("grannySpeaksFreely", safe.grannySpeaksFreely)
             put("localPressureEnabled", safe.localPressureEnabled)
         }.toString()
-        file.writeText(payload, Charsets.UTF_8)
+        AtomicFileWriter.writeText(file, payload)
     }
 
     private fun parse(text: String): SensitivityPreferences? {

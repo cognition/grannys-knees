@@ -28,11 +28,7 @@ internal class DailyFetchStampStore(
 
     /** Records a successful fetch for [date] in the place's local calendar. */
     fun writeLocalDate(date: LocalDate) {
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs()
-        }
-        file.writeText(date.toString(), Charsets.UTF_8)
+        AtomicFileWriter.writeText(file, date.toString())
     }
 
     /** Clears the stamp so the next open may fetch again. */

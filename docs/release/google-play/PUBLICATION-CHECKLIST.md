@@ -1,8 +1,8 @@
 # Google Play 1.0 — publication readiness checklist
 
-**Updated:** 2026-11-05. **Decisions:** personal developer account; Canada-only initial release; free, no ads; weather-index phone app and widget. **Status:** checklist, not proof of completion.
+**Updated:** 2026-11-10. **Decisions:** personal developer account; Canada-only initial release; free, no ads; weather-index phone app, Glance widget, Canadian city search, optional GPS, on-device symptom journal, Wear OS companion sync, and in-app privacy summary. **Status:** checklist, not proof of completion.
 
-**Latest reviewed commit:** `32d8b9e` (expanded hourly/five-day widget, emulator evidence, symptom contract). Review `docs/traycer/CURRENT-STATE.md` and `DEVICE-ACCEPTANCE.md` before asserting current functionality. Historic GP plan predates this commit.
+**Latest reviewed commit:** `33fe033` (`feature/play-store-readiness`). Reconcile store copy and policy text against this branch before upload. Review `docs/traycer/CURRENT-STATE.md` and `DEVICE-ACCEPTANCE.md` before asserting current functionality.
 
 ## Rules for checking boxes
 
@@ -14,7 +14,7 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 - [ ] Owner verifies developer display name, public contact requirements and approved support email/website. Do not expose personal information without approval.
 - [ ] Owner verifies whether personal-account production access requires closed testing; plan for **at least 12 continuously opted-in testers for 14 days** if applicable. Recruit early.
 - [ ] Owner selects permanent Android `applicationId` and confirms control of any reverse-domain namespace; document it before first Play upload.
-- [ ] Confirm 1.0 is free/ad-free, Canada only, weather index with phone and widget; symptom journal and Wear OS excluded.
+- [ ] Confirm 1.0 is free/ad-free, Canada only, and matches the release candidate on `feature/play-store-readiness`: weather index (Today + hourly/five-day outlook), Glance widget, Canadian city search with persisted selection, optional coarse/fine location for “use this phone’s location,” on-device symptom journal (Room), Wear OS tile/sync via the `:wear` module and `WatchLogService`, and the in-app **Your privacy** screen. No developer-operated accounts, ads or cloud symptom collection.
 - [ ] Decide English (Canada) listing and French localization as a subsequent, tracked deliverable.
 - [ ] Confirm public support and privacy policy URLs and hosting owner.
 
@@ -23,8 +23,10 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 ## Gate 1: User-ready application
 
 - [ ] Audit latest main against GP00 and prior N01–N04 evidence; reconcile newly merged expanded widget (#12).
-- [ ] Replace any fixed Toronto default dependency with Canadian city search, clear province/country disambiguation, selection persistence and timezone-aware forecast.
-- [ ] User can choose/change city without mandatory GPS or account sign-in.
+- [ ] Verify Canadian city search (`OpenMeteoGeocodingClient`, `countryCode=CA`), clear province/country disambiguation, selection persistence (`selected-city.json`) and timezone-aware forecast.
+- [ ] User can choose/change city without mandatory GPS or account sign-in; optional location permission only after an explicit in-app choice.
+- [ ] Symptom journal flows (create, list, export via share sheet, delete all) persist in local Room storage only; no developer backend.
+- [ ] With a paired Wear device, phone receives watch log messages and exposes current index to the watch tile; verify on hardware where possible.
 - [ ] App restart, force stop and offline restart retain selected city and show honest freshness.
 - [ ] First-run onboarding explains experimental 0–10 index, forecast-vs-symptom distinction, correlation vs causation, no medical prediction.
 - [ ] About the Index describes variables, methodology, uncertainty, version and sources.
@@ -39,7 +41,7 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 
 ## Gate 2: Security, privacy and policy
 
-- [ ] Inventory Android permissions, SDKs, outbound requests, IP/location transmission, caches, diagnostics, backups and any analytics/crash reporting.
+- [ ] Inventory Android permissions (INTERNET; optional ACCESS_COARSE/FINE_LOCATION), SDKs, outbound requests, IP/location transmission, journal/watch local flows, caches, diagnostics, backups and any analytics/crash reporting.
 - [ ] Decide whether geocoded city, forecast cache or preferences leave the device; document retention and deletion accurately.
 - [ ] Public HTTPS HTML privacy policy describes actual data processing, provider(s), purpose, storage, retention, contact and rights; owner approves.
 - [ ] Link privacy policy from app and Play listing; verify publicly accessible without login.
@@ -49,11 +51,13 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 - [ ] Ensure store and in-app copy make no diagnosis, treatment or individualized flare prediction claims.
 - [ ] Confirm Open-Meteo API licensing, attribution and suitability for planned production usage and request volume.
 - [ ] Verify third-party dependencies/licences, dependency security and no hard-coded secrets.
-- [ ] Confirm Android backup behaviour and any personal data deletion mechanisms actually match privacy statements.
+- [ ] Confirm Android backup behaviour (`allowBackup=false` in release candidate manifest) and journal deletion/export mechanisms match privacy statements and in-app **Your privacy** copy.
 
 **Gate 2 evidence:** privacy policy URL, completed declaration matrix and owner sign-off. Agents prepare, owner submits.
 
 ## Gate 3: Release engineering and assets
+
+> **Branch hygiene:** Do not merge local `main` that contains untracked screenshot helpers (`PrimaryScreenshotMatrix.kt`, debug-only `ScreenshotTodayActivity`) into Play release candidates. Build and upload from this branch (`feature/play-store-readiness`) or `origin/main` only after those debug artefacts are absent.
 
 - [ ] Set final `applicationId`, display name and `versionCode`/`versionName`; avoid changing ID after first Play registration.
 - [ ] Confirm current Play target API policy and Android build toolchain; compile/target API 37 is configured but needs release verification.
@@ -87,7 +91,7 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 - [ ] Confirm Google approval and public Canadian listing; test clean install and widget from Play.
 - [ ] Monitor Play vitals, crashes, ANRs, ratings, user support and policy messages.
 - [ ] Document release tag, bundle hash, version, rollout decision, known issues and hotfix procedure.
-- [ ] Plan next version separately: symptom journal, Wear OS and expanded analytics only after their own gates.
+- [ ] Plan post-1.0 work separately: cloud sync, accounts, expanded analytics, AI personalization or other net-new collection only after their own gates and policy updates.
 
 **Definition of published:** publicly available Play listing and install in Canada, correct production version, verified privacy/support links, no known P0/P1 blockers.
 

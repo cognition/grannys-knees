@@ -42,10 +42,6 @@ internal class FeelCalibrationStore(
 
     /** Replaces the sample list. */
     fun write(samples: List<FeelCalibrationSample>) {
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs()
-        }
         val payload = buildJsonObject {
             put(
                 "samples",
@@ -56,7 +52,7 @@ internal class FeelCalibrationStore(
                 },
             )
         }.toString()
-        file.writeText(payload, Charsets.UTF_8)
+        AtomicFileWriter.writeText(file, payload)
     }
 
     /** Clears all calibration samples. */

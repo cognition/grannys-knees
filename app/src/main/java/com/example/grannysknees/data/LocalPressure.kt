@@ -37,12 +37,11 @@ internal class LocalPressureStore(
     }
 
     fun write(reading: LocalPressureReading) {
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) parent.mkdirs()
-        file.writeText(buildJsonObject {
+        val payload = buildJsonObject {
             put("pressureHpa", reading.pressureHpa)
             put("recordedAtEpoch", reading.recordedAt.epochSecond)
-        }.toString())
+        }.toString()
+        AtomicFileWriter.writeText(file, payload)
     }
 }
 

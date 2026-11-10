@@ -1,8 +1,65 @@
+import org.gradle.api.GradleException
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
 }
+
+/**
+ * Release upload-key credentials from [keystore.properties] at the repo root and/or
+ * environment variables. Property names match the standard Android keystore file.
+ */
+data class ReleaseSigningCredentials(
+    val storeFile: java.io.File,
+    val storePassword: String,
+    val keyAlias: String,
+    val keyPassword: String,
+)
+
+private object ReleaseSigningCredentialsLoader {
+    private const val STORE_FILE = "storeFile"
+    private const val STORE_PASSWORD = "storePassword"
+    private const val KEY_ALIAS = "keyAlias"
+    private const val KEY_PASSWORD = "keyPassword"
+
+    private const val ENV_STORE_FILE = "RELEASE_STORE_FILE"
+    private const val ENV_STORE_PASSWORD = "RELEASE_STORE_PASSWORD"
+    private const val ENV_KEY_ALIAS = "RELEASE_KEY_ALIAS"
+    private const val ENV_KEY_PASSWORD = "RELEASE_KEY_PASSWORD"
+
+    fun load(rootDir: java.io.File): ReleaseSigningCredentials? {
+        val fromFile =
+            rootDir.resolve("keystore.properties").takeIf { it.isFile }?.inputStream()?.use { stream ->
+                Properties().apply { load(stream) }
+            }
+
+        fun resolve(name: String, envName: String): String? =
+            System.getenv(envName)?.trim()?.takeIf { it.isNotEmpty() }
+                ?: fromFile?.getProperty(name)?.trim()?.takeIf { it.isNotEmpty() }
+
+        val storeFilePath = resolve(STORE_FILE, ENV_STORE_FILE) ?: return null
+        val storePassword = resolve(STORE_PASSWORD, ENV_STORE_PASSWORD) ?: return null
+        val keyAlias = resolve(KEY_ALIAS, ENV_KEY_ALIAS) ?: return null
+        val keyPassword = resolve(KEY_PASSWORD, ENV_KEY_PASSWORD) ?: return null
+
+        val storeFile = rootDir.resolve(storeFilePath)
+        if (!storeFile.isFile) {
+            return null
+        }
+
+        return ReleaseSigningCredentials(
+            storeFile = storeFile,
+            storePassword = storePassword,
+            keyAlias = keyAlias,
+            keyPassword = keyPassword,
+        )
+    }
+}
+
+val releaseSigningCredentials = ReleaseSigningCredentialsLoader.load(rootProject.projectDir)
+val uploadSigningReady = releaseSigningCredentials != null
 
 android {
     namespace = "com.example.grannysknees"
@@ -12,17 +69,32 @@ android {
         applicationId = "com.example.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 145
-        versionName = "0.3.81.1"
+        versionCode = 146
+        versionName = "0.3.81.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (uploadSigningReady) {
+            create("release") {
+                val creds = releaseSigningCredentials!!
+                storeFile = creds.storeFile
+                storePassword = creds.storePassword
+                keyAlias = creds.keyAlias
+                keyPassword = creds.keyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // The upload key stays outside git. This local bundle is signed
-            // with the debug key so the artefact can be built and inspected.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig =
+                if (uploadSigningReady) {
+                    signingConfigs.getByName("release")
+                } else {
+                    signingConfigs.getByName("debug")
+                }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -46,6 +118,44 @@ android {
 
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        // AtomicFile.finishWrite touches android.util.Log; return defaults under JVM unit tests.
+        unitTests.isReturnDefaultValues = true
+    }
+}
+
+tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.configureEach {
+    val signingReady = uploadSigningReady
+    doFirst {
+        if (!signingReady) {
+            this.logger.warn(
+                """
+                |
+                |**********************************************************************
+                | Release build is signed with the DEBUG key — NOT uploadable to Play.
+                | Configure upload signing via keystore.properties or RELEASE_* env vars.
+                | See docs/release/google-play/UPLOAD-SIGNING.md
+                | Set PLAY_UPLOAD=true when running bundleRelease to fail instead of warn.
+                |**********************************************************************
+                |
+                """
+                    .trimMargin(),
+            )
+        }
+    }
+}
+
+tasks.matching { it.name == "bundleRelease" }.configureEach {
+    val signingReady = uploadSigningReady
+    doFirst {
+        val playUpload = System.getenv("PLAY_UPLOAD")
+        if (playUpload.equals("true", ignoreCase = true) && !signingReady) {
+            throw GradleException(
+                "bundleRelease: PLAY_UPLOAD=true but release signing credentials are missing. " +
+                    "Provide keystore.properties (storeFile, storePassword, keyAlias, keyPassword) " +
+                    "or RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS, " +
+                    "RELEASE_KEY_PASSWORD. See docs/release/google-play/UPLOAD-SIGNING.md",
+            )
+        }
     }
 }
 
