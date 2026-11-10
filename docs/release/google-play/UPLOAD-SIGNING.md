@@ -66,17 +66,21 @@ From the repo root, with credentials in place:
 
 Output: `app/build/outputs/bundle/release/app-release.aab`
 
-### CI / strict upload builds
+Without upload credentials, `assembleRelease` and `bundleRelease` **fail by default**. That prevents a mistaken Play upload of a debug-signed artefact.
 
-To **fail** the build when credentials are missing (instead of falling back to debug signing):
+## Local debug-signed release (opt-in only)
+
+To inspect a release-type artefact signed with the debug key when credentials are absent:
 
 ```bash
-PLAY_UPLOAD=true ./gradlew bundleRelease
+ALLOW_DEBUG_RELEASE_SIGNING=true ./gradlew bundleRelease
 ```
+
+Gradle prints a prominent warning that the bundle is **not** Play-uploadable. Use this only for local smoke tests, never for Console upload.
 
 ## Verify the certificate is not debug
 
-After building:
+After building a real upload-signed AAB:
 
 ```bash
 jarsigner -verify -verbose -certs app/build/outputs/bundle/release/app-release.aab
@@ -86,13 +90,9 @@ You must **not** see `CN=Android Debug` in the signer certificate. The distingui
 
 Alternatively, unzip the AAB and inspect the signing block with `apksigner` / Play-internal tools; the debug CN check above is usually sufficient for a quick local check.
 
-## Local debug-fallback (credentials absent)
-
-If neither `keystore.properties` nor the `RELEASE_*` variables provide all four values, `bundleRelease` still runs but signs with the **debug** config so you can inspect a release-type artefact locally. Gradle prints a prominent warning that the bundle is **not** Play-uploadable. Use this only for local smoke tests, not for Console upload.
-
 ## Owner follow-ups
 
 - Decide the permanent `applicationId` before the first Play upload (still `com.example.grannysknees` in source until changed).
-- Bump `versionCode` / `versionName` in a dedicated release commit (not handled in the signing change).
-- Wire CI to inject `RELEASE_*` secrets and set `PLAY_UPLOAD=true` on release pipeline jobs.
+- Bump `versionCode` / `versionName` in a dedicated release commit when shipping.
+- Wire CI to inject `RELEASE_*` secrets on any job that runs `bundleRelease` (CI currently uses `assembleDebug` only).
 - Back up the upload keystore and document recovery with Play Console.

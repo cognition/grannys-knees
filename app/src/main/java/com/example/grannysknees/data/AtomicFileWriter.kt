@@ -2,7 +2,6 @@ package com.example.grannysknees.data
 
 import androidx.core.util.AtomicFile
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.nio.charset.Charset
@@ -19,20 +18,23 @@ internal class AtomicFileWriter(
     /**
      * Writes [text] to [destination], replacing any existing contents.
      *
+     * The [OutputStreamWriter] is flushed but not closed before
+     * [AtomicFile.finishWrite], which must sync and close the stream itself.
+     *
      * @throws IOException when the parent directory cannot be created or the write fails
      */
     fun writeText(text: String, charset: Charset = Charsets.UTF_8) {
         ensureParentExists()
         val atomic = AtomicFile(destination)
-        var stream: FileOutputStream? = atomic.startWrite()
+        val stream = atomic.startWrite()
         try {
-            OutputStreamWriter(stream, charset).use { writer ->
-                writer.write(text)
-            }
+            val writer = OutputStreamWriter(stream, charset)
+            writer.write(text)
+            writer.flush()
+            // Do not close writer/stream here — finishWrite syncs and closes.
             atomic.finishWrite(stream)
-            stream = null
         } catch (error: IOException) {
-            stream?.let { atomic.failWrite(it) }
+            atomic.failWrite(stream)
             throw error
         }
     }

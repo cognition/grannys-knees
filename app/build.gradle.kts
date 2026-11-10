@@ -60,6 +60,8 @@ private object ReleaseSigningCredentialsLoader {
 
 val releaseSigningCredentials = ReleaseSigningCredentialsLoader.load(rootProject.projectDir)
 val uploadSigningReady = releaseSigningCredentials != null
+val allowDebugReleaseSigning =
+    System.getenv("ALLOW_DEBUG_RELEASE_SIGNING").equals("true", ignoreCase = true)
 
 android {
     namespace = "com.example.grannysknees"
@@ -69,8 +71,8 @@ android {
         applicationId = "com.example.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 146
-        versionName = "0.3.81.2"
+        versionCode = 147
+        versionName = "0.3.81.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -90,10 +92,10 @@ android {
     buildTypes {
         release {
             signingConfig =
-                if (uploadSigningReady) {
-                    signingConfigs.getByName("release")
-                } else {
-                    signingConfigs.getByName("debug")
+                when {
+                    uploadSigningReady -> signingConfigs.getByName("release")
+                    allowDebugReleaseSigning -> signingConfigs.getByName("debug")
+                    else -> null
                 }
             isMinifyEnabled = false
             proguardFiles(
@@ -125,37 +127,34 @@ android {
 
 tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.configureEach {
     val signingReady = uploadSigningReady
+    val debugFallbackAllowed = allowDebugReleaseSigning
     doFirst {
-        if (!signingReady) {
+        if (signingReady) {
+            return@doFirst
+        }
+        if (debugFallbackAllowed) {
             this.logger.warn(
                 """
                 |
                 |**********************************************************************
                 | Release build is signed with the DEBUG key — NOT uploadable to Play.
+                | ALLOW_DEBUG_RELEASE_SIGNING=true is set for local inspection only.
                 | Configure upload signing via keystore.properties or RELEASE_* env vars.
                 | See docs/release/google-play/UPLOAD-SIGNING.md
-                | Set PLAY_UPLOAD=true when running bundleRelease to fail instead of warn.
                 |**********************************************************************
                 |
                 """
                     .trimMargin(),
             )
+            return@doFirst
         }
-    }
-}
-
-tasks.matching { it.name == "bundleRelease" }.configureEach {
-    val signingReady = uploadSigningReady
-    doFirst {
-        val playUpload = System.getenv("PLAY_UPLOAD")
-        if (playUpload.equals("true", ignoreCase = true) && !signingReady) {
-            throw GradleException(
-                "bundleRelease: PLAY_UPLOAD=true but release signing credentials are missing. " +
-                    "Provide keystore.properties (storeFile, storePassword, keyAlias, keyPassword) " +
-                    "or RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS, " +
-                    "RELEASE_KEY_PASSWORD. See docs/release/google-play/UPLOAD-SIGNING.md",
-            )
-        }
+        throw GradleException(
+            "${this.name}: release signing credentials are missing. " +
+                "Provide keystore.properties (storeFile, storePassword, keyAlias, keyPassword) " +
+                "or RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS, " +
+                "RELEASE_KEY_PASSWORD. For a local debug-signed release artefact only, set " +
+                "ALLOW_DEBUG_RELEASE_SIGNING=true. See docs/release/google-play/UPLOAD-SIGNING.md",
+        )
     }
 }
 
