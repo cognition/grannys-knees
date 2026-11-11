@@ -4,7 +4,7 @@
 **App:** Granny's Knees (Android phone)
 **Publisher/data controller:** AEO3 / Cognition
 **Privacy contact:** cognition@aeo3.ca
-**Policy URL:** https://github.com/cognition/grannys-knees/
+**Policy URL:** https://github.com/cognition/grannys-knees/blob/main/PRIVACY-POLICY.md
 >
 > **Reviewed against:** release version 0.3.82.2 (1.0 phone scope; widget and Wear deferred).
 
