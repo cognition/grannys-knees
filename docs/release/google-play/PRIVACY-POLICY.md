@@ -1,15 +1,12 @@
 # Privacy Policy — Granny's Knees
 
-**DRAFT FOR OWNER REVIEW — NOT YET PUBLISHED OR EFFECTIVE**
-**Proposed effective date:** [DATE OF PUBLICATION]
+**Effective date:** 2026-11-10
 **App:** Granny's Knees (Android phone)
-**Publisher/data controller:** [PERSONAL DEVELOPER LEGAL NAME OR APPROVED PUBLIC IDENTITY]
-**Privacy contact:** [SUPPORT EMAIL]
-**Policy URL:** [PUBLIC HTTPS URL]
-
-> **Release hold:** Replace all brackets, verify actual release build and third-party data flows, obtain publisher approval, then publish as an accessible public HTML page. This Markdown draft is not itself a live Play Store privacy policy.
+**Publisher/data controller:** AEO3 / Cognition
+**Privacy contact:** cognition@aeo3.ca
+**Policy URL:** https://github.com/cognition/grannys-knees/
 >
-> **Reviewed against:** current `main` (1.0 phone scope; widget and Wear deferred).
+> **Reviewed against:** release version 0.3.82.2 (1.0 phone scope; widget and Wear deferred).
 
 ## Privacy promise and important distinction
 
@@ -17,7 +14,7 @@ Granny's Knees is designed so that the **developer does not receive or collect**
 
 **This is not a claim that no information ever leaves the device:** weather and geocoding requests send city search terms or selected coordinates and timezone to Open-Meteo, which can also observe connection metadata such as an IP address. The developer does not receive those requests.
 
-Symptom notes, journal history, and most preferences remain on your phone. They are not uploaded to the developer. You may export journal content yourself through the Android share sheet. Verify final implementation, third-party SDKs and Android backup behaviour before publication.
+Symptom notes, journal history, and most preferences remain on your phone. They are not uploaded to the developer. You may export journal content yourself through the Android share sheet.
 
 ## 1. What Granny's Knees does
 
@@ -54,17 +51,17 @@ Requests include search text or forecast coordinates, timezone and weather-varia
 
 Open-Meteo privacy information: https://open-meteo.com/en/terms
 
-**[VERIFY BEFORE RELEASE]** Confirm whether any analytics, crash reporting, advertising or other third-party SDK/service has been added beyond the current Gradle inventory. If so, describe it here and in Google Play's Data safety declaration.
+The release contains no analytics, crash-reporting, advertising or other developer-operated third-party SDK/service beyond the weather services described above.
 
 ## 5. Sharing and selling
 
-The app does not include advertising or a developer-operated account system. It sends the weather and geocoding request information described above to Open-Meteo to deliver forecasts. Journal data is not sold or shared by the developer because the developer does not receive it. **[VERIFY]** Whether any additional transfer, collection, sharing or sale occurs must be determined from the final release build before this statement is finalized.
+The app does not include advertising or a developer-operated account system. It sends the weather and geocoding request information described above to Open-Meteo to deliver forecasts. Journal data is not sold or shared by the developer because the developer does not receive it.
 
 ## 6. Storage, retention and deletion
 
 The app maintains local forecast cache, city selection, journal data and related files in app-private storage. Cache entries expire according to in-app logic; you can clear journal data through in-app controls. The release candidate sets `android:allowBackup="false"`, so Google Auto Backup does not copy this app's private data. Device-to-device setup flows may still be governed by the operating system; describe only what the app opts into.
 
-You can generally remove locally stored app data through Android's app storage controls or by uninstalling the app. **[VERIFY]** Any additional deletion process needed for the final build.
+You can generally remove locally stored app data through Android's app storage controls or by uninstalling the app.
 
 ## 7. Permissions
 
@@ -75,15 +72,15 @@ The reviewed Android manifest includes:
 
 ## 8. Security
 
-The reviewed forecast client uses HTTPS for requests to Open-Meteo. Local data is stored in the application's private files directory and local database. No app can guarantee absolute security. **[VERIFY]** The final build's network configuration, backup settings, dependencies and any telemetry before release.
+The forecast client uses HTTPS for requests to Open-Meteo. Local data is stored in the application's private files directory and local database. No app can guarantee absolute security.
 
 ## 9. Children
 
-Granny's Knees is intended for a general adult audience interested in weather-related joint discomfort. **[DECISION REQUIRED]** Select the accurate Play Console target age groups and confirm whether any child-directed requirements apply. Do not publish this section as a claim that children cannot access the app without reviewing the intended audience and implementation.
+Granny's Knees is intended for a general adult audience interested in weather-related joint discomfort. The publisher will complete the applicable Google Play target-audience and child-directed-content declarations accurately in Play Console.
 
 ## 10. Your choices and questions
 
-You can choose which city the app uses, whether to grant location permission, whether to use the journal, and you can remove the app and its locally stored information through Android's app controls. For privacy questions, contact **[SUPPORT EMAIL]**.
+You can choose which city the app uses, whether to grant location permission, whether to use the journal, and you can remove the app and its locally stored information through Android's app controls. For privacy questions, contact **cognition@aeo3.ca**.
 
 The app includes an in-app **Your privacy** summary for convenience; the authoritative policy is the published HTTPS page linked from the store listing.
 
@@ -93,5 +90,5 @@ We may update this policy when the app changes, including if future versions int
 
 ---
 
-**Publication approval:** [OWNER NAME / DATE / RELEASE VERSION]
-**Data-flow verification:** [REVIEWER / COMMIT SHA — baseline `33fe033`]
+**Publication approval:** AEO3 / Cognition — 2026-11-10 — release 0.3.82.2
+**Data-flow verification:** Codex review — commit `88c7da2`
