@@ -90,15 +90,15 @@ val allowDebugReleaseSigning =
     System.getenv("ALLOW_DEBUG_RELEASE_SIGNING").equals("true", ignoreCase = true)
 
 android {
-    namespace = "ca.aeo3.grannysknees"
+    namespace = "com.aetherealmind.grannysknees"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "ca.aeo3.grannysknees"
+        applicationId = "com.aetherealmind.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 151
-        versionName = "0.3.83.0"
+        versionCode = 152
+        versionName = "0.3.84.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

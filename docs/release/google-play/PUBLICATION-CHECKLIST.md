@@ -13,7 +13,7 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 - [ ] Owner creates/opens personal Google Play Console account; pays applicable registration fee and completes identity/device verification required by Console.
 - [ ] Owner verifies developer display name, public contact requirements and approved support email/website. Do not expose personal information without approval.
 - [ ] Owner verifies whether personal-account production access requires closed testing; plan for **at least 12 continuously opted-in testers for 14 days** if applicable. Recruit early.
-- [ ] Owner selects permanent Android `applicationId` and confirms control of any reverse-domain namespace; document it before first Play upload.
+- [x] Permanent Android `applicationId` is `com.aetherealmind.grannysknees`; confirm Play Console registration matches before first upload.
 - [ ] Confirm 1.0 is free/ad-free, Canada only, and matches the phone release candidate: weather index (Today + hourly/five-day outlook), Canadian city search with persisted selection, optional coarse/fine location for “use this phone’s location,” on-device symptom journal (Room), and the in-app **Your privacy** screen. **Widget and Wear OS are deferred** to later iterations. No developer-operated accounts, ads or cloud symptom collection.
 - [ ] Decide English (Canada) listing and French localization as a subsequent, tracked deliverable.
 - [ ] Confirm public support and privacy policy URLs and hosting owner.
@@ -58,7 +58,7 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 
 > **Branch hygiene:** Do not merge local `main` that contains untracked screenshot helpers (`PrimaryScreenshotMatrix.kt`, debug-only `ScreenshotTodayActivity`) into Play release candidates. Build and upload from this branch (`feature/play-store-readiness`) or `origin/main` only after those debug artefacts are absent.
 
-- [ ] Set final `applicationId`, display name and `versionCode`/`versionName`; avoid changing ID after first Play registration.
+- [ ] Confirm `applicationId` `com.aetherealmind.grannysknees`, display name and `versionCode`/`versionName` on the upload AAB; do not change ID after first Play registration.
 - [ ] Confirm current Play target API policy and Android build toolchain; compile/target API 37 is configured but needs release verification.
 - [ ] Configure release build, appropriate shrinking/obfuscation choices, ProGuard/R8 rules, resource handling and reproducible CI checks.
 - [ ] Enable Play App Signing and create protected upload keystore/key with backup and recovery procedure; keep all secrets outside repository.
