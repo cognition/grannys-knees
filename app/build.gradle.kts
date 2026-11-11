@@ -1,5 +1,4 @@
 import org.gradle.api.GradleException
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -10,6 +9,10 @@ plugins {
 /**
  * Release upload-key credentials from [keystore.properties] at the repo root and/or
  * environment variables. Property names match the standard Android keystore file.
+ *
+ * The properties file is parsed as plain `key=value` lines (not
+ * `java.util.Properties`) so passwords may contain `\`, `:`, and `#` without
+ * Java escape mangling.
  */
 data class ReleaseSigningCredentials(
     val storeFile: java.io.File,
@@ -30,14 +33,11 @@ private object ReleaseSigningCredentialsLoader {
     private const val ENV_KEY_PASSWORD = "RELEASE_KEY_PASSWORD"
 
     fun load(rootDir: java.io.File): ReleaseSigningCredentials? {
-        val fromFile =
-            rootDir.resolve("keystore.properties").takeIf { it.isFile }?.inputStream()?.use { stream ->
-                Properties().apply { load(stream) }
-            }
+        val fromFile = loadPlainProperties(rootDir.resolve("keystore.properties"))
 
         fun resolve(name: String, envName: String): String? =
             System.getenv(envName)?.trim()?.takeIf { it.isNotEmpty() }
-                ?: fromFile?.getProperty(name)?.trim()?.takeIf { it.isNotEmpty() }
+                ?: fromFile[name]?.trim()?.takeIf { it.isNotEmpty() }
 
         val storeFilePath = resolve(STORE_FILE, ENV_STORE_FILE) ?: return null
         val storePassword = resolve(STORE_PASSWORD, ENV_STORE_PASSWORD) ?: return null
@@ -56,6 +56,32 @@ private object ReleaseSigningCredentialsLoader {
             keyPassword = keyPassword,
         )
     }
+
+    /**
+     * Reads `key=value` lines without Java Properties backslash escaping.
+     */
+    private fun loadPlainProperties(file: java.io.File): Map<String, String> {
+        if (!file.isFile) {
+            return emptyMap()
+        }
+        val values = linkedMapOf<String, String>()
+        file.readLines(Charsets.UTF_8).forEach { raw ->
+            val line = raw.trim()
+            if (line.isEmpty() || line.startsWith("#") || line.startsWith("!")) {
+                return@forEach
+            }
+            val separator = line.indexOf('=')
+            if (separator <= 0) {
+                return@forEach
+            }
+            val key = line.substring(0, separator).trim()
+            val value = line.substring(separator + 1).trim()
+            if (key.isNotEmpty()) {
+                values[key] = value
+            }
+        }
+        return values
+    }
 }
 
 val releaseSigningCredentials = ReleaseSigningCredentialsLoader.load(rootProject.projectDir)
@@ -71,8 +97,8 @@ android {
         applicationId = "ca.aeo3.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 148
-        versionName = "0.3.82.0"
+        versionCode = 149
+        versionName = "0.3.82.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
