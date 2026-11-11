@@ -1,10 +1,10 @@
 # Privacy data-flow and permission audit — Android
 
-**Status:** Preliminary inventory, updated 2026-11-10 for the city, journal, watch code and backup policy. Not a public privacy policy and not a Play Data safety submission.
+**Status:** Preliminary inventory, updated 2026-11-10 for city, journal and backup policy. **Widget and Wear are deferred** to later iterations (not 1.0 gates). Not a public privacy policy and not a Play Data safety submission.
 
-**Latest reviewed commit:** `33fe033`.
+**Latest reviewed commit:** current `main`.
 
-**Evidence:** `app/src/main/AndroidManifest.xml`, `app/build.gradle.kts`, `MainActivity.kt`, `weather/OpenMeteoClient.kt`, `weather/OpenMeteoGeocodingClient.kt`, `data/SelectedCityStore.kt`, `journal/`, `watch/WatchSync.kt`.
+**Evidence:** `app/src/main/AndroidManifest.xml`, `app/build.gradle.kts`, `MainActivity.kt`, `weather/OpenMeteoClient.kt`, `weather/OpenMeteoGeocodingClient.kt`, `data/SelectedCityStore.kt`, `journal/`.
 
 | Data / flow | Current observed implementation | Open verification |
 |---|---|---|
@@ -16,10 +16,10 @@
 | Local weather cache | `filesDir/forecast-cache.json`. A cache for another city is not shown as the current score | Verify retention and removal |
 | Optional GPS | `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` only after "Use this phone's location". Declining them leaves city search working. No background location permission | Confirm the merged release manifest has no background location permission |
 | Symptom journal | Room `journal.db` on the device. Export uses the Android share sheet. Delete everything clears the local tables. No account and no cloud copy | Auto Backup disabled; journal is not included in Google cloud backup |
-| Watch | The phone writes the current index for the tile and accepts one partial report. A repeated event id is ignored. Traffic stays on the Wear data layer | A paired watch was not available in this pass |
+| Watch | **Deferred** — sources may exist in-tree; not a 1.0 product or Data Safety gate | Later Wear iteration |
 | Advertising/analytics | No ad or analytics SDK is declared in the app Gradle file | Scan the release dependency tree and the signed AAB |
 | Crash reporting | No dedicated SDK is declared | Confirm Play and OS diagnostics before a Data safety answer |
-| App widget | Glance reads the same cache as Today and does not call the network itself | Wide short cell was not captured on the emulator |
+| App widget | **Deferred** — Glance sources may exist in-tree; not a 1.0 product or listing gate | Later widget iteration |
 
 ## What stays on the device
 
@@ -27,11 +27,10 @@
 - `forecast-cache.json`
 - `journal.db`
 - `onboarding-seen`
-- `watch-index.txt`
 
 ## Product privacy principle (owner clarification)
 
-**The requirement is no collection by the Granny's Knees developer**, not zero outbound traffic. The phone is allowed to contact an external weather provider directly to retrieve a forecast. The weather provider receives requested coordinates/timezone and technical network metadata; that traffic is not sent to the developer. No developer-operated accounts, backend collection, advertising or analytics are planned. All future symptom records must stay on the phone or paired watch. Validate this against the signed build before making public guarantees.
+**The requirement is no collection by the Granny's Knees developer**, not zero outbound traffic. The phone is allowed to contact an external weather provider directly to retrieve a forecast. The weather provider receives requested coordinates/timezone and technical network metadata; that traffic is not sent to the developer. No developer-operated accounts, backend collection, advertising or analytics are planned. Symptom records must stay on the phone for 1.0. Validate this against the signed build before making public guarantees.
 
 A new in-app **Your privacy** page is linked from Today, with plain-language descriptions including Android backup behaviour. The page is informational, not a substitute for a publicly hosted full policy.
 

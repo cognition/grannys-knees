@@ -97,8 +97,8 @@ android {
         applicationId = "ca.aeo3.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 149
-        versionName = "0.3.82.1"
+        versionCode = 150
+        versionName = "0.3.82.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
