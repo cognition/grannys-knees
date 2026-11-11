@@ -52,7 +52,7 @@ Open the repository in Android Studio, select the `app` run configuration, and d
 
 ## Deferred application ID
 
-Both the namespace and application ID are temporarily `ca.aeo3.grannysknees`. The final reverse-domain identifier and Play Store publisher identity remain an explicit product/release decision. Change them before any store build; published application IDs cannot be changed in place.
+Both the namespace and application ID are `com.aetherealmind.grannysknees`. Published application IDs cannot be changed in place after the first Play upload.
 
 ## Branding boundary
 

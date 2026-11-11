@@ -37,13 +37,13 @@
 
 ## Current code baseline
 
-`applicationId` `ca.aeo3.grannysknees`, `targetSdk=37`. Weather uses Open-Meteo forecast and geocoding; city selection, optional GPS, journal and privacy UI are in source. Widget and Wear have been **stripped** from the phone AAB and Gradle modules for 1.0. Owner must still run phone device regression and policy sign-off before submission.
+`applicationId` `com.aetherealmind.grannysknees`, `targetSdk=37`. Weather uses Open-Meteo forecast and geocoding; city selection, optional GPS, journal and privacy UI are in source. Widget and Wear have been **stripped** from the phone AAB and Gradle modules for 1.0. Owner must still run phone device regression and policy sign-off before submission.
 
 ## Gates
 
 ### G0 — Release scope and publisher readiness
 - Confirm personal account eligibility and identity verification, developer display name and support contact, account ownership and public contact disclosure.
-- Confirm reverse-domain application ID `ca.aeo3.grannysknees` (and any Play Console registration) before upload.
+- Confirm reverse-domain application ID `com.aetherealmind.grannysknees` (and any Play Console registration) before upload.
 - Confirm Canadian English first release; French localization is a tracked follow-up.
 - Decide public privacy policy hosting and support URL; owner must approve any publicly disclosed personal contact information.
 - Acknowledge 1.0 is **phone-first**: weather index + local journal; **no** widget or Wear marketing/testing obligations for this release.
