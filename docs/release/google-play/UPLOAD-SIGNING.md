@@ -92,6 +92,19 @@ You must **not** see `CN=Android Debug` in the signer certificate. The distingui
 
 Alternatively, unzip the AAB and inspect the signing block with `apksigner` / Play-internal tools; the debug CN check above is usually sufficient for a quick local check.
 
+## Crash symbols in the release AAB
+
+Release builds enable R8 (`isMinifyEnabled`) and set `ndk.debugSymbolLevel = SYMBOL_TABLE`. With Android App Bundles, Play extracts the ProGuard/R8 mapping and native debug symbols from the uploaded AAB automatically — no separate mapping upload is required for AAB uploads.
+
+Requires a local Android NDK install so Gradle can strip/extract symbols from packaged `.so` files (for example `sdkmanager "ndk;28.2.13676358"`).
+
+After `bundleRelease`, confirm artefacts exist:
+
+- `app/build/outputs/mapping/release/mapping.txt` (also embedded as `BUNDLE-METADATA/.../proguard.map` in the AAB)
+- native symbols under `app/build/outputs/native-debug-symbols/release/` when extractable
+
+Play may still warn about missing native debug symbols when the only `.so` files come from dependencies that ship already stripped (currently `libandroidx.graphics.path.so` from AndroidX). That warning is expected and safe to acknowledge for this app; there is no unstripped symbol file to upload for those libraries.
+
 ## Owner follow-ups
 
 - Confirm Play Console registration uses `applicationId` `com.aetherealmind.grannysknees` before the first upload.

@@ -92,13 +92,15 @@ val allowDebugReleaseSigning =
 android {
     namespace = "com.aetherealmind.grannysknees"
     compileSdk = 37
+    // Used for release native strip / symbol-table extraction when an NDK is installed.
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "com.aetherealmind.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 152
-        versionName = "0.3.84.0"
+        versionCode = 153
+        versionName = "0.3.84.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -123,11 +125,17 @@ android {
                     allowDebugReleaseSigning -> signingConfigs.getByName("debug")
                     else -> null
                 }
-            isMinifyEnabled = false
+            // R8 mapping ships inside the AAB for Play crash deobfuscation.
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            // Embed native debug symbols so Play can symbolicate ANRs/crashes.
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
 
