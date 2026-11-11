@@ -15,13 +15,11 @@ import ca.aeo3.grannysknees.data.SensitivityProfileStore
 import ca.aeo3.grannysknees.ui.GrannysKneesApp
 import ca.aeo3.grannysknees.ui.about.OnboardingStore
 import ca.aeo3.grannysknees.ui.theme.ThemePreferenceStore
-import ca.aeo3.grannysknees.watch.WatchIndexPublisher
 import java.io.File
 
 class MainActivity : ComponentActivity() {
     private lateinit var localBarometerSensor: LocalBarometerSensor
     private lateinit var repository: ForecastRepository
-    private lateinit var watchPublisher: WatchIndexPublisher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +42,6 @@ class MainActivity : ComponentActivity() {
             localPressureStore = localPressureStore,
             feelCalibrationStore = feelCalibrationStore,
         )
-        watchPublisher = WatchIndexPublisher(this)
         setContent {
             GrannysKneesApp(
                 repository = repository,
@@ -55,10 +52,8 @@ class MainActivity : ComponentActivity() {
                 themePreferenceStore = ThemePreferenceStore(
                     File(filesDir, "theme-preference.txt"),
                 ),
-                onPresentationChanged = { publishWatchIndex() },
             )
         }
-        publishWatchIndex()
     }
 
     override fun onStart() {
@@ -66,21 +61,8 @@ class MainActivity : ComponentActivity() {
         localBarometerSensor.start()
     }
 
-    override fun onResume() {
-        super.onResume()
-        publishWatchIndex()
-    }
-
     override fun onStop() {
         localBarometerSensor.stop()
         super.onStop()
-    }
-
-    /** Writes the latest Today presentation for the watch tile and payload file. */
-    private fun publishWatchIndex() {
-        if (!::repository.isInitialized || !::watchPublisher.isInitialized) {
-            return
-        }
-        watchPublisher.publish(repository.presentFromCache())
     }
 }

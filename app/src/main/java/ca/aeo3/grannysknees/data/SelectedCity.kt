@@ -3,8 +3,7 @@ package ca.aeo3.grannysknees.data
 /**
  * A city the user chose for the forecast.
  *
- * [label] is the short name shown on Today and the widget, for example
- * "London, Ontario".
+ * [label] is the short name shown on Today, for example "London, Ontario".
  *
  * [placeSource] records whether the place came from GPS or city search so
  * pull-to-refresh can re-resolve location only when appropriate.

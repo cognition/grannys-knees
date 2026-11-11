@@ -16,10 +16,10 @@
 | Local weather cache | `filesDir/forecast-cache.json`. A cache for another city is not shown as the current score | Verify retention and removal |
 | Optional GPS | `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` only after "Use this phone's location". Declining them leaves city search working. No background location permission | Confirm the merged release manifest has no background location permission |
 | Symptom journal | Room `journal.db` on the device. Export uses the Android share sheet. Delete everything clears the local tables. No account and no cloud copy | Auto Backup disabled; journal is not included in Google cloud backup |
-| Watch | **Deferred** — sources may exist in-tree; not a 1.0 product or Data Safety gate | Later Wear iteration |
+| Watch | **Stripped for 1.0** — restore in a later Wear iteration | Later Wear iteration |
 | Advertising/analytics | No ad or analytics SDK is declared in the app Gradle file | Scan the release dependency tree and the signed AAB |
 | Crash reporting | No dedicated SDK is declared | Confirm Play and OS diagnostics before a Data safety answer |
-| App widget | **Deferred** — Glance sources may exist in-tree; not a 1.0 product or listing gate | Later widget iteration |
+| App widget | **Stripped for 1.0** — restore in a later widget iteration | Later widget iteration |
 
 ## What stays on the device
 

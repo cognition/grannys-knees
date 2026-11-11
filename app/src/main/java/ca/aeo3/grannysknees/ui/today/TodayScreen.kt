@@ -72,8 +72,6 @@ import ca.aeo3.grannysknees.ui.outlook.SampleOutlookStates
 import ca.aeo3.grannysknees.ui.theme.BrandHeading
 import ca.aeo3.grannysknees.ui.theme.GrannysKneesTheme
 import ca.aeo3.grannysknees.ui.theme.personalIndexColour
-import ca.aeo3.grannysknees.widget.GrannysKneesWidget
-import androidx.glance.appwidget.updateAll
 import java.math.RoundingMode
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
@@ -141,7 +139,6 @@ internal fun TodayRoute(
     suspend fun presentFromDisk() {
         state = withContext(Dispatchers.IO) { repository.presentFromCache() }
         outlook = withContext(Dispatchers.IO) { repository.presentOutlookFromCache() }
-        withContext(Dispatchers.IO) { GrannysKneesWidget().updateAll(context) }
     }
 
     suspend fun loadForecast(forceNetwork: Boolean) {
@@ -160,7 +157,6 @@ internal fun TodayRoute(
             repository.loadToday(forceNetwork = forceNetwork)
         }
         outlook = withContext(Dispatchers.IO) { repository.presentOutlookFromCache() }
-        withContext(Dispatchers.IO) { GrannysKneesWidget().updateAll(context) }
     }
 
     LaunchedEffect(repository, sessionLoadKey) {

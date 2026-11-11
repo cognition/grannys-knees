@@ -27,8 +27,8 @@
 
 ## Explicitly out of scope for 1.0 (later iterations)
 
-- **Home-screen Glance widget** — code may remain in the tree; it is **not** a 1.0 store, QA or Data Safety gate. Ship and market after a dedicated widget iteration.
-- **Wear OS companion** (`:wear` module, `WatchLogService`, watch tile/log sync) — **not** a 1.0 gate. Ship after a dedicated Wear iteration.
+- **Home-screen Glance widget** — removed from the shipping phone AAB; restore in a dedicated widget iteration.
+- **Wear OS companion** — `:wear` module and phone watch sync removed from the shipping tree; restore in a dedicated Wear iteration.
 - Developer-operated accounts, sign-in, or cloud synchronization of journal or profile data.
 - Sending symptom or journal data to the developer or to third-party analytics, crash, or advertising SDKs (none are planned in the current Gradle inventory; verify the release AAB).
 - Individualized medical diagnosis, treatment recommendations, or flare **prediction** claims.
@@ -37,7 +37,7 @@
 
 ## Current code baseline
 
-`applicationId` `ca.aeo3.grannysknees`, `targetSdk=37`. Weather uses Open-Meteo forecast and geocoding; city selection, optional GPS, journal and privacy UI are in source. Widget and Wear sources may still compile in the project but are **deferred product work**, not release blockers. Owner must still run phone device regression and policy sign-off before submission.
+`applicationId` `ca.aeo3.grannysknees`, `targetSdk=37`. Weather uses Open-Meteo forecast and geocoding; city selection, optional GPS, journal and privacy UI are in source. Widget and Wear have been **stripped** from the phone AAB and Gradle modules for 1.0. Owner must still run phone device regression and policy sign-off before submission.
 
 ## Gates
 
