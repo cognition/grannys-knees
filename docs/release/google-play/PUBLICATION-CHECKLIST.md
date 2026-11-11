@@ -1,8 +1,8 @@
 # Google Play 1.0 — publication readiness checklist
 
-**Updated:** 2026-11-10. **Decisions:** personal developer account; Canada-only initial release; free, no ads; weather-index phone app, Glance widget, Canadian city search, optional GPS, on-device symptom journal, Wear OS companion sync, and in-app privacy summary. **Status:** checklist, not proof of completion.
+**Updated:** 2026-11-10. **Decisions:** personal developer account; Canada-only initial release; free, no ads; weather-index **phone** app, Canadian city search, optional GPS, on-device symptom journal, and in-app privacy summary. **Home-screen widget and Wear OS are later iterations** (not 1.0 gates). **Status:** checklist, not proof of completion.
 
-**Latest reviewed commit:** `feature/play-store-readiness`. Reconcile store copy and policy text against this branch before upload. Review `docs/traycer/DEVICE-ACCEPTANCE.md` before asserting current functionality.
+**Latest reviewed commit:** current `main`. Reconcile store copy and policy text against the phone release candidate before upload. Review `docs/traycer/DEVICE-ACCEPTANCE.md` for phone smoke evidence only.
 
 ## Rules for checking boxes
 
@@ -14,7 +14,7 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 - [ ] Owner verifies developer display name, public contact requirements and approved support email/website. Do not expose personal information without approval.
 - [ ] Owner verifies whether personal-account production access requires closed testing; plan for **at least 12 continuously opted-in testers for 14 days** if applicable. Recruit early.
 - [ ] Owner selects permanent Android `applicationId` and confirms control of any reverse-domain namespace; document it before first Play upload.
-- [ ] Confirm 1.0 is free/ad-free, Canada only, and matches the release candidate on `feature/play-store-readiness`: weather index (Today + hourly/five-day outlook), Glance widget, Canadian city search with persisted selection, optional coarse/fine location for “use this phone’s location,” on-device symptom journal (Room), Wear OS tile/sync via the `:wear` module and `WatchLogService`, and the in-app **Your privacy** screen. No developer-operated accounts, ads or cloud symptom collection.
+- [ ] Confirm 1.0 is free/ad-free, Canada only, and matches the phone release candidate: weather index (Today + hourly/five-day outlook), Canadian city search with persisted selection, optional coarse/fine location for “use this phone’s location,” on-device symptom journal (Room), and the in-app **Your privacy** screen. **Widget and Wear OS are deferred** to later iterations. No developer-operated accounts, ads or cloud symptom collection.
 - [ ] Decide English (Canada) listing and French localization as a subsequent, tracked deliverable.
 - [ ] Confirm public support and privacy policy URLs and hosting owner.
 
@@ -22,20 +22,19 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 
 ## Gate 1: User-ready application
 
-- [ ] Audit latest main against GP00 and prior N01–N04 evidence; reconcile newly merged expanded widget (#12).
+- [ ] Audit latest main against GP00 and prior phone evidence; **do not** treat widget (#12) or Wear as 1.0 blockers.
 - [ ] Verify Canadian city search (`OpenMeteoGeocodingClient`, `countryCode=CA`), clear province/country disambiguation, selection persistence (`selected-city.json`) and timezone-aware forecast.
 - [ ] User can choose/change city without mandatory GPS or account sign-in; optional location permission only after an explicit in-app choice.
 - [ ] Symptom journal flows (create, list, export via share sheet, delete all) persist in local Room storage only; no developer backend.
-- [ ] With a paired Wear device, phone receives watch log messages and exposes current index to the watch tile; verify on hardware where possible.
 - [ ] App restart, force stop and offline restart retain selected city and show honest freshness.
 - [ ] First-run onboarding explains experimental 0–10 index, forecast-vs-symptom distinction, correlation vs causation, no medical prediction.
 - [ ] About the Index describes variables, methodology, uncertainty, version and sources.
 - [ ] Today displays city, current index, fetched time, current local-day hourly curve, next five local days' index lows/highs.
 - [ ] Network errors, invalid geocoding, missing hours, stale/expired cache, timezone and DST do not fabricate values or crash.
-- [ ] Current/expanded Glance widget layouts are inspected on device; correct score, location, time, resize, refresh, reboot and tap-through.
-- [ ] Phone and widget use one index computation, one location and compatible freshness rules.
 - [ ] Accessibility: TalkBack, font scaling, touch targets, colour contrast, no colour-only status, light/dark mode.
 - [ ] Review Android 16+ edge-to-edge, notification and background-execution behaviour where applicable; request no unneeded permissions.
+- [ ] (Later iteration) Glance widget device QA — resize, refresh, reboot, tap-through.
+- [ ] (Later iteration) Wear OS paired-device QA — tile sync and watch log ingest.
 
 **Gate 1 evidence:** green unit tests, emulator screenshots/logcat, real Galaxy S24 FE smoke report; record emulator-only limits.
 
@@ -64,7 +63,7 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 - [ ] Configure release build, appropriate shrinking/obfuscation choices, ProGuard/R8 rules, resource handling and reproducible CI checks.
 - [ ] Enable Play App Signing and create protected upload keystore/key with backup and recovery procedure; keep all secrets outside repository.
 - [ ] Build signed `.aab` with `./gradlew clean test bundleRelease`; archive checksum and build provenance securely.
-- [ ] Test release-like install, upgrade, cold start, offline state and widget (debug APK alone is insufficient).
+- [ ] Test release-like install, upgrade, cold start and offline state on phone (debug APK alone is insufficient).
 - [ ] Commit exact owner-approved logo PNGs, adaptive launcher icon, monochrome icon where applicable and splash/theme resources; do not substitute rejected SVG recreations.
 - [ ] Prepare high-res icon, feature graphic and genuine phone screenshots at current Play requirements; no invented features.
 - [ ] Prepare Canadian English short/full description, release notes, support email and accurate content/category tags.
@@ -76,7 +75,7 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 
 - [ ] Create app in personal Play Console account and configure free pricing and Canada country availability.
 - [ ] Complete Store listing, App content, policy forms and privacy URL.
-- [ ] Upload signed AAB to **internal testing** and install from Play on a real phone; test upgrade and widget.
+- [ ] Upload signed AAB to **internal testing** and install from Play on a real phone; test upgrade and core phone flows.
 - [ ] Run full regression on physical Galaxy S24 FE and emulator; review crashes, ANRs and compatibility.
 - [ ] Fix all release-blocking P0/P1 issues and record final regression evidence.
 - [ ] If Console requires it, create closed testing track, recruit 12+ testers, confirm continuous 14-day opt-in and collect genuine feedback.
@@ -88,10 +87,10 @@ Use `[x]` only when the linked issue/PR, test output, screenshot, owner approval
 ## Gate 5: Publish and operate
 
 - [ ] Submit release to production, Canada only; use staged rollout where supported.
-- [ ] Confirm Google approval and public Canadian listing; test clean install and widget from Play.
+- [ ] Confirm Google approval and public Canadian listing; test clean install from Play.
 - [ ] Monitor Play vitals, crashes, ANRs, ratings, user support and policy messages.
 - [ ] Document release tag, bundle hash, version, rollout decision, known issues and hotfix procedure.
-- [ ] Plan post-1.0 work separately: cloud sync, accounts, expanded analytics, AI personalization or other net-new collection only after their own gates and policy updates.
+- [ ] Plan later iterations separately: **home-screen widget**, **Wear OS companion**, then cloud sync/accounts/analytics only after their own gates and policy updates.
 
 **Definition of published:** publicly available Play listing and install in Canada, correct production version, verified privacy/support links, no known P0/P1 blockers.
 

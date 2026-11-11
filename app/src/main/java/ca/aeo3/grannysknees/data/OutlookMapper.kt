@@ -36,7 +36,7 @@ import java.util.Locale
  * - Five-day columns are the five local days **after** today (contract §2.1:
  *   "5-day outlook plus the current local day"), with start/end-of-day scores
  *   from the first and last available hours, while [DailyIndex] extrema stay
- *   available for the widget (§8.2–§8.4).
+ *   available for compact displays (§8.2–§8.4).
  */
 internal object OutlookMapper {
     const val UPCOMING_DAY_COUNT = 5

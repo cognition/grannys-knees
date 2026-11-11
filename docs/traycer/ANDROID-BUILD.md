@@ -1,6 +1,6 @@
 # Android build
 
-The native Android project is a Jetpack Compose and Material 3 app with weather forecast fetch, experimental index scoring, on-device journal, Glance widget and a Wear OS companion module.
+The native Android project is a Jetpack Compose and Material 3 phone app with weather forecast fetch, experimental index scoring and an on-device journal. The home-screen widget and Wear OS companion are deferred and stripped from the 1.0 tree.
 
 ## Pinned toolchain
 

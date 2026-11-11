@@ -30,12 +30,6 @@ A report can name a body part, an optional side, ache or stiffness, and a rating
 
 Nothing in the journal is uploaded. There is no account.
 
-## On the home screen and the watch
-
-The home-screen widget shows the same index as the phone: the current score, the shape of today when the widget is wide and short, and the five-day range when it is tall. It reads the saved forecast. It does not calculate a second score.
-
-A paired watch can show the current index and the time it last heard from the phone. A quick note from the watch is saved once on the phone, even if the watch sends it again.
-
 ## What this is not
 
 Granny's Knees is not a diagnosis, a treatment plan, or a prediction of how you will feel. It does not coach exercise, set goals, or track fitness. The index and your own ratings stay separate. They are never added together.

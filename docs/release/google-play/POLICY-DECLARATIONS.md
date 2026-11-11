@@ -9,16 +9,17 @@
 | App pricing | Free | Approved plan |
 | Ads | No ads planned; verify no ad SDK and complete ads declaration accurately | Needs release audit |
 | App access | No login planned; confirm no restricted content or access steps | Needs verification |
-| Data safety | **Do not preselect “no data collected”.** The phone sends city search queries, forecast coordinates/timezone, and connection metadata to **Open-Meteo** (forecast + geocoding). Symptom journal entries, saved city, cache, and watch sync payloads stay on the device / Wear data layer (`allowBackup=false`; journal export only via user-initiated share sheet). Declare location-related data only if Console questionnaires require describing optional GPS use (approximate location for city fix). | Blocked pending owner audit on signed AAB |
+| Data safety | **Do not preselect “no data collected”.** The phone sends city search queries, forecast coordinates/timezone, and connection metadata to **Open-Meteo** (forecast + geocoding). Symptom journal entries, saved city and cache stay on the device (`allowBackup=false`; journal export only via user-initiated share sheet). **1.0 does not market or gate Wear/widget.** Declare location-related data only if Console questionnaires require describing optional GPS use. | Blocked pending owner audit on signed AAB |
 | Health apps declaration | App concerns weather and joint discomfort and allows optional user symptom notes (local journal); answer health-related questions accurately; do not assume playful language exempts it | Owner/policy review |
 | Medical claims | Experimental, non-clinical index; no diagnosis, treatment or individual flare prediction | Copy review |
 | Target audience | Adult-oriented positioning proposed; select accurate age ranges in Console | Owner decision |
 | Content rating | Complete questionnaire based on actual content (including health-adjacent journaling) | Owner action |
-| Privacy policy | Public HTTPS HTML URL, accessible in app and store; must describe journal, watch sync, Open-Meteo, optional location, and backup | Pending publication |
+| Privacy policy | Public HTTPS HTML URL, accessible in app and store; must describe journal, Open-Meteo, optional location, and backup. Watch/widget deferred to later policy revisions when those products ship. | Pending publication |
 | App category/tags | Select accurate non-misleading category and tags | Owner decision |
-| Permissions | **INTERNET** (forecast and geocoding). **ACCESS_COARSE_LOCATION** and **ACCESS_FINE_LOCATION** declared for optional “use this phone's location”; no background location in manifest. Wearable messaging uses Google Play services Wearable APIs (no extra location permission for watch path). | Release audit on merged manifest |
+| Permissions | **INTERNET** (forecast and geocoding). **ACCESS_COARSE_LOCATION** and **ACCESS_FINE_LOCATION** declared for optional “use this phone's location”; no background location in manifest. | Release audit on merged phone manifest |
 | Location | Default path: manual Canadian city search without GPS. Optional: user-initiated request for device location to set city. Document in Data safety and permission rationale strings. | Needs implementation verification on release build |
-| Wear OS | Companion `:wear` module distributed with phone app; data exchanged via Wearable Data Layer between paired devices only | Verify Play/Wear pairing requirements |
+| Wear OS | **Deferred** to a later iteration; not a 1.0 Console or listing requirement | Post-1.0 |
+| Home-screen widget | **Deferred** to a later iteration; not a 1.0 Console or listing requirement | Post-1.0 |
 | Testing | Personal account may require 12 opted-in testers continuously for 14 days before production access | Confirm Console eligibility |
 
 ## Data safety — working notes (not submission text)
