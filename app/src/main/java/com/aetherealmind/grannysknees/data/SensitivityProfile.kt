@@ -7,7 +7,7 @@ import com.aetherealmind.grannysknees.index.DeltaSensitivities
  *
  * This is influence (does pressure / humidity / temperature affect you?), not
  * a high-vs-low or hot-vs-cold preference. Each factor is clamped to
- * [MIN]–[MAX]. [DEFAULT] (all 1) matches the shared `index-v2` Weather line.
+ * [MIN]–[MAX]. [DEFAULT] (all 1) matches the shared slope-index Weather line.
  */
 internal data class SensitivityProfile(
     val pressure: Float = DEFAULT_SENSITIVITY,
@@ -21,7 +21,7 @@ internal data class SensitivityProfile(
         cold = cold.coerceIn(MIN, MAX),
     )
 
-    /** Delta multipliers for the personal `index-v2` series. */
+    /** Influence multipliers for the personal slope-index series. */
     fun toDeltaSensitivities(): DeltaSensitivities {
         val safe = clamped()
         return DeltaSensitivities.fromMultipliers(

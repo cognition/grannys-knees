@@ -20,17 +20,25 @@ import java.time.Instant
 /**
  * App-private JSON list of Feel calibration time-points.
  *
- * A missing or unreadable file means no samples yet.
+ * A missing or unreadable file means no samples yet. Samples without
+ * [FeelCalibration.DRIVER_SCHEMA] (legacy 12 h deltas) are dropped on read.
  */
 internal class FeelCalibrationStore(
     private val file: File,
     private val json: Json = Json { ignoreUnknownKeys = true },
 ) {
-    /** Every stored sample, oldest first. */
+    /** Every stored slope-schema sample, oldest first. */
     fun read(): List<FeelCalibrationSample> {
         if (!file.exists()) return emptyList()
         return try {
-            parse(file.readText(Charsets.UTF_8))
+            val parsed = parseAll(file.readText(Charsets.UTF_8))
+            val compatible = parsed.filter { sample ->
+                sample.driverSchema == FeelCalibration.DRIVER_SCHEMA
+            }
+            if (compatible.size != parsed.size) {
+                write(compatible)
+            }
+            compatible
         } catch (_: IOException) {
             emptyList()
         } catch (_: IllegalArgumentException) {
@@ -83,6 +91,7 @@ internal class FeelCalibrationStore(
             deltaHumidity = capture.deltaHumidity,
             deltaTemperature = capture.deltaTemperature,
             observationIds = listOf(observationId),
+            driverSchema = FeelCalibration.DRIVER_SCHEMA,
         )
         val next = FeelCalibration.upsertSample(read(), incoming)
         write(next)
@@ -101,6 +110,7 @@ internal class FeelCalibrationStore(
         sample.deltaPressure?.let { put("deltaPressure", it) }
         sample.deltaHumidity?.let { put("deltaHumidity", it) }
         sample.deltaTemperature?.let { put("deltaTemperature", it) }
+        put("driverSchema", sample.driverSchema)
         put(
             "observationIds",
             buildJsonArray {
@@ -109,7 +119,7 @@ internal class FeelCalibrationStore(
         )
     }
 
-    private fun parse(text: String): List<FeelCalibrationSample> {
+    private fun parseAll(text: String): List<FeelCalibrationSample> {
         val root = json.parseToJsonElement(text).jsonObject
         val array = root["samples"]?.jsonArray ?: return emptyList()
         return array.mapNotNull { element ->
@@ -132,6 +142,7 @@ internal class FeelCalibrationStore(
                 deltaHumidity = obj["deltaHumidity"]?.jsonPrimitive?.doubleOrNull,
                 deltaTemperature = obj["deltaTemperature"]?.jsonPrimitive?.doubleOrNull,
                 observationIds = ids,
+                driverSchema = obj["driverSchema"]?.jsonPrimitive?.contentOrNull.orEmpty(),
             )
         }.sortedBy { it.centreAt }
     }

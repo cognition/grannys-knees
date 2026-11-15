@@ -42,6 +42,7 @@ object OpenMeteoParser {
 
     private const val KEY_TEMPERATURE = "temperature_2m"
     private const val KEY_HUMIDITY = "relative_humidity_2m"
+    private const val KEY_APPARENT = "apparent_temperature"
     private const val KEY_PRESSURE = "surface_pressure"
     private const val KEY_WEATHER_CODE = "weather_code"
 
@@ -72,6 +73,7 @@ object OpenMeteoParser {
 
         val temperatures = hourly.optionalDoubleColumn(KEY_TEMPERATURE, epochs.size)
         val humidities = hourly.optionalIntColumn(KEY_HUMIDITY, epochs.size)
+        val apparent = hourly.optionalDoubleColumnIfPresent(KEY_APPARENT, epochs.size)
         val pressures = hourly.optionalDoubleColumn(KEY_PRESSURE, epochs.size)
         val weatherCodes = hourly.optionalIntColumnIfPresent(KEY_WEATHER_CODE, epochs.size)
 
@@ -86,6 +88,7 @@ object OpenMeteoParser {
                 localDate = local.toLocalDate(),
                 temperature2m = temperatures[i],
                 relativeHumidity2m = humidities[i],
+                apparentTemperature = apparent?.get(i),
                 surfacePressure = pressures[i],
                 weatherCode = weatherCodes?.get(i),
             )
@@ -126,6 +129,7 @@ object OpenMeteoParser {
             time = u.requireString("time"),
             temperature2m = u.requireString(KEY_TEMPERATURE),
             relativeHumidity2m = u.requireString(KEY_HUMIDITY),
+            apparentTemperature = u[KEY_APPARENT]?.contentOrNull(),
             surfacePressure = u.requireString(KEY_PRESSURE),
             weatherCode = u[KEY_WEATHER_CODE]?.contentOrNull(),
         )
@@ -135,6 +139,9 @@ object OpenMeteoParser {
         checkUnit("time", units.time, EXPECTED_TIME_UNIT)
         checkUnit(KEY_TEMPERATURE, units.temperature2m, EXPECTED_TEMPERATURE_UNIT)
         checkUnit(KEY_HUMIDITY, units.relativeHumidity2m, EXPECTED_HUMIDITY_UNIT)
+        units.apparentTemperature?.let { actual ->
+            checkUnit(KEY_APPARENT, actual, EXPECTED_TEMPERATURE_UNIT)
+        }
         checkUnit(KEY_PRESSURE, units.surfacePressure, EXPECTED_PRESSURE_UNIT)
     }
 
@@ -187,6 +194,12 @@ object OpenMeteoParser {
 
     private fun JsonObject.optionalIntColumnIfPresent(key: String, expectedSize: Int): List<Int?>? =
         if (this[key] == null) null else optionalIntColumn(key, expectedSize)
+
+    private fun JsonObject.optionalDoubleColumnIfPresent(
+        key: String,
+        expectedSize: Int,
+    ): List<Double?>? =
+        if (this[key] == null) null else optionalDoubleColumn(key, expectedSize)
 
     private fun JsonObject.requireColumn(key: String, expectedSize: Int): JsonArray {
         val array = arr(key)

@@ -3,9 +3,9 @@ package com.aetherealmind.grannysknees.index
 import java.math.BigDecimal
 
 /**
- * Multipliers applied to each 12-hour weather delta before the v2 signal.
+ * Multipliers applied to slope-index terms (pressure, humidity, cool/warm).
  *
- * [BASELINE] leaves the deltas unchanged. Values above 1 amplify that factor;
+ * [BASELINE] leaves the terms unchanged. Values above 1 amplify that factor;
  * 0 drops it from the signal.
  */
 internal data class DeltaSensitivities(

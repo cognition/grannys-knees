@@ -133,6 +133,25 @@ class FeelCalibrationTest {
         assertFalse(effective!!.isDefault())
     }
 
+    @Test
+    fun `small humidity slopes pass the slope noise gate`() {
+        val samples = (0 until 10).map { index ->
+            sample(
+                at = Instant.parse("2026-11-09T10:00:00Z").plusSeconds(index * 45L * 60L),
+                ratings = listOf(9),
+                weather = 3.0,
+                deltaPressure = 0.0,
+                deltaHumidity = 0.03,
+                deltaTemperature = 0.0,
+            )
+        }
+        val suggested = FeelCalibration.suggest(samples)
+        assertTrue(
+            "humidity influence should move off default when mH=0.03 exceeds slope noise",
+            suggested.humidity != SensitivityProfile.DEFAULT_SENSITIVITY,
+        )
+    }
+
     private fun sample(
         at: Instant,
         ratings: List<Int> = listOf(5),
@@ -149,5 +168,6 @@ class FeelCalibrationTest {
         deltaHumidity = deltaHumidity,
         deltaTemperature = deltaTemperature,
         observationIds = listOf(observationId),
+        driverSchema = FeelCalibration.DRIVER_SCHEMA,
     )
 }

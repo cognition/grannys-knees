@@ -5,7 +5,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Personal delta multipliers for the `index-v2` personal curve.
+ * Personal influence multipliers for the slope-index Personal curve.
  */
 class IndexWeightsTest {
     @Test

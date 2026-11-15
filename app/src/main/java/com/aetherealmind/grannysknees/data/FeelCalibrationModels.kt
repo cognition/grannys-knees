@@ -7,6 +7,8 @@ import java.time.Instant
  *
  * [meanRating] and [ratingStdDev] cover reported body parts only.
  * Weather fields come from the Standard index around [centreAt].
+ * [driverSchema] must match [FeelCalibration.DRIVER_SCHEMA] (slope dP12/mH/mT);
+ * legacy 12 h-delta samples omit it and are dropped on read.
  */
 internal data class FeelCalibrationSample(
     val centreAt: Instant,
@@ -16,6 +18,7 @@ internal data class FeelCalibrationSample(
     val deltaHumidity: Double?,
     val deltaTemperature: Double?,
     val observationIds: List<String> = emptyList(),
+    val driverSchema: String = FeelCalibration.DRIVER_SCHEMA,
 ) {
     /** Mean of reported ratings. */
     val meanRating: Double
