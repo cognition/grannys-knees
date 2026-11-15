@@ -1,0 +1,17 @@
+# DE-05 — dark theme smoke. Font scale 1.3 should be set on the device before run:
+#   adb shell settings put system font_scale 1.3
+# Restore afterwards:
+#   adb shell settings put system font_scale 1.0
+appId: com.aetherealmind.grannysknees
+---
+- launchApp
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+- tapOn: "Settings"
+- scroll
+- tapOn: "Dark"
+- tapOn: "Today"
+- assertVisible: "Today"

@@ -73,6 +73,8 @@ repository-layer concern, not part of the Open-Meteo payload.
   extrema and ties are decided on the 1-dp `indexScore`, and the `lowHour`/
   `highHour` tie-break is earliest epoch.
 - Cache fixtures use an explicit `referenceNow` instead of the wall clock.
+- Suite freshness / anti–false-green rules:
+  [`docs/qa/fixture-freshness.md`](../../qa/fixture-freshness.md).
 
 ## How a reviewer/implementer validates
 

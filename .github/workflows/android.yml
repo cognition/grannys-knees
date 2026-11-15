@@ -42,3 +42,7 @@ jobs:
 
       - name: Run unit tests and assemble debug APK
         run: ./gradlew test assembleDebug --stacktrace
+
+      # Instrumented (L2) and Maestro (L3) are local / release-gate checks for now.
+      # See docs/qa/expectation-catalogue.md and maestro/README.md.
+      # Optional follow-up: connectedDebugAndroidTest on an API 35 emulator runner.

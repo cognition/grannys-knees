@@ -99,8 +99,8 @@ android {
         applicationId = "com.aetherealmind.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 160
-        versionName = "0.3.85.3"
+        versionCode = 162
+        versionName = "0.3.86.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -210,8 +210,14 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     testImplementation(libs.junit4)
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.robolectric)
+
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
