@@ -1,6 +1,7 @@
 package com.aetherealmind.grannysknees.ui.about
 
 import android.content.Intent
+import androidx.core.content.FileProvider
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.room.Room
 import com.aetherealmind.grannysknees.R
 import com.aetherealmind.grannysknees.data.FeelCalibrationStore
+import com.aetherealmind.grannysknees.data.LocalBarometerSensor
 import com.aetherealmind.grannysknees.data.SensitivityProfile
+import com.aetherealmind.grannysknees.journal.JournalCsvExport
 import com.aetherealmind.grannysknees.journal.JournalDatabase
 import com.aetherealmind.grannysknees.journal.JournalRepository
 import com.aetherealmind.grannysknees.ui.tabDestinationWindowInsets
@@ -206,6 +209,9 @@ internal fun SettingsScreen(
     var feelSampleCount by remember {
         mutableStateOf(feelCalibrationStore?.read()?.size ?: 0)
     }
+    val localPressureAvailable = remember(context) {
+        LocalBarometerSensor.isAvailable(context)
+    }
     Scaffold(
         modifier = modifier,
         contentWindowInsets = tabDestinationWindowInsets(),
@@ -238,10 +244,12 @@ internal fun SettingsScreen(
                     resetNotice = context.getString(R.string.about_feel_clear_done)
                 },
             )
-            LocalPressureSection(
-                enabled = localPressureEnabled,
-                onEnabledChange = onLocalPressureEnabledChange,
-            )
+            if (localPressureAvailable) {
+                LocalPressureSection(
+                    enabled = localPressureEnabled,
+                    onEnabledChange = onLocalPressureEnabledChange,
+                )
+            }
             FreeSpeechSection(
                 enabled = grannySpeaksFreely,
                 onEnabledChange = onGrannySpeaksFreelyChange,
@@ -260,12 +268,22 @@ internal fun SettingsScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        val payload = withContext(Dispatchers.IO) {
-                            repository.exportCurrentJson()
+                        val exportFile = withContext(Dispatchers.IO) {
+                            val payload = repository.exportCurrentCsv()
+                            File(context.cacheDir, JournalCsvExport.FILE_NAME).also { file ->
+                                file.writeText(payload, Charsets.UTF_8)
+                            }
                         }
+                        val uri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            exportFile,
+                        )
                         val share = Intent(Intent.ACTION_SEND).apply {
-                            type = "application/json"
-                            putExtra(Intent.EXTRA_TEXT, payload)
+                            type = JournalCsvExport.MIME_TYPE
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            putExtra(Intent.EXTRA_SUBJECT, JournalCsvExport.FILE_NAME)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
                         context.startActivity(Intent.createChooser(share, null))
                     }

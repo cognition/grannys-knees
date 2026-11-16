@@ -1,11 +1,5 @@
 package com.aetherealmind.grannysknees.journal
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import java.time.Instant
 import java.util.UUID
 
@@ -104,15 +98,8 @@ internal class JournalRepository(
         dao.deleteSeenEvents()
     }
 
-    /** Current journal as JSON. Tombstones and corrected rows are omitted. */
-    fun exportCurrentJson(): String {
-        val rows = buildJsonArray {
-            current().forEach { observation ->
-                add(observationJson(observation))
-            }
-        }
-        return rows.toString()
-    }
+    /** Current journal as CSV. Tombstones and corrected rows are omitted. */
+    fun exportCurrentCsv(): String = JournalCsvExport.format(current())
 
     private fun insert(observation: JournalObservation, snapshot: JournalSnapshot?) {
         dao.insertObservation(
@@ -184,22 +171,4 @@ internal class JournalRepository(
         )
     }
 
-    private fun observationJson(observation: JournalObservation) = buildJsonObject {
-        put("id", observation.id)
-        put("observedAt", observation.observedAt.toString())
-        put(
-            "measurements",
-            JsonArray(
-                observation.measurements.map { measurement ->
-                    buildJsonObject {
-                        put("bodyPart", measurement.bodyPart)
-                        put("side", measurement.side?.let(::JsonPrimitive) ?: JsonNull)
-                        put("symptom", measurement.symptom)
-                        put("rating", measurement.rating)
-                        put("reportKind", measurement.reportKind)
-                    }
-                },
-            ),
-        )
-    }
 }

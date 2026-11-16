@@ -69,6 +69,6 @@
     <string name="privacy_backup_heading">Android backups</string>
     <string name="privacy_backup_body">Google Auto Backup is off for this app. Your city, forecast cache and symptom journal stay on this phone and are not copied to cloud backup. Uninstalling removes local data. You can export journal entries with the share sheet when that option is available.</string>
     <string name="privacy_footer">The weather index is not medical advice.</string>
-    <string name="about_local_pressure_title">Blend local pressure into Personal</string>
-    <string name="about_local_pressure_hint">Uses a smoothed phone barometer reading for the nearest hour. The Standard score stays forecast-based.</string>
+    <string name="about_local_pressure_title">Use your phone’s internal sensors for Personal</string>
+    <string name="about_local_pressure_hint">When on, a smoothed reading from your phone’s pressure sensor can refine the nearest Personal hour. The Standard score stays forecast-based.</string>
 </resources>

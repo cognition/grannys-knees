@@ -2,7 +2,10 @@ package com.aetherealmind.grannysknees.journal
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -751,7 +755,7 @@ private fun QuietAction(
 }
 
 /** Saved check-ins as full-width cards with a larger figure thumb. */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 internal fun HistoryScreen(
     modifier: Modifier = Modifier,
@@ -768,9 +772,14 @@ internal fun HistoryScreen(
     }
     var rows by remember { mutableStateOf<List<JournalObservation>>(emptyList()) }
     var pendingRemove by remember { mutableStateOf<PendingHistoryRemove?>(null) }
+    var pendingBulkRemove by remember { mutableStateOf<List<PendingHistoryRemove>?>(null) }
+    var isRemoving by remember { mutableStateOf(false) }
+    var selecting by remember { mutableStateOf(false) }
+    var selectedKeys by remember { mutableStateOf<Set<HistorySelectionKey>>(emptySet()) }
     var notice by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val deleteFailed = stringResource(R.string.journal_delete_failed)
+    val bulkDeleteFailed = stringResource(R.string.journal_history_bulk_failed)
     val formatter = remember {
         DateTimeFormatter.ofPattern("EEE d MMM · HH:mm", Locale.CANADA)
             .withZone(ZoneId.systemDefault())
@@ -778,23 +787,63 @@ internal fun HistoryScreen(
     fun loadNewestFirst(): List<JournalObservation> =
         repository.current().sortedByDescending { observation -> observation.observedAt }
 
-    fun removeMeasurement(pending: PendingHistoryRemove) {
+    fun exitSelection() {
+        selecting = false
+        selectedKeys = emptySet()
+    }
+
+    fun toggleSelection(pending: PendingHistoryRemove) {
+        val key = pending.selectionKey()
+        selectedKeys = if (key in selectedKeys) {
+            selectedKeys - key
+        } else {
+            selectedKeys + key
+        }
+        if (selectedKeys.isEmpty()) {
+            selecting = false
+        }
+    }
+
+    fun beginSelection(pending: PendingHistoryRemove) {
+        notice = null
+        selecting = true
+        selectedKeys = setOf(pending.selectionKey())
+        pendingRemove = null
+    }
+
+    fun removeMeasurements(targets: List<PendingHistoryRemove>) {
+        if (isRemoving || targets.isEmpty()) return
+        isRemoving = true
+        pendingRemove = null
+        pendingBulkRemove = null
+        exitSelection()
         scope.launch {
-            val removed = withContext(Dispatchers.IO) {
-                repository.deleteMeasurement(
-                    observationId = pending.observationId,
-                    bodyPart = pending.measurement.bodyPart,
-                    side = pending.measurement.side,
-                    symptom = pending.measurement.symptom,
-                    deletedAt = Instant.now(),
-                )
-            }
-            rows = withContext(Dispatchers.IO) { loadNewestFirst() }
-            if (removed == null) {
-                notice = deleteFailed
-            } else {
-                notice = null
-                pendingRemove = null
+            try {
+                val anyFailed = withContext(Dispatchers.IO) {
+                    val deletedAt = Instant.now()
+                    var failed = false
+                    targets.forEach { pending ->
+                        val removed = repository.deleteMeasurement(
+                            observationId = pending.observationId,
+                            bodyPart = pending.measurement.bodyPart,
+                            side = pending.measurement.side,
+                            symptom = pending.measurement.symptom,
+                            deletedAt = deletedAt,
+                        )
+                        if (removed == null) {
+                            failed = true
+                        }
+                    }
+                    failed
+                }
+                rows = withContext(Dispatchers.IO) { loadNewestFirst() }
+                notice = when {
+                    anyFailed && targets.size == 1 -> deleteFailed
+                    anyFailed -> bulkDeleteFailed
+                    else -> null
+                }
+            } finally {
+                isRemoving = false
             }
         }
     }
@@ -808,7 +857,52 @@ internal fun HistoryScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    BrandHeading(title = stringResource(R.string.journal_open_history))
+                    if (selecting) {
+                        Text(
+                            text = stringResource(
+                                R.string.journal_history_select_count,
+                                selectedKeys.size,
+                            ),
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                    } else {
+                        BrandHeading(title = stringResource(R.string.journal_open_history))
+                    }
+                },
+                navigationIcon = {
+                    if (selecting) {
+                        TextButton(onClick = { exitSelection() }) {
+                            Text(stringResource(R.string.journal_history_select_cancel))
+                        }
+                    }
+                },
+                actions = {
+                    if (selecting) {
+                        TextButton(
+                            onClick = {
+                                if (selectedKeys.isEmpty() || isRemoving) return@TextButton
+                                notice = null
+                                pendingBulkRemove = selectedKeys.map { key ->
+                                    PendingHistoryRemove(
+                                        observationId = key.observationId,
+                                        measurement = JournalMeasurement(
+                                            bodyPart = key.bodyPart,
+                                            side = key.side,
+                                            symptom = key.symptom,
+                                            rating = 0,
+                                            reportKind = "",
+                                            previousObservationId = null,
+                                            previousRating = null,
+                                            previousObservedAt = null,
+                                        ),
+                                    )
+                                }
+                            },
+                            enabled = selectedKeys.isNotEmpty() && !isRemoving,
+                        ) {
+                            Text(stringResource(R.string.journal_history_delete_selected))
+                        }
+                    }
                 },
             )
         },
@@ -859,11 +953,29 @@ internal fun HistoryScreen(
                             HistoryObservationCard(
                                 observation = observation,
                                 formatter = formatter,
+                                selecting = selecting,
+                                selectedKeys = selectedKeys,
                                 onRemoveMeasurement = { measurement ->
                                     notice = null
                                     pendingRemove = PendingHistoryRemove(
                                         observationId = observation.id,
                                         measurement = measurement,
+                                    )
+                                },
+                                onToggleSelect = { measurement ->
+                                    toggleSelection(
+                                        PendingHistoryRemove(
+                                            observationId = observation.id,
+                                            measurement = measurement,
+                                        ),
+                                    )
+                                },
+                                onBeginSelect = { measurement ->
+                                    beginSelection(
+                                        PendingHistoryRemove(
+                                            observationId = observation.id,
+                                            measurement = measurement,
+                                        ),
                                     )
                                 },
                             )
@@ -881,12 +993,38 @@ internal fun HistoryScreen(
                         Text(stringResource(R.string.journal_delete_confirm_body))
                     },
                     confirmButton = {
-                        TextButton(onClick = { removeMeasurement(pending) }) {
+                        TextButton(onClick = { removeMeasurements(listOf(pending)) }) {
                             Text(stringResource(R.string.journal_delete_confirm))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { pendingRemove = null }) {
+                            Text(stringResource(R.string.journal_delete_cancel))
+                        }
+                    },
+                )
+            }
+            pendingBulkRemove?.let { pending ->
+                AlertDialog(
+                    onDismissRequest = { pendingBulkRemove = null },
+                    title = {
+                        Text(stringResource(R.string.journal_history_bulk_confirm_title))
+                    },
+                    text = {
+                        Text(
+                            stringResource(
+                                R.string.journal_history_bulk_confirm_body,
+                                pending.size,
+                            ),
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { removeMeasurements(pending) }) {
+                            Text(stringResource(R.string.journal_delete_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { pendingBulkRemove = null }) {
                             Text(stringResource(R.string.journal_delete_cancel))
                         }
                     },
@@ -900,13 +1038,32 @@ internal fun HistoryScreen(
 private data class PendingHistoryRemove(
     val observationId: String,
     val measurement: JournalMeasurement,
+) {
+    fun selectionKey(): HistorySelectionKey = HistorySelectionKey(
+        observationId = observationId,
+        bodyPart = measurement.bodyPart,
+        side = measurement.side,
+        symptom = measurement.symptom,
+    )
+}
+
+/** Stable identity for multi-select (matches [JournalRepository.deleteMeasurement]). */
+private data class HistorySelectionKey(
+    val observationId: String,
+    val bodyPart: String,
+    val side: String?,
+    val symptom: String,
 )
 
 @Composable
 private fun HistoryObservationCard(
     observation: JournalObservation,
     formatter: DateTimeFormatter,
+    selecting: Boolean,
+    selectedKeys: Set<HistorySelectionKey>,
     onRemoveMeasurement: (JournalMeasurement) -> Unit,
+    onToggleSelect: (JournalMeasurement) -> Unit,
+    onBeginSelect: (JournalMeasurement) -> Unit,
 ) {
     val panel = MaterialTheme.colorScheme.surfaceContainerLowest
     Column(
@@ -917,11 +1074,21 @@ private fun HistoryObservationCard(
         verticalArrangement = Arrangement.spacedBy(HISTORY_ROW_GAP),
     ) {
         observation.measurements.forEach { measurement ->
+            val key = HistorySelectionKey(
+                observationId = observation.id,
+                bodyPart = measurement.bodyPart,
+                side = measurement.side,
+                symptom = measurement.symptom,
+            )
             HistoryReportRow(
                 measurement = measurement,
                 observedAt = measurement.previousObservedAt ?: observation.observedAt,
                 formatter = formatter,
+                selecting = selecting,
+                selected = key in selectedKeys,
                 onRemove = { onRemoveMeasurement(measurement) },
+                onToggleSelect = { onToggleSelect(measurement) },
+                onBeginSelect = { onBeginSelect(measurement) },
             )
         }
     }
@@ -951,12 +1118,17 @@ private fun recordFeelCalibration(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HistoryReportRow(
     measurement: JournalMeasurement,
     observedAt: Instant,
     formatter: DateTimeFormatter,
+    selecting: Boolean,
+    selected: Boolean,
     onRemove: () -> Unit,
+    onToggleSelect: () -> Unit,
+    onBeginSelect: () -> Unit,
 ) {
     val whenLabel = formatter.format(observedAt)
     val label = quietReportTitle(
@@ -980,15 +1152,48 @@ private fun HistoryReportRow(
         rating = measurement.rating,
         ache = measurement.symptom == "ache",
     )
+    val selectedBorder = MaterialTheme.colorScheme.primary
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .then(
+                if (selected) {
+                    Modifier.border(
+                        width = 2.dp,
+                        color = selectedBorder,
+                        shape = RoundedCornerShape(HISTORY_CARD_CORNER),
+                    )
+                } else {
+                    Modifier
+                },
+            )
+            .combinedClickable(
+                onClick = {
+                    if (selecting) {
+                        onToggleSelect()
+                    }
+                },
+                onLongClick = {
+                    if (selecting) {
+                        onToggleSelect()
+                    } else {
+                        onBeginSelect()
+                    }
+                },
+            )
+            .padding(vertical = 2.dp)
             .clearAndSetSemantics {
                 contentDescription = spoken
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        if (selecting) {
+            Checkbox(
+                checked = selected,
+                onCheckedChange = { onToggleSelect() },
+            )
+        }
         Box(
             modifier = Modifier
                 .height(HISTORY_THUMB_HEIGHT)
@@ -1020,15 +1225,17 @@ private fun HistoryReportRow(
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        TextButton(
-            onClick = onRemove,
-            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.journal_delete),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        if (!selecting) {
+            TextButton(
+                onClick = onRemove,
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.journal_delete),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

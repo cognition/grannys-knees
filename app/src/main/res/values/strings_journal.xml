@@ -39,6 +39,12 @@
     <string name="journal_delete_confirm">Remove</string>
     <string name="journal_delete_cancel">Cancel</string>
     <string name="journal_delete_failed">Could not remove that report. Try again.</string>
+    <string name="journal_history_select_cancel">Cancel</string>
+    <string name="journal_history_select_count">%1$d selected</string>
+    <string name="journal_history_delete_selected">Remove</string>
+    <string name="journal_history_bulk_confirm_title">Remove selected reports?</string>
+    <string name="journal_history_bulk_confirm_body">This removes %1$d check-ins from History on this phone.</string>
+    <string name="journal_history_bulk_failed">Could not remove every selected report. Try again.</string>
     <string name="journal_export">Export</string>
     <string name="journal_last_reported">Last logged %1$s</string>
     <string name="journal_open">How you feel</string>
