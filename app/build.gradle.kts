@@ -99,7 +99,7 @@ android {
         applicationId = "com.aetherealmind.grannysknees"
         minSdk = 26
         targetSdk = 37
-        versionCode = 161
+        versionCode = 170
         versionName = "0.3.86.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
