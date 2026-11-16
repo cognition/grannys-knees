@@ -18,6 +18,9 @@
     <string name="about_feel_clear">Clear Feel history</string>
     <string name="about_feel_clear_hint">Removes stored Feel check-ins used for real-feel tuning. Journal symptom reports stay.</string>
     <string name="about_feel_clear_done">Feel history was cleared.</string>
+    <string name="feel_schema_reset_title">Feel tuning reset</string>
+    <string name="feel_schema_reset_body">Previous Feel calibration data has been removed because the weather index uses a new calculation process. Journal symptom reports are unchanged. Personal real-feel tuning will unlock again after ten consecutive usable Feel reports under the new process.</string>
+    <string name="feel_schema_reset_confirm">Got it</string>
     <string name="about_granny_speech_heading">Granny’s language</string>
     <string name="about_granny_speech_title">Let Granny speak her mind freely</string>
     <string name="about_granny_speech_hint">When on, Granny may use the occasional salty word and a few more theatrical complaints. Off keeps the commentary family-friendly.</string>

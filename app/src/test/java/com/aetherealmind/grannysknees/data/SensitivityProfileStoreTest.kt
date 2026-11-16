@@ -1,6 +1,7 @@
 package com.aetherealmind.grannysknees.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -52,5 +53,15 @@ class SensitivityProfileStoreTest {
 
         assertEquals(false, store.readFeelCalibrationEnabled())
         assertTrue(store.read().isDefault())
+    }
+
+    @Test
+    fun `feel schema reset notice flag round trips`() {
+        val store = SensitivityProfileStore(temporaryFolder.newFile("feel-notice.json"))
+        assertFalse(store.readPendingFeelSchemaResetNotice())
+        store.writePendingFeelSchemaResetNotice(true)
+        assertTrue(store.readPendingFeelSchemaResetNotice())
+        store.writePendingFeelSchemaResetNotice(false)
+        assertFalse(store.readPendingFeelSchemaResetNotice())
     }
 }

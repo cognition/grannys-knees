@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +31,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -107,6 +109,9 @@ internal fun GrannysKneesApp(
     }
     var sensitivityEpoch by remember { mutableStateOf(0) }
     var journalDataEpoch by remember { mutableIntStateOf(0) }
+    var showFeelSchemaResetNotice by remember {
+        mutableStateOf(sensitivityStore?.readPendingFeelSchemaResetNotice() == true)
+    }
     LaunchedEffect(sensitivityEpoch) {
         if (sensitivityEpoch == 0) {
             return@LaunchedEffect
@@ -123,6 +128,30 @@ internal fun GrannysKneesApp(
                 },
             )
             return@GrannysKneesTheme
+        }
+        if (showFeelSchemaResetNotice) {
+            AlertDialog(
+                onDismissRequest = {
+                    showFeelSchemaResetNotice = false
+                    sensitivityStore?.writePendingFeelSchemaResetNotice(false)
+                },
+                title = {
+                    Text(stringResource(R.string.feel_schema_reset_title))
+                },
+                text = {
+                    Text(stringResource(R.string.feel_schema_reset_body))
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showFeelSchemaResetNotice = false
+                            sensitivityStore?.writePendingFeelSchemaResetNotice(false)
+                        },
+                    ) {
+                        Text(stringResource(R.string.feel_schema_reset_confirm))
+                    }
+                },
+            )
         }
         val navController = rememberNavController()
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route

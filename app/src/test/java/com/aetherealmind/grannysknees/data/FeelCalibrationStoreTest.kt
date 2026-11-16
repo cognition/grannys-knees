@@ -1,6 +1,7 @@
 package com.aetherealmind.grannysknees.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -78,6 +79,9 @@ class FeelCalibrationStoreTest {
         )
         val store = FeelCalibrationStore(file)
         assertTrue(store.read().isEmpty())
+        assertTrue(store.consumeSchemaResetOccurred())
+        assertFalse(store.consumeSchemaResetOccurred())
         assertTrue(store.read().isEmpty())
+        assertFalse(store.consumeSchemaResetOccurred())
     }
 }
