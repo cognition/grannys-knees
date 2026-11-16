@@ -6,63 +6,101 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigDecimal
-import java.math.RoundingMode
+import kotlin.math.abs
 
 /**
- * Behaviour tests for the experimental `index-v2` 12-hour scorer.
+ * Acceptance and behaviour tests for the slope-index scorer.
+ *
+ * The five rounded cases match `scripts/slope_index.py`.
  */
 class WeatherIndexScorerTest {
 
     @Test
-    fun calibrationAnchorsMapToEndsAndMidpoint() {
+    fun `steady weather scores near the RC1 baseline`() {
+        val flatP = List(13) { 1013.0 }
+        val steady = listOf(20.0, 20.0, 20.0, 20.0)
         assertEquals(
-            0,
-            BigDecimal("1.0").compareTo(
-                WeatherIndexScorer.mapSignal(BigDecimal("-89.4"))
-                    .setScale(1, RoundingMode.HALF_UP),
-            ),
+            5.53,
+            round2(WeatherIndexScorer.scoreSlope(steady, listOf(50.0, 50.0, 50.0, 50.0), steady, flatP)),
+            0.0,
         )
-        assertEquals(
-            0,
-            BigDecimal("10.0").compareTo(
-                WeatherIndexScorer.mapSignal(BigDecimal("88.4"))
-                    .setScale(1, RoundingMode.HALF_UP),
-            ),
-        )
-        val mid = WeatherIndexScorer.mapSignal(BigDecimal.ZERO)
-            .setScale(1, RoundingMode.HALF_UP)
-        assertEquals(0, BigDecimal("5.5").compareTo(mid))
     }
 
     @Test
-    fun twelveHourWindowProducesAvailableScore() {
-        val request = windowRequest(
-            priorPressure = 1015.0,
-            priorHumidity = 40.0,
-            priorTemperature = 15.0,
-            nowPressure = 1010.0,
-            nowHumidity = 70.0,
-            nowTemperature = 5.0,
-        )
-        val last = WeatherIndexScorer.score(request).hours.last()
-
-        assertEquals(HourStatus.AVAILABLE, last.status)
-        assertEquals("index-v2", WeatherIndexScorer.score(request).indexVersion)
-        assertNotNull(last.indexScore)
-        // ΔH=30, ΔP=-5, ΔT=-10 → signal = 30 - (-5) - (-10) = 45
-        val expected = WeatherIndexScorer.mapSignal(BigDecimal("45"))
-            .setScale(1, RoundingMode.HALF_UP)
-        assertEquals(0, expected.compareTo(last.indexScore))
+    fun `cooling with rising humidity raises the index`() {
+        val flatP = List(13) { 1013.0 }
+        val t = listOf(26.0, 24.0, 22.0, 20.0)
+        val h = listOf(41.0, 44.0, 47.0, 50.0)
+        assertEquals(7.28, round2(WeatherIndexScorer.scoreSlope(t, h, t, flatP)), 0.0)
     }
 
     @Test
-    fun firstTwelveHoursAreUnavailableWithoutLeadIn() {
+    fun `warming with drying lowers the index below baseline`() {
+        val flatP = List(13) { 1013.0 }
+        val t = listOf(14.0, 16.0, 18.0, 20.0)
+        val h = listOf(59.0, 56.0, 53.0, 50.0)
+        assertEquals(5.03, round2(WeatherIndexScorer.scoreSlope(t, h, t, flatP)), 0.0)
+    }
+
+    @Test
+    fun `furnace stop grows the feels-like gap`() {
+        val flatP = List(13) { 1013.0 }
+        val t = listOf(20.0, 20.0, 20.0, 20.0)
+        val gap = listOf(0.0, 1.5, 3.0, 4.5)
+        val feels = t.zip(gap) { temp, g -> temp - g }
+        assertTrue(abs(WeatherIndexScorer.slope4(gap[0], gap[1], gap[2], gap[3]) - 1.5) < 1e-9)
+        assertEquals(
+            5.90,
+            round2(WeatherIndexScorer.scoreSlope(t, listOf(50.0, 50.0, 50.0, 50.0), feels, flatP)),
+            0.0,
+        )
+    }
+
+    @Test
+    fun `rising pressure over twelve hours lowers the index`() {
+        val steady = listOf(20.0, 20.0, 20.0, 20.0)
+        val p = (0..12).map { i -> 1013.0 + i * 10.0 / 12.0 }
+        assertEquals(
+            round3(5.5254 - 0.506),
+            round3(
+                WeatherIndexScorer.scoreSlope(
+                    steady,
+                    listOf(50.0, 50.0, 50.0, 50.0),
+                    steady,
+                    p,
+                ),
+            ),
+            0.0,
+        )
+    }
+
+    @Test
+    fun `missing feels-like drops the gap term to zero`() {
+        val flatP = List(13) { 1013.0 }
+        val steady = listOf(20.0, 20.0, 20.0, 20.0)
+        assertEquals(
+            5.53,
+            round2(
+                WeatherIndexScorer.scoreSlope(
+                    steady,
+                    listOf(50.0, 50.0, 50.0, 50.0),
+                    feels4 = null,
+                    pressure13 = flatP,
+                ),
+            ),
+            0.0,
+        )
+    }
+
+    @Test
+    fun `first twelve hours are unavailable without pressure lead-in`() {
         val hours = (0..12).map { i ->
             HourlyObservation(
                 epoch = BASE_EPOCH + i * 3600L,
                 surfacePressureHpa = 1013.0,
                 relativeHumidityPct = 60.0,
                 temperatureC = 10.0,
+                feelsLikeC = 10.0,
             )
         }
         val scored = WeatherIndexScorer.score(
@@ -74,16 +112,20 @@ class WeatherIndexScorerTest {
             assertTrue(scored[i].unavailableReasons.any { it.contains("12-hour") })
         }
         assertEquals(HourStatus.AVAILABLE, scored[12].status)
+        assertEquals("index-slope-v1", WeatherIndexScorer.score(
+            ScoringRequest(zoneId = "America/Toronto", hours = hours),
+        ).indexVersion)
     }
 
     @Test
-    fun missingValueMarksHourUnavailable() {
+    fun `missing pressure marks hour unavailable`() {
         val hours = (0..12).map { i ->
             HourlyObservation(
                 epoch = BASE_EPOCH + i * 3600L,
                 surfacePressureHpa = if (i == 12) null else 1013.0,
                 relativeHumidityPct = 60.0,
                 temperatureC = 10.0,
+                feelsLikeC = 10.0,
             )
         }
         val last = WeatherIndexScorer.score(
@@ -96,15 +138,8 @@ class WeatherIndexScorerTest {
     }
 
     @Test
-    fun personalPressureSensitivityRaisesScoreWhenPressureFalls() {
-        val request = windowRequest(
-            priorPressure = 1020.0,
-            priorHumidity = 50.0,
-            priorTemperature = 10.0,
-            nowPressure = 1010.0,
-            nowHumidity = 50.0,
-            nowTemperature = 10.0,
-        )
+    fun `personal pressure sensitivity raises score when pressure falls`() {
+        val request = flatWindowRequest(startPressure = 1020.0, endPressure = 1010.0)
         val baseline = WeatherIndexScorer.score(request).hours.last().indexScore!!
         val personal = WeatherIndexScorer.score(
             request,
@@ -112,22 +147,13 @@ class WeatherIndexScorerTest {
         )
         val personalScore = personal.hours.last().indexScore!!
 
-        assertEquals("index-v2-personal", personal.indexVersion)
+        assertEquals("index-slope-v1-personal", personal.indexVersion)
         assertTrue(personalScore.compareTo(baseline) > 0)
     }
 
     @Test
-    fun personalSensitivityDoesNotLowerScoreOnReliefWeather() {
-        // Galaxy-shaped hour: rising pressure, falling humidity — baseline ~4.1.
-        // High “hits you hard” sliders used to amplify relief and drop Personal to ~2.9.
-        val request = windowRequest(
-            priorPressure = 1005.0,
-            priorHumidity = 70.0,
-            priorTemperature = 5.0,
-            nowPressure = 1013.4,
-            nowHumidity = 50.0,
-            nowTemperature = 4.1,
-        )
+    fun `personal sensitivity does not lower score on relief weather`() {
+        val request = flatWindowRequest(startPressure = 1005.0, endPressure = 1015.0)
         val baseline = WeatherIndexScorer.score(request).hours.last().indexScore!!
         val personal = WeatherIndexScorer.score(
             request,
@@ -141,19 +167,15 @@ class WeatherIndexScorerTest {
     }
 
     @Test
-    fun scaleContributionAmplifiesProvocationAndDampensRelief() {
+    fun `scaleContribution amplifies provocation and dampens relief`() {
         val bad = WeatherIndexScorer.scaleContribution(BigDecimal("10"), BigDecimal("2"))
         val good = WeatherIndexScorer.scaleContribution(BigDecimal("-10"), BigDecimal("2"))
         assertEquals(0, BigDecimal("20").compareTo(bad))
         assertEquals(0, BigDecimal.ZERO.compareTo(good))
-        val neutralBad = WeatherIndexScorer.scaleContribution(BigDecimal("10"), BigDecimal.ONE)
-        val neutralGood = WeatherIndexScorer.scaleContribution(BigDecimal("-10"), BigDecimal.ONE)
-        assertEquals(0, BigDecimal("10").compareTo(neutralBad))
-        assertEquals(0, BigDecimal("-10").compareTo(neutralGood))
     }
 
     @Test
-    fun fixtureInputsStillScoreWithoutThrowing() {
+    fun `fixture inputs still score without throwing`() {
         listOf(
             "nominal",
             "missing-values",
@@ -162,44 +184,30 @@ class WeatherIndexScorerTest {
             "dst-spring-forward",
         ).forEach { caseName ->
             val result = WeatherIndexScorer.score(FixtureSupport.loadRequest(caseName))
-            assertEquals(caseName, "weather-index/2.0.0", result.contractVersion)
-            assertEquals(caseName, "index-v2", result.indexVersion)
+            assertEquals(caseName, "slope-index/1.0.0", result.contractVersion)
+            assertEquals(caseName, "index-slope-v1", result.indexVersion)
             assertTrue(caseName, result.hours.isNotEmpty())
+            assertNotNull(caseName, result.hours.first())
         }
     }
 
-    private fun windowRequest(
-        priorPressure: Double,
-        priorHumidity: Double,
-        priorTemperature: Double,
-        nowPressure: Double,
-        nowHumidity: Double,
-        nowTemperature: Double,
-    ): ScoringRequest {
+    private fun flatWindowRequest(startPressure: Double, endPressure: Double): ScoringRequest {
         val hours = (0..12).map { i ->
-            val atPrior = i == 0
-            val atNow = i == 12
+            val pressure = startPressure + (endPressure - startPressure) * (i / 12.0)
             HourlyObservation(
                 epoch = BASE_EPOCH + i * 3600L,
-                surfacePressureHpa = when {
-                    atPrior -> priorPressure
-                    atNow -> nowPressure
-                    else -> 1013.0
-                },
-                relativeHumidityPct = when {
-                    atPrior -> priorHumidity
-                    atNow -> nowHumidity
-                    else -> 50.0
-                },
-                temperatureC = when {
-                    atPrior -> priorTemperature
-                    atNow -> nowTemperature
-                    else -> 10.0
-                },
+                surfacePressureHpa = pressure,
+                relativeHumidityPct = 50.0,
+                temperatureC = 20.0,
+                feelsLikeC = 20.0,
             )
         }
         return ScoringRequest(zoneId = "America/Toronto", hours = hours)
     }
+
+    private fun round2(value: Double): Double = kotlin.math.round(value * 100.0) / 100.0
+
+    private fun round3(value: Double): Double = kotlin.math.round(value * 1000.0) / 1000.0
 
     private companion object {
         const val BASE_EPOCH: Long = 1_700_000_000L

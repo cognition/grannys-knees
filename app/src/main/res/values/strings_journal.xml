@@ -34,6 +34,11 @@
     <string name="journal_saved">Saved on this phone.</string>
     <string name="journal_history_empty">Nothing here yet. Mark a place under Feel.</string>
     <string name="journal_delete">Remove</string>
+    <string name="journal_delete_confirm_title">Remove this report?</string>
+    <string name="journal_delete_confirm_body">This removes the check-in from History on this phone.</string>
+    <string name="journal_delete_confirm">Remove</string>
+    <string name="journal_delete_cancel">Cancel</string>
+    <string name="journal_delete_failed">Could not remove that report. Try again.</string>
     <string name="journal_export">Export</string>
     <string name="journal_last_reported">Last logged %1$s</string>
     <string name="journal_open">How you feel</string>
@@ -42,8 +47,11 @@
     <string name="journal_feel_tune_title">Use these reports to tune real-feel</string>
     <string name="journal_feel_tune_hint_on">After ten spaced check-ins, Feel can gently tune Personal real-feel.</string>
     <string name="journal_feel_tune_hint_off">Recording only — Feel will not change real-feel.</string>
-    <string name="journal_figure_clear">Clear</string>
+    <string name="journal_figure_clear">Clear all</string>
     <string name="journal_figure_clear_done">Figure reset. Mark how you feel again.</string>
+    <string name="journal_figure_clear_this">Clear this</string>
+    <string name="journal_figure_clear_this_done">Removed that place. Others kept.</string>
+    <string name="journal_place_hint">Tap the figure to add places. Clear this removes only the one you are editing.</string>
     <string name="journal_feel_tune_compact">Tune real-feel from Feel</string>
     <string name="journal_feel_no_backdate">You cannot currently go back in time to report earlier in the day. Each save is for now.</string>
 </resources>

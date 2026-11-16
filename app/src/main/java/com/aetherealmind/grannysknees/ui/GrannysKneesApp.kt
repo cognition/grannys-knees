@@ -145,12 +145,26 @@ internal fun GrannysKneesApp(
         }
         val isLandscape =
             LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-        // Zero content insets here: the tab chrome owns system-nav padding, and
-        // each destination Scaffold owns status-bar / top insets. Applying
-        // safeDrawing again on the outer Scaffold doubled the gap above the tabs.
-        if (isLandscape) {
-            Row(modifier = Modifier.fillMaxSize()) {
-                if (showTabs) {
+        // One shell for both orientations so AppNavHost (and TodayRoute) stay
+        // mounted across rotate. Zero content insets: tab chrome owns system-nav
+        // padding; each destination Scaffold owns status-bar / top insets.
+        Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            bottomBar = {
+                if (!isLandscape && showTabs) {
+                    BottomTabs(
+                        currentRoute = selectedTabRoute,
+                        onSelect = onSelectTab,
+                    )
+                }
+            },
+        ) { innerPadding ->
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            ) {
+                if (isLandscape && showTabs) {
                     SideTabs(
                         currentRoute = selectedTabRoute,
                         onSelect = onSelectTab,
@@ -199,61 +213,6 @@ internal fun GrannysKneesApp(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                )
-            }
-        } else {
-            Scaffold(
-                contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                bottomBar = {
-                    if (showTabs) {
-                        BottomTabs(
-                            currentRoute = selectedTabRoute,
-                            onSelect = onSelectTab,
-                        )
-                    }
-                },
-            ) { innerPadding ->
-                AppNavHost(
-                    navController = navController,
-                    repository = repository,
-                    cityStore = cityStore,
-                    feelCalibrationStore = feelCalibrationStore,
-                    themePreference = themePreference,
-                    onThemePreferenceChange = { next ->
-                        themePreference = next
-                        themePreferenceStore?.write(next)
-                    },
-                    sensitivityProfile = sensitivityProfile,
-                    onSensitivityProfileChange = { next ->
-                        sensitivityProfile = next
-                        sensitivityStore?.write(next)
-                        sensitivityEpoch += 1
-                    },
-                    feelCalibrationEnabled = feelCalibrationEnabled,
-                    onFeelCalibrationEnabledChange = { enabled ->
-                        feelCalibrationEnabled = enabled
-                        sensitivityStore?.writeFeelCalibrationEnabled(enabled)
-                        sensitivityEpoch += 1
-                    },
-                    grannySpeaksFreely = grannySpeaksFreely,
-                    onGrannySpeaksFreelyChange = { enabled ->
-                        grannySpeaksFreely = enabled
-                        sensitivityStore?.writeGrannySpeaksFreely(enabled)
-                    },
-                    localPressureEnabled = localPressureEnabled,
-                    onLocalPressureEnabledChange = { enabled ->
-                        localPressureEnabled = enabled
-                        sensitivityStore?.writeLocalPressureEnabled(enabled)
-                        sensitivityEpoch += 1
-                    },
-                    sensitivityEpoch = sensitivityEpoch,
-                    onFeelCleared = { sensitivityEpoch += 1 },
-                    journalDataEpoch = journalDataEpoch,
-                    onDataReset = {
-                        journalDataEpoch += 1
-                        sensitivityEpoch += 1
-                    },
-                    modifier = Modifier.padding(innerPadding),
                 )
             }
         }

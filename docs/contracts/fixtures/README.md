@@ -2,8 +2,9 @@
 
 Deterministic **input** fixtures for weather scoring. Historical
 `*.expected.json` files target `index-v1` and are retained for archive review.
-The live Android scorer follows [`../weather-index-v2.md`](../weather-index-v2.md)
-(`index-v2`, 12-hour deltas); unit tests cover that formula directly.
+The live Android scorer follows [`../slope-index.md`](../slope-index.md)
+(`index-slope-v1`); unit tests cover that formula directly (see also
+`scripts/slope_index.py`).
 
 **These fixtures are not medical data and the index is experimental, not a
 clinical prediction.** See the contract document for the full disclaimer.

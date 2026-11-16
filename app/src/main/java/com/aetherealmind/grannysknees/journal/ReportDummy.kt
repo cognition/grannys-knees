@@ -88,21 +88,12 @@ internal object ReportDay {
     }
 }
 
-/** The figure shown before anything has been marked today. */
-internal fun defaultReportPlaces(): List<ChosenPlace> {
-    return listOf(
-        ChosenPlace(
-            part = "knee",
-            side = "left",
-            symptom = "ache",
-            rating = ratingForSymptom("ache", 0),
-        ),
-    )
-}
+/** The figure shown before anything has been marked today — blank until tapped. */
+internal fun defaultReportPlaces(): List<ChosenPlace> = emptyList()
 
 /**
  * Keeps the in-progress figure on this phone until the next 3:00 a.m.
- * A missing or stale file returns the starting figure. Saved reports are left alone.
+ * A missing or stale file returns a blank figure. Saved reports are left alone.
  */
 internal class ReportDummyStore(
     private val file: File,
@@ -143,7 +134,7 @@ internal class ReportDummyStore(
         AtomicFileWriter.writeText(file, payload)
     }
 
-    /** The starting figure, stamped at [now]. */
+    /** A blank figure, stamped at [now]. */
     fun fresh(now: Instant): ReportDummy {
         return ReportDummy(places = defaultReportPlaces(), focus = 0, savedAt = now)
     }
@@ -170,10 +161,11 @@ internal class ReportDummyStore(
         val places = root["places"]?.jsonArray?.mapNotNull { element ->
             val item = element.jsonObject
             val part = item.string("part") ?: return@mapNotNull null
-            val symptom = item.string("symptom") ?: return@mapNotNull null
-            if (part.isBlank() || symptom.isBlank()) {
+            if (part.isBlank()) {
                 return@mapNotNull null
             }
+            // Draft marks may omit symptom until the person chooses ache/stiffness.
+            val symptom = item.string("symptom").orEmpty()
             val rating = item["rating"]?.jsonPrimitive?.intOrNull ?: return@mapNotNull null
             val sideNode = item["side"]
             val side = when {
@@ -187,13 +179,14 @@ internal class ReportDummyStore(
                 rating = ratingForSymptom(symptom, rating),
             )
         } ?: return null
-        if (places.isEmpty()) {
-            return null
+        val focus = if (places.isEmpty()) {
+            0
+        } else {
+            (root["focus"]?.jsonPrimitive?.intOrNull ?: 0).coerceIn(0, places.lastIndex)
         }
-        val focus = root["focus"]?.jsonPrimitive?.intOrNull ?: 0
         return ReportDummy(
             places = places,
-            focus = focus.coerceIn(0, places.lastIndex),
+            focus = focus,
             savedAt = savedAt,
         )
     }

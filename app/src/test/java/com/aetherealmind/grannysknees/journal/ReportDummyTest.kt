@@ -21,7 +21,16 @@ class ReportDummyTest {
         assertEquals(1, ratingForSymptom("ache", 1))
         assertEquals(7, ratingForSymptom("ache", 7))
         assertEquals(0, ratingForSymptom("stiffness", 0))
-        assertEquals(1, defaultReportPlaces().single().rating)
+        assertEquals(0, ratingForSymptom("", 0))
+    }
+
+    @Test
+    fun `fresh report starts with no places marked`() {
+        assertTrue(defaultReportPlaces().isEmpty())
+        val store = ReportDummyStore(Files.createTempFile("report-dummy-blank", ".json").toFile())
+        val fresh = store.fresh(Instant.parse("2026-11-06T15:00:00Z"))
+        assertTrue(fresh.places.isEmpty())
+        assertEquals(0, fresh.focus)
     }
 
     @Test
@@ -77,12 +86,27 @@ class ReportDummyTest {
             ),
         )
         val read = store.read(Instant.parse("2026-11-06T08:00:00Z"), toronto)
-        assertEquals("knee", read.places.single().part)
-        assertEquals("left", read.places.single().side)
-        assertEquals("ache", read.places.single().symptom)
-        assertEquals(1, read.places.single().rating)
+        assertTrue(read.places.isEmpty())
+        assertEquals(0, read.focus)
         assertFalse(ReportDay.sameReportingDay(read.savedAt, Instant.parse("2026-11-06T07:30:00Z"), toronto))
         assertTrue(ReportDay.sameReportingDay(read.savedAt, Instant.parse("2026-11-06T08:00:00Z"), toronto))
+    }
+
+    @Test
+    fun `an empty draft with a blank symptom is kept for the reporting day`() {
+        val file = Files.createTempFile("report-dummy-empty-symptom", ".json").toFile()
+        val store = ReportDummyStore(file)
+        store.write(
+            ReportDummy(
+                places = listOf(ChosenPlace("knee", "left", "", 0)),
+                focus = 0,
+                savedAt = Instant.parse("2026-11-06T15:00:00Z"),
+            ),
+        )
+        val read = store.read(Instant.parse("2026-11-06T16:00:00Z"), toronto)
+        assertEquals("knee", read.places.single().part)
+        assertEquals("", read.places.single().symptom)
+        assertEquals(0, read.places.single().rating)
     }
 
     @Test

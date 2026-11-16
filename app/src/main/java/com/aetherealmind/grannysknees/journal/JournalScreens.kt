@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -120,12 +121,14 @@ internal fun JournalScreen(
     }
     val scope = rememberCoroutineScope()
     LaunchedEffect(chosen, focus) {
-        if (chosen.isEmpty()) {
-            return@LaunchedEffect
+        val draftFocus = if (chosen.isEmpty()) {
+            0
+        } else {
+            focus.coerceIn(0, chosen.lastIndex)
         }
         val draft = ReportDummy(
             places = chosen,
-            focus = focus.coerceIn(0, chosen.lastIndex),
+            focus = draftFocus,
             savedAt = Instant.now(),
         )
         withContext(Dispatchers.IO) { store.write(draft) }
@@ -165,22 +168,22 @@ internal fun JournalScreen(
     val displayedFocus = if (editing) focus else 0
     val place = displayed.getOrNull(displayedFocus)
     fun addOrFocus(part: String, side: String?) {
-        if (!editing || chosen.isEmpty()) {
+        if (!editing) {
             return
         }
         val existing = chosen.indexOfFirst { it.part == part && it.side == side }
         if (existing >= 0) {
             focus = existing
-        } else {
-            val current = chosen.getOrNull(focus.coerceIn(0, chosen.lastIndex)) ?: return
-            chosen = chosen + ChosenPlace(
-                part,
-                side,
-                current.symptom,
-                ratingForSymptom(current.symptom, current.rating),
-            )
-            focus = chosen.lastIndex
+            return
         }
+        // Each new mark starts blank; set its symptom and rating on its own.
+        chosen = chosen + ChosenPlace(
+            part = part,
+            side = side,
+            symptom = "",
+            rating = 0,
+        )
+        focus = chosen.lastIndex
     }
     fun replaceFocus(next: ChosenPlace) {
         if (!editing) {
@@ -190,6 +193,20 @@ internal fun JournalScreen(
             rating = ratingForSymptom(next.symptom, next.rating),
         )
         chosen = chosen.mapIndexed { index, item -> if (index == focus) adjusted else item }
+    }
+    fun removeFocus() {
+        if (!editing || chosen.isEmpty()) {
+            return
+        }
+        val index = focus.coerceIn(0, chosen.lastIndex)
+        val next = chosen.filterIndexed { itemIndex, _ -> itemIndex != index }
+        chosen = next
+        focus = when {
+            next.isEmpty() -> 0
+            index >= next.size -> next.lastIndex
+            else -> index
+        }
+        notice = context.getString(R.string.journal_figure_clear_this_done)
     }
 
     val isLandscape =
@@ -235,7 +252,7 @@ internal fun JournalScreen(
             )
             TextButton(
                 onClick = {
-                    if (!editing) {
+                    if (!editing || chosen.isEmpty()) {
                         return@TextButton
                     }
                     val cleared = store.fresh(Instant.now())
@@ -249,7 +266,7 @@ internal fun JournalScreen(
                     frameLabel = null
                     notice = context.getString(R.string.journal_figure_clear_done)
                 },
-                enabled = editing,
+                enabled = editing && chosen.isNotEmpty(),
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -287,6 +304,13 @@ internal fun JournalScreen(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            Text(
+                text = stringResource(R.string.journal_place_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -306,6 +330,17 @@ internal fun JournalScreen(
                             )
                         },
                     )
+                }
+                if (editing && place != null) {
+                    TextButton(
+                        onClick = { removeFocus() },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.journal_figure_clear_this),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
                 }
             }
             if (displayed.size > 1) {
@@ -330,7 +365,7 @@ internal fun JournalScreen(
             Slider(
                 value = place?.rating?.toFloat() ?: 0f,
                 onValueChange = { value ->
-                    if (!editing || place == null) {
+                    if (!editing || place == null || place.symptom.isBlank()) {
                         return@Slider
                     }
                     chosen = chosen.mapIndexed { index, item ->
@@ -341,7 +376,7 @@ internal fun JournalScreen(
                         }
                     }
                 },
-                enabled = editing && place != null,
+                enabled = editing && place != null && place.symptom.isNotBlank(),
                 valueRange = if (place?.symptom == "ache") 1f..10f else 0f..10f,
                 steps = if (place?.symptom == "ache") 8 else 9,
                 colors = SliderDefaults.colors(
@@ -358,14 +393,16 @@ internal fun JournalScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        val edits = chosen.map { item ->
-                            SeriesEdit(
-                                item.part,
-                                item.side,
-                                item.symptom,
-                                ratingForSymptom(item.symptom, item.rating),
-                            )
-                        }
+                        val edits = chosen
+                            .filter { item -> item.symptom.isNotBlank() }
+                            .map { item ->
+                                SeriesEdit(
+                                    item.part,
+                                    item.side,
+                                    item.symptom,
+                                    ratingForSymptom(item.symptom, item.rating),
+                                )
+                            }
                         val now = Instant.now()
                         val wrote = withContext(Dispatchers.IO) {
                             val observation = journalRepository.save(
@@ -390,7 +427,7 @@ internal fun JournalScreen(
                         }
                     }
                 },
-                enabled = editing,
+                enabled = editing && chosen.any { item -> item.symptom.isNotBlank() },
                 shape = GrannyCorner,
                 contentPadding = ACTION_PADDING,
                 modifier = Modifier
@@ -439,15 +476,17 @@ internal fun JournalScreen(
                 )
                 QuietAction(
                     label = stringResource(R.string.journal_unchanged),
-                    enabled = editing,
+                    enabled = editing && chosen.any { item -> item.symptom.isNotBlank() },
                     onClick = {
                         if (!editing) {
                             return@QuietAction
                         }
                         scope.launch {
-                            val keys = chosen.map { item ->
-                                SeriesKey(item.part, item.side, item.symptom)
-                            }
+                            val keys = chosen
+                                .filter { item -> item.symptom.isNotBlank() }
+                                .map { item ->
+                                    SeriesKey(item.part, item.side, item.symptom)
+                                }
                             val now = Instant.now()
                             val wrote = withContext(Dispatchers.IO) {
                                 val observation = journalRepository.save(
@@ -728,13 +767,37 @@ internal fun HistoryScreen(
         )
     }
     var rows by remember { mutableStateOf<List<JournalObservation>>(emptyList()) }
+    var pendingRemove by remember { mutableStateOf<PendingHistoryRemove?>(null) }
+    var notice by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val deleteFailed = stringResource(R.string.journal_delete_failed)
     val formatter = remember {
         DateTimeFormatter.ofPattern("EEE d MMM · HH:mm", Locale.CANADA)
             .withZone(ZoneId.systemDefault())
     }
     fun loadNewestFirst(): List<JournalObservation> =
         repository.current().sortedByDescending { observation -> observation.observedAt }
+
+    fun removeMeasurement(pending: PendingHistoryRemove) {
+        scope.launch {
+            val removed = withContext(Dispatchers.IO) {
+                repository.deleteMeasurement(
+                    observationId = pending.observationId,
+                    bodyPart = pending.measurement.bodyPart,
+                    side = pending.measurement.side,
+                    symptom = pending.measurement.symptom,
+                    deletedAt = Instant.now(),
+                )
+            }
+            rows = withContext(Dispatchers.IO) { loadNewestFirst() }
+            if (removed == null) {
+                notice = deleteFailed
+            } else {
+                notice = null
+                pendingRemove = null
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         rows = withContext(Dispatchers.IO) { loadNewestFirst() }
@@ -755,63 +818,89 @@ internal fun HistoryScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            if (rows.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.journal_history_empty),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(horizontal = 32.dp),
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        horizontal = 12.dp,
-                        vertical = 6.dp,
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(HISTORY_ROW_GAP),
-                ) {
-                    items(
-                        items = rows,
-                        key = { observation -> observation.id },
-                    ) { observation ->
-                        HistoryObservationCard(
-                            observation = observation,
-                            formatter = formatter,
-                            onRemoveMeasurement = { measurement ->
-                                scope.launch {
-                                    withContext(Dispatchers.IO) {
-                                        val liveId = repository.current()
-                                            .firstOrNull { row ->
-                                                row.measurements.any { item ->
-                                                    item.bodyPart == measurement.bodyPart &&
-                                                        item.side == measurement.side &&
-                                                        item.symptom == measurement.symptom
-                                                }
-                                            }
-                                            ?.id
-                                        if (liveId != null) {
-                                            repository.deleteMeasurement(
-                                                observationId = liveId,
-                                                bodyPart = measurement.bodyPart,
-                                                side = measurement.side,
-                                                symptom = measurement.symptom,
-                                                deletedAt = Instant.now(),
-                                            )
-                                        }
-                                    }
-                                    rows = withContext(Dispatchers.IO) { loadNewestFirst() }
-                                }
-                            },
+            Column(modifier = Modifier.fillMaxSize()) {
+                notice?.let { message ->
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    )
+                }
+                if (rows.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.journal_history_empty),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 32.dp),
                         )
                     }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentPadding = PaddingValues(
+                            horizontal = 12.dp,
+                            vertical = 6.dp,
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(HISTORY_ROW_GAP),
+                    ) {
+                        items(
+                            items = rows,
+                            key = { observation -> observation.id },
+                        ) { observation ->
+                            HistoryObservationCard(
+                                observation = observation,
+                                formatter = formatter,
+                                onRemoveMeasurement = { measurement ->
+                                    notice = null
+                                    pendingRemove = PendingHistoryRemove(
+                                        observationId = observation.id,
+                                        measurement = measurement,
+                                    )
+                                },
+                            )
+                        }
+                    }
                 }
+            }
+            pendingRemove?.let { pending ->
+                AlertDialog(
+                    onDismissRequest = { pendingRemove = null },
+                    title = {
+                        Text(stringResource(R.string.journal_delete_confirm_title))
+                    },
+                    text = {
+                        Text(stringResource(R.string.journal_delete_confirm_body))
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { removeMeasurement(pending) }) {
+                            Text(stringResource(R.string.journal_delete_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { pendingRemove = null }) {
+                            Text(stringResource(R.string.journal_delete_cancel))
+                        }
+                    },
+                )
             }
         }
     }
 }
+
+/** Confirmed History remove: the card's observation id plus the series row. */
+private data class PendingHistoryRemove(
+    val observationId: String,
+    val measurement: JournalMeasurement,
+)
 
 @Composable
 private fun HistoryObservationCard(
