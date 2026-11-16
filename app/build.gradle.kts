@@ -99,10 +99,10 @@ android {
         applicationId = "com.aetherealmind.grannysknees"
         minSdk = 26
         targetSdk = 37
-        // RC2 versioning: versionName major 2 = RC2, then feature.bugfix.
-        // versionCode = 20000 + feature * 100 + bugfix (e.g. 2.2.0 → 20200).
+        // RC2 versioning: versionName is rc2.<feature>.<bugfix>.
+        // versionCode = 20000 + feature * 100 + bugfix (e.g. rc2.2.0 → 20200).
         versionCode = 20200
-        versionName = "2.2.0"
+        versionName = "rc2.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
