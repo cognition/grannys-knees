@@ -176,7 +176,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Six out of ten. I'll still go out. Wherever we're going had better have a lift."
+          "text": "Six out of ten. I'll still go out. Wherever we're going had better have an elevator."
         }
       ]
     },
@@ -577,7 +577,7 @@
         },
         {
           "tone": "wry",
-          "text": "Standard says six, personalized says seven. Either way, I'm taking the lift.",
+          "text": "Standard says six, personalized says seven. Either way, I'm taking the elevator.",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 7
         },
@@ -1378,7 +1378,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Five out of ten. Enough to make me take the lift and pretend I was going to anyway.",
+          "text": "Five out of ten. Enough to make me take the elevator and pretend I was going to anyway.",
           "requiresFreeSpeech": true
         },
         {
