@@ -1,6 +1,8 @@
 package com.aetherealmind.grannysknees.ui.about
 
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.content.FileProvider
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -169,8 +171,47 @@ internal fun AboutScreen(
             TextButton(onClick = onOpenPrivacy) {
                 Text(stringResource(R.string.about_open_privacy_action))
             }
+            AboutVersionLine()
         }
     }
+}
+
+/** Shows the installed versionName and versionCode on About. */
+@Composable
+private fun AboutVersionLine(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val label = remember(context) {
+        val info = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(
+                    context.packageName,
+                    PackageManager.PackageInfoFlags.of(0),
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(context.packageName, 0)
+            }
+        } catch (_: PackageManager.NameNotFoundException) {
+            null
+        }
+        val name = info?.versionName.orEmpty().ifBlank { "—" }
+        val code = when {
+            info == null -> 0L
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> info.longVersionCode
+            else -> {
+                @Suppress("DEPRECATION")
+                info.versionCode.toLong()
+            }
+        }
+        context.getString(R.string.about_version_label, name, code.toInt())
+    }
+    Text(
+        text = label,
+        modifier = modifier.fillMaxWidth(),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+    )
 }
 
 /**
