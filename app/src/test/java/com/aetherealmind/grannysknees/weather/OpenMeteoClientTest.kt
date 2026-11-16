@@ -40,7 +40,7 @@ class OpenMeteoClientTest {
         assertEquals("43.65", params["latitude"])
         assertEquals("-79.38", params["longitude"])
         assertEquals(
-            "temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,weather_code",
+            "temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,weather_code,wind_speed_10m",
             params["hourly"],
         )
         assertEquals("America/Toronto", params["timezone"])

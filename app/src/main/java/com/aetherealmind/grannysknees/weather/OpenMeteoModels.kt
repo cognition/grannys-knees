@@ -56,6 +56,8 @@ data class HourlyUnits(
     val apparentTemperature: String?,
     val surfacePressure: String,
     val weatherCode: String?,
+    /** Wind speed at 10 m unit, or null when the feed omits wind. */
+    val windSpeed10m: String? = null,
 )
 
 /**
@@ -91,6 +93,8 @@ data class ForecastHour(
     val surfacePressure: Double?,
     /** WMO weather interpretation code, or `null` when unavailable. */
     val weatherCode: Int?,
+    /** Wind speed at 10 m in km/h, or `null` when the feed omits wind. */
+    val windSpeed10m: Double? = null,
 )
 
 /**

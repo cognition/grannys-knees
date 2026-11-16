@@ -4,6 +4,7 @@ import com.aetherealmind.grannysknees.index.WeatherIndexScorer
 import com.aetherealmind.grannysknees.ui.outlook.OutlookUiState
 import com.aetherealmind.grannysknees.ui.today.TodayUiState
 import com.aetherealmind.grannysknees.ui.today.UnavailableReason
+import com.aetherealmind.grannysknees.sayings.GrannyWeatherType
 import com.aetherealmind.grannysknees.weather.HttpTransport
 import com.aetherealmind.grannysknees.weather.OpenMeteoClient
 import com.aetherealmind.grannysknees.weather.OpenMeteoParseException
@@ -160,6 +161,12 @@ internal class ForecastRepository(
         val personal = personalProfile?.let { profile ->
             WeatherIndexScorer.score(personalRequest, profile.toDeltaSensitivities())
         }
+        val activeWeatherTypes = GrannyWeatherType.activeTypes(
+            hours = forecast.hours,
+            scoredHours = scored.hours,
+            zoneId = forecast.timezone.zone,
+            referenceNow = referenceNow,
+        )
         return TodayMapper.toUiState(
             locationLabel = envelope.locationLabel,
             fetchedAt = envelope.fetchedAt,
@@ -168,7 +175,9 @@ internal class ForecastRepository(
             zoneId = forecast.timezone.zone,
             referenceNow = referenceNow,
             personalResult = personal,
-            forecastHasSnow = forecast.hours.any { it.weatherCode in SNOW_WEATHER_CODES },
+            forecastHasSnow = forecast.hours.any { it.weatherCode in SNOW_WEATHER_CODES } ||
+                GrannyWeatherType.SNOW in activeWeatherTypes,
+            activeWeatherTypes = activeWeatherTypes,
         )
     }
 

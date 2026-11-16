@@ -39,12 +39,14 @@ object OpenMeteoParser {
     private const val EXPECTED_TEMPERATURE_UNIT = "°C"
     private const val EXPECTED_HUMIDITY_UNIT = "%"
     private const val EXPECTED_PRESSURE_UNIT = "hPa"
+    private const val EXPECTED_WIND_SPEED_UNIT = "km/h"
 
     private const val KEY_TEMPERATURE = "temperature_2m"
     private const val KEY_HUMIDITY = "relative_humidity_2m"
     private const val KEY_APPARENT = "apparent_temperature"
     private const val KEY_PRESSURE = "surface_pressure"
     private const val KEY_WEATHER_CODE = "weather_code"
+    private const val KEY_WIND_SPEED = "wind_speed_10m"
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -76,6 +78,7 @@ object OpenMeteoParser {
         val apparent = hourly.optionalDoubleColumnIfPresent(KEY_APPARENT, epochs.size)
         val pressures = hourly.optionalDoubleColumn(KEY_PRESSURE, epochs.size)
         val weatherCodes = hourly.optionalIntColumnIfPresent(KEY_WEATHER_CODE, epochs.size)
+        val windSpeeds = hourly.optionalDoubleColumnIfPresent(KEY_WIND_SPEED, epochs.size)
 
         val hours = epochs.mapIndexed { i, epoch ->
             val instant = Instant.ofEpochSecond(epoch)
@@ -91,6 +94,7 @@ object OpenMeteoParser {
                 apparentTemperature = apparent?.get(i),
                 surfacePressure = pressures[i],
                 weatherCode = weatherCodes?.get(i),
+                windSpeed10m = windSpeeds?.get(i),
             )
         }
 
@@ -132,6 +136,7 @@ object OpenMeteoParser {
             apparentTemperature = u[KEY_APPARENT]?.contentOrNull(),
             surfacePressure = u.requireString(KEY_PRESSURE),
             weatherCode = u[KEY_WEATHER_CODE]?.contentOrNull(),
+            windSpeed10m = u[KEY_WIND_SPEED]?.contentOrNull(),
         )
     }
 
@@ -143,6 +148,9 @@ object OpenMeteoParser {
             checkUnit(KEY_APPARENT, actual, EXPECTED_TEMPERATURE_UNIT)
         }
         checkUnit(KEY_PRESSURE, units.surfacePressure, EXPECTED_PRESSURE_UNIT)
+        units.windSpeed10m?.let { actual ->
+            checkUnit(KEY_WIND_SPEED, actual, EXPECTED_WIND_SPEED_UNIT)
+        }
     }
 
     private fun checkUnit(name: String, actual: String, expected: String) {

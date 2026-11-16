@@ -236,6 +236,7 @@ internal fun TodayScreen(
         available?.personalScore,
         grannySpeaksFreely,
         available?.forecastHasSnow,
+        available?.activeWeatherTypes,
         picker,
         season,
         today,
@@ -252,6 +253,7 @@ internal fun TodayScreen(
             allowFreeSpeech = grannySpeaksFreely,
             season = season,
             snowInForecast = available.forecastHasSnow,
+            activeWeatherTypes = available.activeWeatherTypes,
         )?.text?.let(SayingPlaceholders::render)
     }
     val onAnotherSaying: () -> Unit = {

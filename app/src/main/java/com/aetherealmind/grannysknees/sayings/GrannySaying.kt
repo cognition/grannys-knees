@@ -64,4 +64,9 @@ internal data class GrannySaying(
     /** Only eligible when the user explicitly enables free-speech mode. */
     val requiresFreeSpeech: Boolean = false,
     val season: GrannySeason = GrannySeason.ALL_YEAR,
+    /**
+     * When non-empty, the saying is only eligible if the live forecast activates
+     * at least one of these [GrannyWeatherType] labels.
+     */
+    val weatherTypes: Set<String> = emptySet(),
 )
