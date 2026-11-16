@@ -13,13 +13,15 @@ import java.nio.charset.StandardCharsets
 private val REQUIRED_HOURLY_VARIABLES = listOf(
     "temperature_2m",
     "relative_humidity_2m",
+    "apparent_temperature",
     "surface_pressure",
     "weather_code",
+    "wind_speed_10m",
 )
 
 /**
  * Hours before "now" so the **whole local calendar day** is in the payload,
- * plus the 12-hour trailing window lead-in before local midnight (`index-v2`).
+ * plus the 12-hour trailing window lead-in before local midnight (slope index).
  *
  * With only twelve past hours, a late-evening open would leave the morning
  * blank on Today's curve.
@@ -30,7 +32,7 @@ const val DEFAULT_PAST_HOURS: Int = 24 + 12
  * A single Open-Meteo `/v1/forecast` request.
  *
  * Defaults: `timeformat=unixtime`, `forecast_days >= 6` (5-day outlook +
- * current local day), and `past_hours >= 12` for the 12-hour index window.
+ * current local day), and `past_hours >= 12` for the 12-hour pressure window.
  * [DEFAULT_PAST_HOURS] also covers morning→night on Today's curve.
  */
 data class OpenMeteoRequest(

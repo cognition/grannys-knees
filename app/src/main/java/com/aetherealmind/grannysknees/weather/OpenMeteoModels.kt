@@ -52,8 +52,12 @@ data class HourlyUnits(
     val time: String,
     val temperature2m: String,
     val relativeHumidity2m: String,
+    /** Apparent (feels-like) temperature unit, or null when the feed omits it. */
+    val apparentTemperature: String?,
     val surfacePressure: String,
     val weatherCode: String?,
+    /** Wind speed at 10 m unit, or null when the feed omits wind. */
+    val windSpeed10m: String? = null,
 )
 
 /**
@@ -83,10 +87,14 @@ data class ForecastHour(
     val temperature2m: Double?,
     /** Relative humidity at 2 m in %, or `null` if missing. */
     val relativeHumidity2m: Int?,
+    /** Apparent (feels-like) temperature in °C, or `null` if missing. */
+    val apparentTemperature: Double?,
     /** Surface (station-level) pressure in hPa, or `null` if missing. */
     val surfacePressure: Double?,
     /** WMO weather interpretation code, or `null` when unavailable. */
     val weatherCode: Int?,
+    /** Wind speed at 10 m in km/h, or `null` when the feed omits wind. */
+    val windSpeed10m: Double? = null,
 )
 
 /**

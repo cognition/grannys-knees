@@ -130,6 +130,10 @@ internal class GrannySaysCatalog(
                 }
             val flaggedFreeSpeech = saying["requiresFreeSpeech"]
                 ?.jsonPrimitive?.booleanOrNull == true
+            val weatherTypes = saying["weatherTypes"]?.jsonArray.orEmpty()
+                .mapNotNull { element -> element.jsonPrimitive.contentOrNull?.trim() }
+                .filter { label -> label.isNotEmpty() }
+                .toSet()
             return GrannySaying(
                 tone = tone,
                 text = body,
@@ -141,6 +145,7 @@ internal class GrannySaysCatalog(
                     ?.jsonPrimitive?.intOrNull,
                 requiresFreeSpeech = forceFreeSpeech || flaggedFreeSpeech,
                 season = season,
+                weatherTypes = weatherTypes,
             )
         }
 

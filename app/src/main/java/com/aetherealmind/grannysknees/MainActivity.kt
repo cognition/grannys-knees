@@ -34,6 +34,11 @@ class MainActivity : ComponentActivity() {
         val cities = SelectedCityStore(cityFile)
         val sensitivityStore = SensitivityProfileStore(sensitivityFile)
         val feelCalibrationStore = FeelCalibrationStore(feelCalibrationFile)
+        // Drop incompatible Feel samples before first UI frame; persist notice flag.
+        feelCalibrationStore.read()
+        if (feelCalibrationStore.consumeSchemaResetOccurred()) {
+            sensitivityStore.writePendingFeelSchemaResetNotice(true)
+        }
         repository = ForecastRepository(
             store = ForecastCacheStore(cacheFile),
             cityStore = cities,

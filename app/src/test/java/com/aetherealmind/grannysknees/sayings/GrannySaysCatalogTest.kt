@@ -78,14 +78,27 @@ class GrannySaysCatalogTest {
     @Test
     fun `personal comparison sayings are gated to matching scores`() {
         val agree = catalog.sayingsForScore(4).single {
-            it.text.startsWith("Standard says four; personalized says four.")
+            it.requiresPersonalAgreement && it.text.contains("personalized says four")
         }
         assertTrue(agree.requiresPersonalAgreement)
         val differ = catalog.sayingsForScore(4).single {
-            it.text.startsWith("Standard says four; personalized says five.")
+            it.requiresPersonalDifference && it.expectedPersonalScore == 5
         }
         assertTrue(differ.requiresPersonalDifference)
         assertEquals(5, differ.expectedPersonalScore)
+    }
+
+    @Test
+    fun `weatherTypes from the catalog are parsed onto sayings`() {
+        val tagged = catalog.sayingsForScore(6).filter { it.weatherTypes.isNotEmpty() }
+        assertTrue(tagged.isNotEmpty())
+        assertTrue(
+            tagged.any { saying ->
+                GrannyWeatherType.SNOW in saying.weatherTypes ||
+                    GrannyWeatherType.PRESSURE_CHANGE in saying.weatherTypes ||
+                    GrannyWeatherType.RAIN in saying.weatherTypes
+            },
+        )
     }
 
     private fun canonicalJson(): String {

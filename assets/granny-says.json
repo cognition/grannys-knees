@@ -38,7 +38,7 @@
         },
         {
           "tone": "wry",
-          "text": "My knees have nothing to report, which is exactly how I like it."
+          "text": "I heard one little creak. I'll let it off with a warning."
         },
         {
           "tone": "spicy",
@@ -46,7 +46,7 @@
         },
         {
           "tone": "warm",
-          "text": "This is the sort of day you don't waste indoors."
+          "text": "A good day to go out if you've got somewhere nice in mind."
         },
         {
           "tone": "wry",
@@ -63,11 +63,11 @@
       "sayings": [
         {
           "tone": "warm",
-          "text": "Beautiful day. Even my joints are minding their own business."
+          "text": "A little creaky today, but I still fancy a walk."
         },
         {
           "tone": "wry",
-          "text": "Three out of ten. The knees approve. Carry on."
+          "text": "Three out of ten. The knees have a minor objection. Overruled."
         },
         {
           "tone": "spicy",
@@ -79,11 +79,11 @@
         },
         {
           "tone": "wry",
-          "text": "There's a tiny creak in the forecast, but nothing dramatic."
+          "text": "My knees gave a little creak at the front door. That's how Grandpa knew I'd left."
         },
         {
           "tone": "spicy",
-          "text": "Three out of ten. I've had slippers more troublesome than this."
+          "text": "Three out of ten. I walked to Tim’s on sore knees. Grandpa drove and counted the walk from the car."
         }
       ]
     },
@@ -96,7 +96,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees are starting to gossip about the weather."
+          "text": "The knees started talking halfway upstairs. They could've waited till I had both hands free."
         },
         {
           "tone": "spicy",
@@ -104,15 +104,15 @@
         },
         {
           "tone": "warm",
-          "text": "A bit of stiffness. Nothing a hot coffee and a slow start can't negotiate."
+          "text": "These knees could use a slow start. I'll put the coffee on."
         },
         {
           "tone": "wry",
-          "text": "The knees have noticed the weather. They're keeping it to themselves for now."
+          "text": "I can hear my knees on the stairs. Luckily, they're still quieter than Grandpa."
         },
         {
           "tone": "spicy",
-          "text": "Four out of ten. Irritating, but I've met worse at a Boxing Day dinner."
+          "text": "Four out of ten. Irritating, but not as much as the neighbour's kids."
         }
       ]
     },
@@ -125,7 +125,7 @@
         },
         {
           "tone": "wry",
-          "text": "The weather's changing its mind. Again."
+          "text": "The knees waited till I sat down to remind me what I left upstairs."
         },
         {
           "tone": "spicy",
@@ -133,11 +133,11 @@
         },
         {
           "tone": "warm",
-          "text": "Middle of the road today. Take your time and enjoy your double-double."
+          "text": "Five out of ten. I'll take the errands one at a time."
         },
         {
           "tone": "wry",
-          "text": "Five out of ten. The knees are considering their options."
+          "text": "Standing up was fine. Sitting down again was even better."
         },
         {
           "tone": "spicy",
@@ -154,11 +154,14 @@
         },
         {
           "tone": "wry",
-          "text": "My knees are predicting weather again. Show-offs."
+          "text": "The knees had a word with me on the way upstairs. Then another on the way down."
         },
         {
           "tone": "spicy",
-          "text": "Six out of ten. I wouldn't volunteer to shovel the walk."
+          "text": "Six out of ten. I'll supervise the shovelling through the window. Wave if you need more supervision.",
+          "weatherTypes": [
+            "snow"
+          ]
         },
         {
           "tone": "warm",
@@ -166,11 +169,14 @@
         },
         {
           "tone": "wry",
-          "text": "The barometer moved and apparently my knees were copied on the email."
+          "text": "My knees noticed the pressure change. I wish they'd learned to send a text.",
+          "weatherTypes": [
+            "pressure_change"
+          ]
         },
         {
           "tone": "spicy",
-          "text": "Six out of ten. I'm still going out, but the stairs can wait outside."
+          "text": "Six out of ten. I'll still go out. Wherever we're going had better have an elevator."
         }
       ]
     },
@@ -195,7 +201,7 @@
         },
         {
           "tone": "wry",
-          "text": "Seven out of ten. The knees would prefer all destinations to have parking."
+          "text": "Seven out of ten. If we can't park near the door, give me the keys and I'll wait here."
         },
         {
           "tone": "spicy",
@@ -212,7 +218,7 @@
         },
         {
           "tone": "wry",
-          "text": "My knees have contacted their union representative."
+          "text": "My knees have called their union rep. Even she said to leave a message after eight."
         },
         {
           "tone": "spicy",
@@ -237,7 +243,7 @@
       "sayings": [
         {
           "tone": "warm",
-          "text": "Put the kettle on. We're not rushing anywhere, eh."
+          "text": "Put the kettle on, love. I'm staying right here."
         },
         {
           "tone": "wry",
@@ -245,7 +251,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Nine out of ten. Absolutely not. Put the kettle on and grab the hotwater bottle."
+          "text": "Nine out of ten. Pass the hot water bottle. Yes, the big one."
         },
         {
           "tone": "warm",
@@ -266,11 +272,11 @@
       "sayings": [
         {
           "tone": "warm",
-          "text": "Be kind to yourself today. Essential movement only."
+          "text": "Get comfortable, love. Ask somebody else to do the fetching."
         },
         {
           "tone": "wry",
-          "text": "Today's plans have been revised by the Department of Knees."
+          "text": "I had three things on the list today. I've crossed off two and underlined 'sit down.'"
         },
         {
           "tone": "spicy",
@@ -286,7 +292,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Ten out of ten. Double-double here. Hudson's Bay blanket here. Everyone else can use the door."
+          "text": "Ten out of ten. Bring me a double-double and my good blanket. Then you can tell me what you wanted."
         }
       ]
     }
@@ -297,7 +303,10 @@
       "sayings": [
         {
           "tone": "warm",
-          "text": "A very decent day. Try not to frighten it with grand plans or a snow shovel."
+          "text": "The knees feel good enough to shovel. I'm keeping that between me and the curtains.",
+          "weatherTypes": [
+            "snow"
+          ]
         },
         {
           "tone": "warm",
@@ -305,11 +314,11 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is behaving. Naturally, I remain suspicious."
+          "text": "My knees are quiet. You'd think I'd enjoy it, but now I can hear Grandpa chewing."
         },
         {
           "tone": "wry",
-          "text": "One out of ten, and still somehow not a personal triumph. The loons remain unimpressed."
+          "text": "One out of ten. That's the nicest thing my knees have had to say all week."
         },
         {
           "tone": "wry",
@@ -328,7 +337,7 @@
         },
         {
           "tone": "spicy",
-          "text": "One out of ten. I expect this level of competence from the weather."
+          "text": "One out of ten. I might go for a second walk just to make the neighbours think the first one was easy."
         },
         {
           "tone": "spicy",
@@ -336,7 +345,7 @@
         },
         {
           "tone": "spicy",
-          "text": "A calm forecast. Hide the good cookies before the day gets ideas."
+          "text": "I feel good enough to share the cookies. I said good enough. I haven't actually offered."
         }
       ]
     },
@@ -357,11 +366,11 @@
         },
         {
           "tone": "wry",
-          "text": "Two out of ten. The weather has cleared the low bar with confidence."
+          "text": "The knees only complained once. If Grandpa asks, tell him that's the target."
         },
         {
           "tone": "wry",
-          "text": "Nothing dramatic today. Even the snowbank is keeping a low profile."
+          "text": "One creak on the stairs. Between us, I think they just wanted attention."
         },
         {
           "tone": "wry",
@@ -370,7 +379,7 @@
         },
         {
           "tone": "wry",
-          "text": "Standard says two, personalized says three. The personal committee has notes.",
+          "text": "Standard says two, personalized says three. My knees always add a little for themselves.",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 3
         },
@@ -380,7 +389,7 @@
         },
         {
           "tone": "spicy",
-          "text": "The day is usable. Please handle it with care."
+          "text": "I feel good enough to run errands. Keep that to yourself or they'll give me their lists."
         },
         {
           "tone": "spicy",
@@ -401,7 +410,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees give this weather three stars and a very small asterisk."
+          "text": "Three out of ten. The knees are coming along for the walk. They've asked about benches."
         },
         {
           "tone": "wry",
@@ -409,7 +418,7 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is making promises. The knees are asking for references."
+          "text": "My knees warmed up halfway through the walk. They could've told me before I wore the ugly shoes."
         },
         {
           "tone": "wry",
@@ -418,7 +427,7 @@
         },
         {
           "tone": "wry",
-          "text": "Standard says three; personalized says four. Apparently the knees have their own polling firm.",
+          "text": "Standard says three, personalized says four. Apparently I get the family rate on creaking.",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 4
         },
@@ -449,15 +458,15 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have opened a case file on the weather."
+          "text": "Four out of ten. One knee creaked. The other waited a step and did it louder."
         },
         {
           "tone": "wry",
-          "text": "Four out of ten. The forecast has entered its mildly irritating era."
+          "text": "Four out of ten. I can do the stairs. I'd appreciate it if you'd stop remembering things upstairs."
         },
         {
           "tone": "wry",
-          "text": "The barometer is being dramatic. The knees are taking minutes and checking the radar."
+          "text": "I made it down the stairs without stopping. I did have a few words with the railing."
         },
         {
           "tone": "wry",
@@ -466,13 +475,13 @@
         },
         {
           "tone": "wry",
-          "text": "Standard says four; personalized says five. The personal forecast has union representation.",
+          "text": "Standard says four, personalized says five. My knees would like that extra point entered into the record.",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 5
         },
         {
           "tone": "spicy",
-          "text": "Four out of ten. Annoying enough to mention, not enough to cancel lunch."
+          "text": "Four out of ten. I'll still meet you for lunch. Save me a chair with arms."
         },
         {
           "tone": "spicy",
@@ -480,7 +489,10 @@
         },
         {
           "tone": "spicy",
-          "text": "The weather has started something. I have started the kettle."
+          "text": "I came in from the rain and wrung out my socks. Now I've got two reasons to put my feet up.",
+          "weatherTypes": [
+            "rain"
+          ]
         }
       ]
     },
@@ -493,7 +505,7 @@
         },
         {
           "tone": "warm",
-          "text": "Meet the middle of the day in the middle of the road, after the salt truck passes."
+          "text": "Halfway up the stairs seems like a perfectly good place to admire the wallpaper."
         },
         {
           "tone": "wry",
@@ -501,11 +513,14 @@
         },
         {
           "tone": "wry",
-          "text": "The weather has reached the part where it expects applause for being difficult."
+          "text": "I can do the groceries. Grandpa can do the part where they come out of the boot."
         },
         {
           "tone": "wry",
-          "text": "The knees have noticed the pressure. They would like credit for noticing."
+          "text": "The air pressure shifted. My knees would like to know who gave it permission.",
+          "weatherTypes": [
+            "pressure_change"
+          ]
         },
         {
           "tone": "wry",
@@ -514,7 +529,7 @@
         },
         {
           "tone": "wry",
-          "text": "Standard says five; personalized says six. The personal version has raised an eyebrow.",
+          "text": "Standard says five, personalized says six. One more point and Grandpa's unloading the car.",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 6
         },
@@ -545,15 +560,15 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have moved from commentary to editorial."
+          "text": "The knees had their say on the stairs. I made sure the whole house heard mine."
         },
         {
           "tone": "wry",
-          "text": "Six out of ten. The forecast has acquired a personality, and not a charming one."
+          "text": "Six out of ten. I made it to the shops and back. Getting out of the car is a separate appointment."
         },
         {
           "tone": "wry",
-          "text": "Apparently the air has opinions. Apparently my knees are its press secretary."
+          "text": "My knees are sore enough that I checked the forecast twice. Still no apology."
         },
         {
           "tone": "wry",
@@ -562,7 +577,7 @@
         },
         {
           "tone": "wry",
-          "text": "Standard says six; personalized says seven. The custom model has chosen honesty.",
+          "text": "Standard says six, personalized says seven. Either way, I'm taking the elevator.",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 7
         },
@@ -593,7 +608,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have scheduled a meeting and mysteriously omitted the agenda."
+          "text": "I took one look at the basement stairs and remembered we have a perfectly good freezer upstairs."
         },
         {
           "tone": "wry",
@@ -601,7 +616,7 @@
         },
         {
           "tone": "wry",
-          "text": "The weather has made its case. The knees are preparing a rebuttal."
+          "text": "I brought the empty laundry basket down. If you were hoping for clothes in it, go get them."
         },
         {
           "tone": "wry",
@@ -610,7 +625,7 @@
         },
         {
           "tone": "wry",
-          "text": "Standard says seven; personalized says eight. Personalization has entered the room wearing boots.",
+          "text": "Standard says seven, personalized says eight. Either number gets you sent to the basement for me.",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 8
         },
@@ -637,7 +652,7 @@
         },
         {
           "tone": "warm",
-          "text": "Keep warm, take your time, and let the day be less ambitious than a January driveway."
+          "text": "Put the warm blanket over my knees, love. Stay for a cup if you've got a minute."
         },
         {
           "tone": "wry",
@@ -649,16 +664,16 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast says weather. The knees say consequences."
+          "text": "I stood up to get the kettle. Forgot the kettle. Remembered every step back."
         },
         {
           "tone": "wry",
-          "text": "Standard says eight; personalized says eight. We have reached numerical solidarity.",
+          "text": "Standard says eight. Personalized says eight. There's your second opinion.",
           "requiresPersonalAgreement": true
         },
         {
           "tone": "wry",
-          "text": "Standard says eight; personalized says nine. The personal forecast has stopped being diplomatic.",
+          "text": "Standard says eight, personalized says nine. Either way, could you bring the tea to me?",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 9
         },
@@ -689,7 +704,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have issued a press release. It is mostly punctuation."
+          "text": "My knees gave a speech on the way to the kettle. By the time they finished, I'd forgotten what I got up for."
         },
         {
           "tone": "wry",
@@ -697,7 +712,7 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is loud today. The knees have brought earplugs and a toque."
+          "text": "If you're coming over, let yourself in. You'll see why the door's unlocked when I try to get up."
         },
         {
           "tone": "wry",
@@ -729,7 +744,7 @@
       "sayings": [
         {
           "tone": "warm",
-          "text": "Ten out of ten. Today is for care, comfort, and no apologies to the snowbank."
+          "text": "Ten out of ten. Get comfortable and let someone bring you what you need."
         },
         {
           "tone": "warm",
@@ -737,15 +752,18 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have declared a weather emergency and appointed me spokesperson."
+          "text": "My knees have declared today a write-off. If anybody needs a second opinion, try the other knee."
         },
         {
           "tone": "wry",
-          "text": "Ten out of ten. The floor is doing excellent work as a destination."
+          "text": "Ten out of ten. I dropped the remote. Apparently we're watching the credits."
         },
         {
           "tone": "wry",
-          "text": "The forecast has gone too far. I shall be responding with a blanket and a hockey rerun."
+          "text": "Ten out of ten and bitter cold outside. Put the hockey on. I'll let somebody else fall on the ice.",
+          "weatherTypes": [
+            "cold"
+          ]
         },
         {
           "tone": "wry",
@@ -754,7 +772,7 @@
         },
         {
           "tone": "wry",
-          "text": "Standard says ten; personalized says nine. Even the personal model is trying diplomacy.",
+          "text": "Standard says ten, personalized says nine. I'll take the smaller number and the bigger blanket.",
           "requiresPersonalDifference": true,
           "expectedPersonalScore": 9
         },
@@ -783,11 +801,11 @@
         },
         {
           "tone": "wry",
-          "text": "The knees are doing a quiet encore. Nobody request a tougher number."
+          "text": "The knees stayed quiet all the way down the stairs. I nearly went back up to check."
         },
         {
           "tone": "warm",
-          "text": "If the weather were a vaudeville act, this one gets a polite chuckle."
+          "text": "I went for a walk and forgot to complain about my knees. Very unlike me."
         },
         {
           "tone": "wry",
@@ -824,7 +842,7 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is sweet as pie. I remain the suspicious filling.",
+          "text": "My knees gave me the day off. Shame the rest of the family didn't get the memo.",
           "requiresFreeSpeech": true
         },
         {
@@ -844,7 +862,7 @@
         },
         {
           "tone": "wry",
-          "text": "The weather has brought flowers; the knees have brought paperwork.",
+          "text": "I stood up without a sound. Grandpa still grunted on my behalf.",
           "requiresFreeSpeech": true
         },
         {
@@ -854,12 +872,15 @@
         },
         {
           "tone": "wry",
-          "text": "The barometer says calm. The knees say don't be an idiot.",
-          "requiresFreeSpeech": true
+          "text": "I feel so good I could shovel the neighbour's driveway. Idiot thought. It's gone now.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "snow"
+          ]
         },
         {
           "tone": "spicy",
-          "text": "A one out of ten. Put that in your pipe and smoke it, forecast.",
+          "text": "One out of ten. I got up without a grunt. So who the hell did Grandpa just tell to take it easy?",
           "requiresFreeSpeech": true
         },
         {
@@ -871,6 +892,31 @@
           "tone": "spicy",
           "text": "No drama today. What a bloody inconvenience.",
           "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "One out of ten. My knees feel great, and I'm going to bring it up exactly as often as you wished I'd stop complaining.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "I got up without saying 'shit.' Grandpa thought I'd gone out.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "My knees are behaving for once. Nobody tell them this is what I expect every day.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "I took the stairs and didn't swear once. Bloody waste of a good vocabulary.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "Nothing hurts enough to complain about. Go on, then. Tell me what you did to my good frying pan.",
+          "requiresFreeSpeech": true
         }
       ]
     },
@@ -879,11 +925,11 @@
       "sayings": [
         {
           "tone": "warm",
-          "text": "Two out of ten. huh.."
+          "text": "Two out of ten. A little creak, then it's on with the day."
         },
         {
           "tone": "wry",
-          "text": "The knees have accepted the weather's apology, provisionally. The loons are still reviewing it."
+          "text": "The knees chimed in once on the stairs. I told them I'd put it in the minutes."
         },
         {
           "tone": "warm",
@@ -899,7 +945,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Two out of ten. The weather is getting away with something.",
+          "text": "Two out of ten. I made more noise opening the front door than walking through it.",
           "requiresFreeSpeech": true
         },
         {
@@ -914,7 +960,7 @@
         },
         {
           "tone": "wry",
-          "text": "Two out of ten, and the forecast still thinks it is the main act.",
+          "text": "Two out of ten. I've made bigger noises getting the lid off the peanut butter.",
           "requiresFreeSpeech": true
         },
         {
@@ -924,13 +970,16 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have sent a postcard: wish you were sitting down.",
+          "text": "The knees sent a little twinge on the way out. I told them we'd already left.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "Not bad. Don't let it go to its head, the smug little cloud.",
-          "requiresFreeSpeech": true
+          "text": "The clouds are putting on a show. My knees gave them two out of ten and went back inside for a biscuit.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "cloudy"
+          ]
         },
         {
           "tone": "wry",
@@ -954,7 +1003,7 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast has a clean record today. Suspicious, but useful.",
+          "text": "My knees managed a single creak all morning. Pity the kitchen door couldn't show the same restraint.",
           "requiresFreeSpeech": true
         },
         {
@@ -964,12 +1013,37 @@
         },
         {
           "tone": "wry",
-          "text": "Nothing to report except my disappointment at having nothing to report.",
+          "text": "A little ache. I can save the long version for somebody who asks twice.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
           "text": "The knees are quiet. Everybody keep your bloody hands off the weather.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Two out of ten. I heard a creak. For once it might actually have been the damn floor.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "The left knee piped up on the front step. I told it to save the good material for company.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "I felt one twinge getting the post. I still had more to say about the gas bill.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "A little stiff till I got moving. The dog and I both said 'fuck it' and took the long way home. I said it for the dog.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "I barely noticed my knees today. Shame I can't say the same for whoever put the empty milk carton back.",
           "requiresFreeSpeech": true
         }
       ]
@@ -979,19 +1053,19 @@
       "sayings": [
         {
           "tone": "warm",
-          "text": "Three out of ten. A little creak is just comic timing."
+          "text": "Three out of ten. A little creak and I'm on my way."
         },
         {
           "tone": "wry",
-          "text": "The knees give the forecast a tiny hat and a polite nod."
+          "text": "The knees grumbled at the front step. They've been quiet since I gave them something to do."
         },
         {
           "tone": "warm",
-          "text": "A good day to putter about with the confidence of a man in a very good toque."
+          "text": "A good day to putter around. I'll get to the rest when I get to it."
         },
         {
           "tone": "wry",
-          "text": "The joints have found a minor subplot and will not be rushed."
+          "text": "The knees needed a minute to warm up. So did the car."
         },
         {
           "tone": "warm",
@@ -1009,7 +1083,7 @@
         },
         {
           "tone": "spicy",
-          "text": "The weather is being cheeky. I can be cheekier.",
+          "text": "I went up two steps before my knees had anything to say. They were probably saving their breath for the other twelve.",
           "requiresFreeSpeech": true
         },
         {
@@ -1024,7 +1098,7 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is delivering a routine, and the knees are heckling from the balcony.",
+          "text": "My knees creaked in the biscuit aisle. I'd have blamed the trolley, but I'd left it at the end.",
           "requiresFreeSpeech": true
         },
         {
@@ -1034,8 +1108,11 @@
         },
         {
           "tone": "wry",
-          "text": "The sky has a grin on it. I know that look.",
-          "requiresFreeSpeech": true
+          "text": "Sun's out. My knees are up for a walk. The dog might have mentioned he's already been.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "sunny"
+          ]
         },
         {
           "tone": "spicy",
@@ -1054,22 +1131,47 @@
         },
         {
           "tone": "wry",
-          "text": "A small creak for a small audience. Please tip your joints.",
+          "text": "A creak when I stood up and a sigh when I sat down. Between us, I supplied the sigh.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "The forecast can behave itself, or it can explain itself to Granny.",
+          "text": "I walked the whole block. The knees complained once. Grandpa complained about the route twice.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "wry",
-          "text": "Three out of ten: the knees' version of a standing ovation.",
+          "text": "Three out of ten. I can still get up without using both hands. Hold the applause.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
           "text": "I can handle this. I simply refuse to make it look easy.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Three out of ten. My knees and I are going for a walk. They can bitch about the hills when we get to them.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "One creak getting up, two getting down. The chair's getting all the credit.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "My knees grumbled through the first block. By the second, they'd bloody well caught up.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Three out of ten. I'll go to the garden centre. If you buy soil, you're carrying the damn bag.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "The knees are talking again. So far it's the sort of shit you can nod through while you butter your toast.",
           "requiresFreeSpeech": true
         }
       ]
@@ -1091,7 +1193,7 @@
         },
         {
           "tone": "wry",
-          "text": "The weather has begun its little vaudeville routine."
+          "text": "The knees were fine once I got moving. Getting moving was the part they objected to."
         },
         {
           "tone": "warm",
@@ -1104,13 +1206,19 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have noticed the pressure and are being bloody theatrical.",
-          "requiresFreeSpeech": true
+          "text": "The pressure changed and my knees did a bloody drum roll. All I did was stand up.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "pressure_change"
+          ]
         },
         {
           "tone": "spicy",
-          "text": "If the weather wants a quarrel, it can get in line.",
-          "requiresFreeSpeech": true
+          "text": "The rain's picking a fight with my knees. It can come inside and help me get these damn boots off.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "rain"
+          ]
         },
         {
           "tone": "wry",
@@ -1124,8 +1232,11 @@
         },
         {
           "tone": "wry",
-          "text": "The barometer has a punchline, and unfortunately I am it.",
-          "requiresFreeSpeech": true
+          "text": "The pressure shifted and I creaked louder than the screen door. At least nobody tried to oil me.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "pressure_change"
+          ]
         },
         {
           "tone": "spicy",
@@ -1134,7 +1245,7 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is wearing a false moustache and calling itself a crisis.",
+          "text": "The forecast looked innocent enough. My knees would like to cross-examine it.",
           "requiresFreeSpeech": true
         },
         {
@@ -1164,12 +1275,40 @@
         },
         {
           "tone": "wry",
-          "text": "The weather has arrived with a tiny trumpet and no invitation.",
+          "text": "The knees started up halfway to the mailbox. I've had worse company on a walk.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "Not a disaster. Just a damn nuisance with clouds.",
+          "text": "It's grey out and the knees are touchy. If Grandpa asks how I am, tell him to pick one of those to fix.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "cloudy"
+          ]
+        },
+        {
+          "tone": "spicy",
+          "text": "Four out of ten. I'll come for a walk. If you say 'let's pick up the pace,' I'll point out you have bloody legs of your own.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "I can still weed the garden. The ones in the back can consider today a fucking reprieve.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "My knees have developed a small objection to stairs. The objection gets louder when I've left my glasses upstairs.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Four out of ten. I'm tying my shoes with one foot on a chair. I look ridiculous and I don't give a shit.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "I can get things done today. Whoever put 'quick run to the shops' on the list can strike out 'quick' and bloody well drive.",
           "requiresFreeSpeech": true
         }
       ]
@@ -1183,7 +1322,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have reached the intermission and would like refreshments."
+          "text": "Five out of ten. I can finish the errands. Can the last one be buying myself a biscuit?"
         },
         {
           "tone": "warm",
@@ -1191,7 +1330,7 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is now doing a full routine with props."
+          "text": "I can still do the laundry. Whoever put the machine in the basement can bring it back up."
         },
         {
           "tone": "warm",
@@ -1204,7 +1343,7 @@
         },
         {
           "tone": "wry",
-          "text": "The air has changed its mind, and the knees are bloody copy editors.",
+          "text": "The weather can change its mind all it likes. My bloody knees hear about it every time.",
           "requiresFreeSpeech": true
         },
         {
@@ -1214,7 +1353,7 @@
         },
         {
           "tone": "wry",
-          "text": "Five out of ten. The weather has put on its little hat of trouble.",
+          "text": "Five out of ten. I can do the shopping. I intend to lean on the trolley like I own it.",
           "requiresFreeSpeech": true
         },
         {
@@ -1224,7 +1363,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees are giving the forecast two stars and a stern look.",
+          "text": "My knees have made their point. They could stop making it every time I stand up.",
           "requiresFreeSpeech": true
         },
         {
@@ -1234,17 +1373,17 @@
         },
         {
           "tone": "wry",
-          "text": "The day has a punchline. I am waiting for the part where it improves.",
+          "text": "I sat down to tie my shoes and wound up having a cup of tea. The shoes can join me when they're ready.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "Five out of ten: enough trouble to be interesting, not enough to be impressive.",
+          "text": "Five out of ten. Enough to make me take the elevator and pretend I was going to anyway.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "wry",
-          "text": "The joints are consulting the rule book and finding loopholes.",
+          "text": "I put the washing on. Then I put a chair beside the dryer. Whoever calls that lazy can fold the bloody fitted sheet.",
           "requiresFreeSpeech": true
         },
         {
@@ -1264,12 +1403,37 @@
         },
         {
           "tone": "wry",
-          "text": "Five out of ten and the forecast is already fishing for applause.",
+          "text": "Five out of ten. If you hear me sigh from the kitchen, I'm getting something out of the oven.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "The middle of the scale is a bloody lot of negotiation.",
+          "text": "Halfway up the scale and halfway through the dishes. Guess which one I'm leaving in the sink.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Five out of ten. I can do the laundry or change the sheets. Pick one before I say fuck it and do neither.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "My knees have complained every time I've stood up. I've started complaining every time Grandpa asks why I'm still sitting.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Halfway up the stairs I remembered I don't even like the damn sweater I was going up for.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "I can get through the grocery shop. If you remember the eggs at the checkout, you're the one going back for them.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "Five out of ten. I've come down with a mild case of the fuck-its. So far it only affects vacuuming.",
           "requiresFreeSpeech": true
         }
       ]
@@ -1283,7 +1447,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have gone from comic relief to featured performer."
+          "text": "Six out of ten. The knees let me do the shopping. They objected when I remembered I'd bought stairs with the house."
         },
         {
           "tone": "warm",
@@ -1291,7 +1455,7 @@
         },
         {
           "tone": "wry",
-          "text": "The weather has developed a strong personality and no references."
+          "text": "The knees are sore enough to make me count the steps from the car to the door."
         },
         {
           "tone": "warm",
@@ -1304,17 +1468,20 @@
         },
         {
           "tone": "wry",
-          "text": "The barometer moved and the joints filed a bloody grievance.",
-          "requiresFreeSpeech": true
+          "text": "The pressure shifted and both knees kicked up a fuss. Nice of the bastards to agree on something.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "pressure_change"
+          ]
         },
         {
           "tone": "spicy",
-          "text": "I can do it. I simply won't do it at the weather's preferred speed.",
+          "text": "If you're waiting for me on the stairs, sit down. I keep thinking of things I should've brought the first damn time.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "wry",
-          "text": "Six out of ten: the forecast's way of heckling from the cheap seats.",
+          "text": "Six out of ten. I'll go to the shop with you. Pick the one where we can park out front.",
           "requiresFreeSpeech": true
         },
         {
@@ -1324,7 +1491,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have hired a press agent and are demanding better lighting.",
+          "text": "Grandpa asked if I was coming upstairs. I said yes. I didn't say before supper.",
           "requiresFreeSpeech": true
         },
         {
@@ -1334,8 +1501,11 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is doing slapstick with my cartilage.",
-          "requiresFreeSpeech": true
+          "text": "It's so damn muggy my shirt's stuck to the chair. For once the chair and my knees agree on where I ought to be.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "humid"
+          ]
         },
         {
           "tone": "spicy",
@@ -1344,7 +1514,7 @@
         },
         {
           "tone": "wry",
-          "text": "Six out of ten and suddenly every cupboard is a high-risk venture.",
+          "text": "Six out of ten. Whatever's in the bottom cupboard had better be worth getting back up for.",
           "requiresFreeSpeech": true
         },
         {
@@ -1359,22 +1529,47 @@
         },
         {
           "tone": "spicy",
-          "text": "The weather is a nuisance with a forecast subscription.",
+          "text": "I told Grandpa I needed a minute on the landing. He brought me the vacuum. The man's a slow learner.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "wry",
-          "text": "Six out of ten: a fine day for a dramatic chair entrance.",
+          "text": "Six out of ten. If I sit down with a groan, kindly give me a moment before you ask for anything.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "If it bends, climbs, or hurries, it can get stuffed in tomorrow's drawer.",
+          "text": "If it takes two trips upstairs, it's staying down here till tomorrow.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "yeah right.. ",
+          "text": "Run back upstairs for your glasses? Yeah, right.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Six out of ten. I'll come to the shops if I can lean on the trolley. Get your own damn trolley.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "I can carry the laundry basket or hold the railing. Guess which one is staying on the landing.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "There's free parking two blocks away. At six out of ten, I'm paying the damn meter.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "If you need me to kneel, have the decency to tell me how the fuck you plan to get me back up.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "Six out of ten. I put the pie on the middle shelf. Anything I have to bend for can go straight to hell.",
           "requiresFreeSpeech": true
         }
       ]
@@ -1388,7 +1583,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have taken the stage and forgotten the next line."
+          "text": "I made it to the landing. That chair up there is beginning to look like good planning."
         },
         {
           "tone": "warm",
@@ -1396,7 +1591,7 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast has become a one-joint comedy duo."
+          "text": "The dog brought me his lead. I brought him a ball. We both know who's running today."
         },
         {
           "tone": "warm",
@@ -1404,7 +1599,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Seven out of ten. The joints have filed a damn manifesto.",
+          "text": "Seven out of ten. I made it down the stairs once. Who left the damn laundry upstairs?",
           "requiresFreeSpeech": true
         },
         {
@@ -1429,8 +1624,11 @@
         },
         {
           "tone": "wry",
-          "text": "The weather has brought a prop, a spotlight, and absolutely no talent.",
-          "requiresFreeSpeech": true
+          "text": "The wind blew the bin halfway down the street. At seven out of ten, that's the bin's new bloody address.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "windy"
+          ]
         },
         {
           "tone": "spicy",
@@ -1449,8 +1647,11 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast says go gently. The knees say it with stronger punctuation.",
-          "requiresFreeSpeech": true
+          "text": "I can hear thunder from here. The dog has claimed my spot on the sofa. He can bloody well budge over.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "thunderstorm"
+          ]
         },
         {
           "tone": "spicy",
@@ -1459,7 +1660,7 @@
         },
         {
           "tone": "wry",
-          "text": "Seven out of ten and the sofa has received a standing ovation.",
+          "text": "Seven out of ten. If the sofa had a kettle, I'd be set.",
           "requiresFreeSpeech": true
         },
         {
@@ -1469,17 +1670,42 @@
         },
         {
           "tone": "wry",
-          "text": "Today's comedy is physical, which feels unnecessarily personal.",
+          "text": "I took the bottom step with one hand on the railing and the other on the wall. In my own house. Airport security should be this thorough.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "I am not avoiding the stairs. We have mutually agreed to bugger off.",
+          "text": "The stairs can bugger off. Grandpa can bring the laundry down.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "I'm coming down with the fuckits.",
+          "text": "Seven out of ten and I've got a case of the fuck-its. The laundry can wait.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Seven out of ten. If you hear me say 'fuck' from the bathroom, bring me the bathmat. I'm trying to get my socks on.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "I walked to the end of the driveway. The bins can stay there till somebody with better knees comes home.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Grandpa asked what I wanted for supper. I said anything he could get out of the damn oven himself.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Seven out of ten. I'd tell the stairs to go to hell, but I'd still have to go down them to get to the car.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "Somebody dropped a twenty under the sofa. At seven out of ten it can sit there and earn bloody interest.",
           "requiresFreeSpeech": true
         }
       ]
@@ -1514,8 +1740,11 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is loud, and the knees are bloody tired of the encore.",
-          "requiresFreeSpeech": true
+          "text": "It's bloody hot. If you move the fan away from my chair again, you'd better be bringing me the whole damn lake.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "hot"
+          ]
         },
         {
           "tone": "spicy",
@@ -1544,8 +1773,11 @@
         },
         {
           "tone": "wry",
-          "text": "The weather has a punchline. Unfortunately, it is 'stand up again.'",
-          "requiresFreeSpeech": true
+          "text": "It's raining hard enough to hear it through the windows. Between that and the knees, nobody's going to miss me swearing.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "rain"
+          ]
         },
         {
           "tone": "spicy",
@@ -1564,12 +1796,12 @@
         },
         {
           "tone": "wry",
-          "text": "The chesterfield has better attendance than I do.",
+          "text": "I've spent so long on this chesterfield I've got a favourite dip in the cushion.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "I am conserving cartilage and refusing to feel guilty about it.",
+          "text": "I'm saving my next trip across the room for something worth getting up for.",
           "requiresFreeSpeech": true
         },
         {
@@ -1579,12 +1811,37 @@
         },
         {
           "tone": "spicy",
-          "text": "The knees say no. The knees have excellent bloody points.",
+          "text": "The knees say no. For once, I see their bloody point.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "spicy",
-          "text": "fuck off.",
+          "text": "If the doorbell rings again, I'm yelling 'fuck off' from right here.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Eight out of ten. I made it to the kettle. If you want a second cup, put it in the first bloody cup now.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "The doorbell rang. Whoever it is can wait. I only just sat the fuck down.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "I dropped my glasses. The dog's looking straight at them. For all the treats I've paid him, he's bloody useless.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Eight out of ten. If somebody says they're just popping in, tell them to pop the kettle on while they're at it.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "I got up for a biscuit and came back with the whole tin. Like hell I'm doing that twice.",
           "requiresFreeSpeech": true
         }
       ]
@@ -1598,7 +1855,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have issued a press release and it is mostly commas."
+          "text": "My knees are giving a speech every time I get up. At this point I'm supplying the swear words."
         },
         {
           "tone": "warm",
@@ -1619,8 +1876,11 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast is putting on a tragedy; the joints want royalties.",
-          "requiresFreeSpeech": true
+          "text": "There's ice on the steps. I'm already at nine out of ten sitting still. Whoever wants the post can strap on their damn skates.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "icy"
+          ]
         },
         {
           "tone": "spicy",
@@ -1654,12 +1914,12 @@
         },
         {
           "tone": "spicy",
-          "text": "No, I will not 'just pop out.' Is this a reference to my hip?",
+          "text": "Just pop out? Love, it took me five minutes to get to the front door.",
           "requiresFreeSpeech": true
         },
         {
           "tone": "wry",
-          "text": "The weather has front-row tickets to my knees' complaint department.",
+          "text": "Nine out of ten. Grandpa said to put my feet up. Funny, I could've sworn that's what I've been asking him to help me do.",
           "requiresFreeSpeech": true
         },
         {
@@ -1669,7 +1929,7 @@
         },
         {
           "tone": "wry",
-          "text": "The floor is close, the stairs are smug, and the plot is thin.",
+          "text": "I can see the stairs from here. That's as far as our relationship goes today.",
           "requiresFreeSpeech": true
         },
         {
@@ -1679,7 +1939,7 @@
         },
         {
           "tone": "wry",
-          "text": "The knees have gone method actor. Nobody knows when they will stop.",
+          "text": "My knees hurt sitting down. Imagine the review they gave standing up.",
           "requiresFreeSpeech": true
         },
         {
@@ -1689,7 +1949,32 @@
         },
         {
           "tone": "spicy",
-          "text": "fuck off.",
+          "text": "Nine out of ten. The stairs can fuck off. So can whoever left my tea at the top.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Nine out of ten. If you want me to get up and see something, film the damn thing and bring it over.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "Grandpa asked if I'd like to come along for the ride. I'd like to put my bloody socks on without an intermission.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Yes, I'm still wearing yesterday's pyjamas. If you feel strongly about it, you can bring me a clean fucking pair.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Nine out of ten. The tea's gone cold. Bring a fresh one before you tell me where the microwave is.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "There are three steps to the porch. Today I hate every single fucking one of them by name.",
           "requiresFreeSpeech": true
         }
       ]
@@ -1711,7 +1996,7 @@
         },
         {
           "tone": "wry",
-          "text": "The floor is now a fully accredited destination."
+          "text": "If it fell on the floor, say goodbye. I have enough trouble putting my feet on it."
         },
         {
           "tone": "warm",
@@ -1724,8 +2009,11 @@
         },
         {
           "tone": "wry",
-          "text": "The forecast has gone to hell and sent no forwarding address.",
-          "requiresFreeSpeech": true
+          "text": "Snow's piling up and my knees are at ten. Whoever asks me to go out can start by digging a bloody tunnel to the car.",
+          "requiresFreeSpeech": true,
+          "weatherTypes": [
+            "snow"
+          ]
         },
         {
           "tone": "spicy",
@@ -1754,7 +2042,7 @@
         },
         {
           "tone": "wry",
-          "text": "The weather is doing slapstick, but I am not volunteering for the pratfall.",
+          "text": "At ten out of ten, I can put on my slippers or I can answer the door. If you hear swearing and nothing else, I've picked the slippers.",
           "requiresFreeSpeech": true
         },
         {
@@ -1769,7 +2057,7 @@
         },
         {
           "tone": "spicy",
-          "text": "If it involves stairs, no. it can get stuffed until next week.",
+          "text": "If it involves stairs, it can get stuffed. That includes the clean pyjamas upstairs.",
           "requiresFreeSpeech": true
         },
         {
@@ -1779,7 +2067,7 @@
         },
         {
           "tone": "spicy",
-          "text": "Ten out of ten. I have officially run out of polite bloody gestures.",
+          "text": "Ten out of ten. All my polite words are upstairs. Guess where they're staying.",
           "requiresFreeSpeech": true
         },
         {
@@ -1794,7 +2082,32 @@
         },
         {
           "tone": "spicy",
-          "text": "fuck off.",
+          "text": "Ten out of ten. If anyone says 'walk it off,' they can fuck off in that direction.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "Ten out of ten. You want to take my mind off my knees? Bring the good biscuits and keep your damn hands off them.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "I dropped the remote. If this show turns out to be shit, I expect a full apology from whoever put it on.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "At ten out of ten the answer is no. Go on, finish asking. I can say it again with swearing.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "spicy",
+          "text": "The phone's ringing in the kitchen. If it's important, they'll ring Grandpa. If it's Grandpa, he knows where the fuck I am.",
+          "requiresFreeSpeech": true
+        },
+        {
+          "tone": "wry",
+          "text": "Ten out of ten. I can hear you saying 'it's only two steps.' I can also hear you taking them for me. Off you go.",
           "requiresFreeSpeech": true
         }
       ]
@@ -1809,7 +2122,7 @@
     },
     {
       "tone": "wry",
-      "text": "Nothing but blue skies and cooperative knees. Lovely.",
+      "text": "Cooperative knees. Now there's a pleasant surprise.",
       "minIndex": 1,
       "maxIndex": 3
     },
@@ -1821,7 +2134,7 @@
     },
     {
       "tone": "warm",
-      "text": "The weather and I have agreed to disagree.",
+      "text": "I asked the knees what they thought of the weather. They waited till I was carrying a full cup of tea to tell me.",
       "minIndex": 4,
       "maxIndex": 6
     },
@@ -1833,7 +2146,7 @@
     },
     {
       "tone": "wry",
-      "text": "Some people feel the weather in their bones. Mine apparently get advance notice.",
+      "text": "Some people check an app. I checked mine and then stood up. Only one of them called me an optimist.",
       "minIndex": 4,
       "maxIndex": 6
     },
@@ -1851,7 +2164,7 @@
     },
     {
       "tone": "wry",
-      "text": "There's a storm coming. My knees have already sent the memo.",
+      "text": "Something's got my knees talking. I'd prefer it if they took the afternoon off.",
       "minIndex": 7,
       "maxIndex": 8
     },
@@ -1869,7 +2182,7 @@
     },
     {
       "tone": "spicy",
-      "text": "The forecast says eight. My knees have asked for a second opinion.",
+      "text": "My knees are sore enough to make the stairs a one-trip affair.",
       "minIndex": 7,
       "maxIndex": 8
     },
@@ -1893,27 +2206,30 @@
     },
     {
       "tone": "wry",
-      "text": "The weather's putting on quite a show. My knees bought front-row tickets.",
+      "text": "My knees are sore enough to complain without standing up. You can imagine the encore.",
       "minIndex": 9,
       "maxIndex": 10
     },
     {
       "tone": "spicy",
-      "text": "The forecast says nine. My knees say the forecast can take a seat.",
+      "text": "My knees have a few choice words for the forecast. The one I can repeat is 'again?'",
       "minIndex": 9,
       "maxIndex": 10
     },
     {
       "tone": "spicy",
-      "text": "I told my knees we had things to do. They requested a postponement. Fair enough.",
+      "text": "I told my knees we had things to do. They requested a postponement.",
       "minIndex": 9,
       "maxIndex": 10
     },
     {
       "tone": "spicy",
-      "text": "The weather's gone spectacularly sideways. Fortunately, I've got biscuits.",
+      "text": "It's cold enough that Grandpa asked where the heated blanket was. I told him he was looking at it.",
       "minIndex": 9,
-      "maxIndex": 10
+      "maxIndex": 10,
+      "weatherTypes": [
+        "cold"
+      ]
     },
     {
       "tone": "spicy",
@@ -1973,13 +2289,16 @@
     },
     {
       "tone": "wry",
-      "text": "Clouds over there. Grumbling down here. Coincidence? I think not.",
+      "text": "The clouds are settling in. I've told my knees they don't have to give each one a personal greeting.",
       "minIndex": 4,
-      "maxIndex": 8
+      "maxIndex": 8,
+      "weatherTypes": [
+        "cloudy"
+      ]
     },
     {
       "tone": "wry",
-      "text": "The weather hasn't arrived yet, but apparently its advance party has.",
+      "text": "My knees were grumbling before breakfast. I told them to take a number behind the cat.",
       "minIndex": 5,
       "maxIndex": 9
     },
@@ -1997,9 +2316,12 @@
     },
     {
       "tone": "wry",
-      "text": "The knees say rain. The window says sunshine. Someone's lying.",
+      "text": "The knees said rain. The window says sunshine. The dog says walk, and he's the only one with any follow-through.",
       "minIndex": 3,
-      "maxIndex": 7
+      "maxIndex": 7,
+      "weatherTypes": [
+        "sunny"
+      ]
     },
     {
       "tone": "wry",
@@ -2009,7 +2331,7 @@
     },
     {
       "tone": "wry",
-      "text": "There's precipitation in the forecast and punctuation in my knees.",
+      "text": "I heard my knees on the stairs. Unfortunately, so did everyone else.",
       "minIndex": 5,
       "maxIndex": 9
     },
@@ -2021,15 +2343,21 @@
     },
     {
       "tone": "wry",
-      "text": "You call it atmospheric pressure. My knees call it {weekday}.",
+      "text": "The air pressure changed on {weekday}. My knees were kind enough to announce it before I'd got the kettle on.",
       "minIndex": 3,
-      "maxIndex": 7
+      "maxIndex": 7,
+      "weatherTypes": [
+        "pressure_change"
+      ]
     },
     {
       "tone": "spicy",
-      "text": "Whoever keeps adjusting the air pressure, knock it off.",
+      "text": "The air pressure changed. I'd like to speak to whoever authorised it while I was on the stairs.",
       "minIndex": 5,
-      "maxIndex": 8
+      "maxIndex": 8,
+      "weatherTypes": [
+        "pressure_change"
+      ]
     },
     {
       "tone": "spicy",
@@ -2149,7 +2477,7 @@
       "tone": "wry",
       "text": "The knees are off duty. Long may it last.",
       "minIndex": 1,
-      "maxIndex": 4
+      "maxIndex": 2
     },
     {
       "tone": "wry",
@@ -2159,7 +2487,7 @@
     },
     {
       "tone": "wry",
-      "text": "There's weather happening somewhere. My knees are investigating.",
+      "text": "I checked the weather because my knees were loud. Then I realised Grandpa had left the morning news on again.",
       "minIndex": 3,
       "maxIndex": 6
     },
@@ -2183,7 +2511,7 @@
     },
     {
       "tone": "wry",
-      "text": "The sky hasn't decided what it's doing, but my knees have opinions.",
+      "text": "I checked the sky on the way to the shops. My knees waited until I was too far from the house to change my shoes.",
       "minIndex": 5,
       "maxIndex": 8
     },
@@ -2267,9 +2595,12 @@
     },
     {
       "tone": "warm",
-      "text": "Good gardening weather. The weeds won't know what hit them.",
+      "text": "The sun is out and I'm off to pull weeds. If I can't get up, I'll tell Grandpa I found a good spot to sit.",
       "minIndex": 1,
-      "maxIndex": 4
+      "maxIndex": 4,
+      "weatherTypes": [
+        "sunny"
+      ]
     },
     {
       "tone": "wry",
@@ -2285,7 +2616,7 @@
     },
     {
       "tone": "wry",
-      "text": "I planted those flowers at knee height for a reason.",
+      "text": "I put those flowerpots on a bench so I could look after them standing up. Finally, some decent planning.",
       "minIndex": 6,
       "maxIndex": 9
     },
@@ -2459,7 +2790,7 @@
     },
     {
       "tone": "wry",
-      "text": "Today we're shopping exclusively at stores with benches, ideally Canadian Tire.",
+      "text": "If we're going shopping, tell me which shops have somewhere to sit.",
       "minIndex": 7,
       "maxIndex": 10
     },
@@ -2525,21 +2856,24 @@
     },
     {
       "tone": "warm",
-      "text": "Good day for a drive with the radio turned up and the snow tires earning their keep.",
+      "text": "The snow tyres are doing their job. Now if only they'd make a decent pair for my boots.",
       "minIndex": 2,
-      "maxIndex": 5
+      "maxIndex": 5,
+      "weatherTypes": [
+        "snow"
+      ]
     },
     {
       "tone": "wry",
-      "text": "Today's running smoother than a freshly rewound cassette.",
+      "text": "I went a whole block before I thought about my knees. Then I thought about a butter tart.",
       "minIndex": 2,
       "maxIndex": 5
     },
     {
       "tone": "spicy",
       "text": "My knees feel fine. Don't jinx it.",
-      "minIndex": 2,
-      "maxIndex": 6
+      "minIndex": 1,
+      "maxIndex": 2
     },
     {
       "tone": "warm",
@@ -2549,7 +2883,7 @@
     },
     {
       "tone": "wry",
-      "text": "I survived mall parking lots in December and a January salt truck. This is nothing.",
+      "text": "The knees are creaking. I've made louder noises looking for parking in December.",
       "minIndex": 3,
       "maxIndex": 6
     },
@@ -2568,8 +2902,8 @@
     {
       "tone": "warm",
       "text": "A little stiff today. Nothing worth cancelling the afternoon over.",
-      "minIndex": 4,
-      "maxIndex": 7
+      "minIndex": 3,
+      "maxIndex": 5
     },
     {
       "tone": "wry",
@@ -2609,13 +2943,13 @@
     },
     {
       "tone": "wry",
-      "text": "Today's forecast has big 'be kind, please rewind' energy.",
+      "text": "I'd rewind this morning if it meant I could get out of bed a little more gently.",
       "minIndex": 5,
       "maxIndex": 8
     },
     {
       "tone": "spicy",
-      "text": "My joints have entered their grunge period.",
+      "text": "My knees sound like the garage band next door. All percussion.",
       "minIndex": 5,
       "maxIndex": 8
     },
@@ -2639,7 +2973,7 @@
     },
     {
       "tone": "wry",
-      "text": "The knees have gone full unplugged today.",
+      "text": "My knees are making enough noise without an amplifier.",
       "minIndex": 5,
       "maxIndex": 9
     },
@@ -2651,9 +2985,12 @@
     },
     {
       "tone": "wry",
-      "text": "The forecast says rain. My knees already spoiled the ending.",
+      "text": "It's raining. My knees would like me to know they put in a complaint before the first drop hit the window.",
       "minIndex": 6,
-      "maxIndex": 9
+      "maxIndex": 9,
+      "weatherTypes": [
+        "rain"
+      ]
     },
     {
       "tone": "spicy",
@@ -2669,9 +3006,12 @@
     },
     {
       "tone": "spicy",
-      "text": "I've got 99 problems and apparently 97 of them are atmospheric pressure.",
+      "text": "The air pressure moved and my knees started up. With that kind of timing they could at least tell me when the toast is done.",
       "minIndex": 6,
-      "maxIndex": 9
+      "maxIndex": 9,
+      "weatherTypes": [
+        "pressure_change"
+      ]
     },
     {
       "tone": "warm",
@@ -2735,19 +3075,22 @@
     },
     {
       "tone": "spicy",
-      "text": "I survived shoulder pads. I can survive this weather.",
+      "text": "I survived shoulder pads. I can survive the stairs. Give me a minute between the two.",
       "minIndex": 7,
       "maxIndex": 10
     },
     {
       "tone": "warm",
-      "text": "Put on an old album, pull on the toque, and let the weather do what it does.",
+      "text": "Cold enough for a toque indoors. Grandpa laughed until I told him I had another one.",
       "minIndex": 7,
-      "maxIndex": 10
+      "maxIndex": 10,
+      "weatherTypes": [
+        "cold"
+      ]
     },
     {
       "tone": "wry",
-      "text": "Grandpa suggested a walk. I suggested he enjoy the rink without me.",
+      "text": "Grandpa suggested a walk. I suggested he take the dog and bring me back a coffee.",
       "minIndex": 7,
       "maxIndex": 10
     },
@@ -2777,9 +3120,12 @@
     },
     {
       "tone": "spicy",
-      "text": "I didn't survive Aqua Net and acid-wash denim to be defeated by a cold front.",
+      "text": "The cold front got here before my knees were out of bed. Awfully keen for something nobody invited.",
       "minIndex": 8,
-      "maxIndex": 10
+      "maxIndex": 10,
+      "weatherTypes": [
+        "cold_front"
+      ]
     },
     {
       "tone": "warm",
@@ -2789,13 +3135,13 @@
     },
     {
       "tone": "wry",
-      "text": "I've reached the VHS portion of the day: sit down and don't touch anything.",
+      "text": "Put an old movie on. As long as nobody asks me to get up and change the tape.",
       "minIndex": 8,
       "maxIndex": 10
     },
     {
       "tone": "spicy",
-      "text": "The knees have one message for today's weather: whatever.",
+      "text": "I sent Grandpa to check the weather. He said it was fine. I've sent him back out to bring the bins in.",
       "minIndex": 9,
       "maxIndex": 10
     },
@@ -2838,14 +3184,14 @@
     {
       "tone": "spicy",
       "text": "The knees are fine. Let's quit while we're ahead.",
-      "minIndex": 2,
-      "maxIndex": 5
+      "minIndex": 1,
+      "maxIndex": 3
     },
     {
       "tone": "wry",
       "text": "It's suspiciously pleasant out. I'm keeping an eye on it.",
-      "minIndex": 2,
-      "maxIndex": 6
+      "minIndex": 1,
+      "maxIndex": 3
     },
     {
       "tone": "warm",
@@ -2867,7 +3213,7 @@
     },
     {
       "tone": "wry",
-      "text": "The weather's being subtle. My knees aren't.",
+      "text": "One knee creaked coming down. The other waited until I told Grandpa I was fine.",
       "minIndex": 3,
       "maxIndex": 7
     },
@@ -2879,7 +3225,7 @@
     },
     {
       "tone": "wry",
-      "text": "There's a bit of complaining downstairs. Management is aware.",
+      "text": "There's a bit of complaining in the lower half. Management is aware.",
       "minIndex": 4,
       "maxIndex": 7
     },
@@ -2905,7 +3251,7 @@
       "tone": "spicy",
       "text": "I can do everything I planned today. I just don't see why I should.",
       "minIndex": 4,
-      "maxIndex": 8
+      "maxIndex": 6
     },
     {
       "tone": "wry",
@@ -2934,14 +3280,14 @@
     {
       "tone": "wry",
       "text": "Standing up is currently a decision, not a reflex.",
-      "minIndex": 5,
-      "maxIndex": 8
+      "minIndex": 7,
+      "maxIndex": 9
     },
     {
       "tone": "spicy",
       "text": "Today's energy level is somewhere between maybe and absolutely not.",
-      "minIndex": 5,
-      "maxIndex": 8
+      "minIndex": 6,
+      "maxIndex": 9
     },
     {
       "tone": "warm",
@@ -2981,7 +3327,7 @@
     },
     {
       "tone": "wry",
-      "text": "I've reached the age where weather is apparently a full-contact sport.",
+      "text": "I've reached the age where the weather gets the first word and the knees get the last three.",
       "minIndex": 6,
       "maxIndex": 9
     },
@@ -3209,7 +3555,7 @@
     },
     {
       "tone": "warm",
-      "text": "Good working weather. Let's get something useful done.",
+      "text": "I'll get something useful done while the knees are feeling good. Probably hide the jobs I don't want to do tomorrow.",
       "minIndex": 1,
       "maxIndex": 4
     },
@@ -3251,13 +3597,13 @@
     },
     {
       "tone": "wry",
-      "text": "I have enough experience to know when we're reinventing something that already worked.",
+      "text": "I'll circle back as soon as I can stand up without the meeting hearing about it.",
       "minIndex": 5,
       "maxIndex": 8
     },
     {
       "tone": "spicy",
-      "text": "I'll circle back when my knees stop rolling their eyes.",
+      "text": "I'll circle back when I can get out of this chair without making a speech about it.",
       "minIndex": 5,
       "maxIndex": 8
     },
