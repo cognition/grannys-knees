@@ -6,6 +6,8 @@ A playful weather index for your joints, and a private place to note how you fee
 
 Read the [Privacy Policy](PRIVACY-POLICY.md).
 
+QA: [expectation catalogue](docs/qa/expectation-catalogue.md), [acceptance matrix](docs/qa/acceptance-matrix.md), [fixture freshness](docs/qa/fixture-freshness.md).
+
 Granny's Knees turns the hourly forecast into an experimental 0–10 index. A higher number means less comfortable weather in the model. It is not a measurement of your pain, and it does not say the weather caused a flare.
 
 The evidence that weather and joint symptoms line up is mixed. Correlation is not causation. Your joints may disagree with the number.

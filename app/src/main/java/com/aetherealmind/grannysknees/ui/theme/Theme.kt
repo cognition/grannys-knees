@@ -34,110 +34,118 @@ internal fun personalIndexColour(): Color {
 }
 
 
-// Light · Lake teal
-private val LakeTeal = Color(0xFF0E7C86)
-private val LakeTealWell = Color(0xFFD9EEF0)
-private val CoolPaper = Color(0xFFF4F8F9)
-private val CoolPaperBright = Color(0xFFF9FCFC)
-private val CoolPaperLow = Color(0xFFEEF4F5)
-private val CoolContainer = Color(0xFFE7F1F3)
-private val CoolContainerHigh = Color(0xFFD5E6EA)
-private val CoolContainerHighest = Color(0xFFC5DCE2)
-private val CoolDim = Color(0xFFC8D8DC)
-private val Ink = Color(0xFF1C2A30)
-private val InkMuted = Color(0xFF5E7380)
-private val CoolLine = Color(0xFFC5D5DA)
-private val Rough = Color(0xFFC24E2D)
-private val RoughWell = Color(0xFFF8E4E1)
-private val MildTeal = Color(0xFF2F6F78)
-/** Mid-band (Noticeable) well — cool slate with ink for clear pill contrast. */
-private val NoticeableWell = Color(0xFFCFE3E8)
-private val NoticeableOn = Color(0xFF1A3A42)
+/**
+ * Locked lake-teal / soft-navy brand colours (design DE-01).
+ *
+ * Exposed for token contract tests so palette drift fails in CI without
+ * screenshot goldens.
+ */
+internal object BrandColours {
+    // Light · Lake teal
+    val LakeTeal = Color(0xFF0E7C86)
+    val LakeTealWell = Color(0xFFD9EEF0)
+    val CoolPaper = Color(0xFFF4F8F9)
+    val CoolPaperBright = Color(0xFFF9FCFC)
+    val CoolPaperLow = Color(0xFFEEF4F5)
+    val CoolContainer = Color(0xFFE7F1F3)
+    val CoolContainerHigh = Color(0xFFD5E6EA)
+    val CoolContainerHighest = Color(0xFFC5DCE2)
+    val CoolDim = Color(0xFFC8D8DC)
+    val Ink = Color(0xFF1C2A30)
+    val InkMuted = Color(0xFF5E7380)
+    val CoolLine = Color(0xFFC5D5DA)
+    val Rough = Color(0xFFC24E2D)
+    val RoughWell = Color(0xFFF8E4E1)
+    val MildTeal = Color(0xFF2F6F78)
+    /** Mid-band (Noticeable) well — cool slate with ink for clear pill contrast. */
+    val NoticeableWell = Color(0xFFCFE3E8)
+    val NoticeableOn = Color(0xFF1A3A42)
 
-// Dark · Soft navy with mint-teal accents
-private val SoftNavy = Color(0xFF152033)
-private val SoftNavyLowest = Color(0xFF101828)
-private val SoftNavyLow = Color(0xFF18253A)
-private val SoftNavySurface = Color(0xFF1B2A42)
-private val SoftNavyContainer = Color(0xFF1E2C44)
-private val SoftNavyRaised = Color(0xFF2A4A5C)
-private val SoftNavyHigh = Color(0xFF334F66)
-private val SoftNavyHighest = Color(0xFF3D5C78)
-private val SoftNavyBright = Color(0xFF3A516E)
-private val MintTeal = Color(0xFF7FE0E8)
-private val MintOn = Color(0xFF0F2A38)
-private val NightInk = Color(0xFFE8F0F8)
-private val NightMuted = Color(0xFF8FA3BC)
-private val NightLine = Color(0xFF3A4F68)
-private val RoughNight = Color(0xFFFFC4BC)
-private val RoughNightWell = Color(0xFF5A2E2A)
-/** Mid-band (Noticeable) night well — lifted slate with bright ink. */
-private val NoticeableNightWell = Color(0xFF3D5F72)
-private val NoticeableNightOn = Color(0xFFE5F6FA)
+    // Dark · Soft navy with mint-teal accents
+    val SoftNavy = Color(0xFF152033)
+    val SoftNavyLowest = Color(0xFF101828)
+    val SoftNavyLow = Color(0xFF18253A)
+    val SoftNavySurface = Color(0xFF1B2A42)
+    val SoftNavyContainer = Color(0xFF1E2C44)
+    val SoftNavyRaised = Color(0xFF2A4A5C)
+    val SoftNavyHigh = Color(0xFF334F66)
+    val SoftNavyHighest = Color(0xFF3D5C78)
+    val SoftNavyBright = Color(0xFF3A516E)
+    val MintTeal = Color(0xFF7FE0E8)
+    val MintOn = Color(0xFF0F2A38)
+    val NightInk = Color(0xFFE8F0F8)
+    val NightMuted = Color(0xFF8FA3BC)
+    val NightLine = Color(0xFF3A4F68)
+    val RoughNight = Color(0xFFFFC4BC)
+    val RoughNightWell = Color(0xFF5A2E2A)
+    /** Mid-band (Noticeable) night well — lifted slate with bright ink. */
+    val NoticeableNightWell = Color(0xFF3D5F72)
+    val NoticeableNightOn = Color(0xFFE5F6FA)
+}
 
 /** Friendly corner used by compact journal and about controls. */
 internal val GrannyCorner = RoundedCornerShape(12.dp)
 
 private val LightColours = lightColorScheme(
-    primary = LakeTeal,
-    onPrimary = CoolPaper,
-    primaryContainer = LakeTealWell,
-    onPrimaryContainer = Ink,
-    secondary = Rough,
-    onSecondary = CoolPaper,
-    secondaryContainer = RoughWell,
-    onSecondaryContainer = Rough,
-    tertiary = MildTeal,
-    onTertiary = CoolPaper,
-    tertiaryContainer = NoticeableWell,
-    onTertiaryContainer = NoticeableOn,
-    background = CoolPaper,
-    onBackground = Ink,
-    surface = CoolPaper,
-    onSurface = Ink,
-    surfaceVariant = CoolContainer,
-    onSurfaceVariant = InkMuted,
-    outline = InkMuted,
-    outlineVariant = CoolLine,
+    primary = BrandColours.LakeTeal,
+    onPrimary = BrandColours.CoolPaper,
+    primaryContainer = BrandColours.LakeTealWell,
+    onPrimaryContainer = BrandColours.Ink,
+    secondary = BrandColours.Rough,
+    onSecondary = BrandColours.CoolPaper,
+    secondaryContainer = BrandColours.RoughWell,
+    onSecondaryContainer = BrandColours.Rough,
+    tertiary = BrandColours.MildTeal,
+    onTertiary = BrandColours.CoolPaper,
+    tertiaryContainer = BrandColours.NoticeableWell,
+    onTertiaryContainer = BrandColours.NoticeableOn,
+    background = BrandColours.CoolPaper,
+    onBackground = BrandColours.Ink,
+    surface = BrandColours.CoolPaper,
+    onSurface = BrandColours.Ink,
+    surfaceVariant = BrandColours.CoolContainer,
+    onSurfaceVariant = BrandColours.InkMuted,
+    outline = BrandColours.InkMuted,
+    outlineVariant = BrandColours.CoolLine,
     surfaceTint = Color.Transparent,
-    surfaceBright = CoolPaperBright,
-    surfaceContainerLowest = CoolPaperBright,
-    surfaceContainerLow = CoolPaperLow,
-    surfaceContainer = CoolContainer,
-    surfaceContainerHigh = CoolContainerHigh,
-    surfaceContainerHighest = CoolContainerHighest,
-    surfaceDim = CoolDim,
+    surfaceBright = BrandColours.CoolPaperBright,
+    surfaceContainerLowest = BrandColours.CoolPaperBright,
+    surfaceContainerLow = BrandColours.CoolPaperLow,
+    surfaceContainer = BrandColours.CoolContainer,
+    surfaceContainerHigh = BrandColours.CoolContainerHigh,
+    surfaceContainerHighest = BrandColours.CoolContainerHighest,
+    surfaceDim = BrandColours.CoolDim,
 )
 
 private val DarkColours = darkColorScheme(
-    primary = MintTeal,
-    onPrimary = MintOn,
-    primaryContainer = SoftNavyRaised,
-    onPrimaryContainer = NightInk,
-    secondary = RoughNight,
-    onSecondary = RoughNightWell,
-    secondaryContainer = RoughNightWell,
-    onSecondaryContainer = RoughNight,
+    primary = BrandColours.MintTeal,
+    onPrimary = BrandColours.MintOn,
+    primaryContainer = BrandColours.SoftNavyRaised,
+    onPrimaryContainer = BrandColours.NightInk,
+    secondary = BrandColours.RoughNight,
+    onSecondary = BrandColours.RoughNightWell,
+    secondaryContainer = BrandColours.RoughNightWell,
+    onSecondaryContainer = BrandColours.RoughNight,
     tertiary = Color(0xFF8FCBD4),
-    onTertiary = MintOn,
-    tertiaryContainer = NoticeableNightWell,
-    onTertiaryContainer = NoticeableNightOn,
-    background = SoftNavy,
-    onBackground = NightInk,
-    surface = SoftNavySurface,
-    onSurface = NightInk,
-    surfaceVariant = SoftNavyContainer,
-    onSurfaceVariant = NightMuted,
-    outline = NightMuted,
-    outlineVariant = NightLine,
+    onTertiary = BrandColours.MintOn,
+    tertiaryContainer = BrandColours.NoticeableNightWell,
+    onTertiaryContainer = BrandColours.NoticeableNightOn,
+    background = BrandColours.SoftNavy,
+    onBackground = BrandColours.NightInk,
+    surface = BrandColours.SoftNavySurface,
+    onSurface = BrandColours.NightInk,
+    surfaceVariant = BrandColours.SoftNavyContainer,
+    onSurfaceVariant = BrandColours.NightMuted,
+    outline = BrandColours.NightMuted,
+    outlineVariant = BrandColours.NightLine,
     surfaceTint = Color.Transparent,
-    surfaceBright = SoftNavyBright,
-    surfaceContainerLowest = SoftNavyLowest,
-    surfaceContainerLow = SoftNavyLow,
-    surfaceContainer = SoftNavyContainer,
-    surfaceContainerHigh = SoftNavyHigh,
-    surfaceContainerHighest = SoftNavyHighest,
-    surfaceDim = SoftNavyLowest,
+    surfaceBright = BrandColours.SoftNavyBright,
+    surfaceContainerLowest = BrandColours.SoftNavyLowest,
+    surfaceContainerLow = BrandColours.SoftNavyLow,
+    surfaceContainer = BrandColours.SoftNavyContainer,
+    surfaceContainerHigh = BrandColours.SoftNavyHigh,
+    surfaceContainerHighest = BrandColours.SoftNavyHighest,
+    surfaceDim = BrandColours.SoftNavyLowest,
 )
 
 private val GrannysKneesType = Typography(
