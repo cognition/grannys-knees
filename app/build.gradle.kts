@@ -100,9 +100,9 @@ android {
         minSdk = 26
         targetSdk = 37
         // RC2 versioning: versionName is rc2.<feature>.<bugfix>.
-        // versionCode = 20000 + feature * 100 + bugfix (e.g. rc2.2.3 → 20203).
-        versionCode = 20203
-        versionName = "rc2.2.3"
+        // versionCode = 20000 + feature * 100 + bugfix (e.g. rc2.2.4 → 20204).
+        versionCode = 20204
+        versionName = "rc2.2.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

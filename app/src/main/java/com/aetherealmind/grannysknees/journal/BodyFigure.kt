@@ -454,8 +454,26 @@ private fun DrawScope.drawBoltSite(site: BoltSite, scale: Float) {
         }
         is AcheBoltLayout.Crossed -> {
             val colour = acheBoltColour(layout.brightness)
-            drawBolt(site.x, site.y, scale, colour, angleDegrees = -32f)
-            drawBolt(site.x, site.y, scale, colour, angleDegrees = 32f)
+            // Wide X with a small offset so the two bolts read as a cross,
+            // not one thick zigzag on top of itself.
+            drawBolt(
+                site.x - 0.55f,
+                site.y,
+                scale,
+                colour,
+                angleDegrees = -48f,
+                length = 1.2f,
+                strokeWidth = 1.45f,
+            )
+            drawBolt(
+                site.x + 0.55f,
+                site.y,
+                scale,
+                colour,
+                angleDegrees = 48f,
+                length = 1.2f,
+                strokeWidth = 1.45f,
+            )
         }
     }
 }
@@ -471,19 +489,26 @@ private fun DrawScope.drawBolt(
     scale: Float,
     colour: Color,
     angleDegrees: Float = 0f,
+    length: Float = 1f,
+    strokeWidth: Float = 1.2f,
 ) {
     val pivot = Offset(x * scale, y * scale)
+    val grow = length.coerceAtLeast(0.5f)
     rotate(degrees = angleDegrees, pivot = pivot) {
         val bolt = Path().apply {
-            moveTo((x - 1.3f) * scale, (y - 3.1f) * scale)
-            lineTo((x + 0.7f) * scale, (y - 0.2f) * scale)
-            lineTo((x - 0.5f) * scale, (y + 0.3f) * scale)
-            lineTo((x + 1.4f) * scale, (y + 3.1f) * scale)
+            moveTo((x - 1.3f * grow) * scale, (y - 3.1f * grow) * scale)
+            lineTo((x + 0.7f * grow) * scale, (y - 0.2f * grow) * scale)
+            lineTo((x - 0.5f * grow) * scale, (y + 0.3f * grow) * scale)
+            lineTo((x + 1.4f * grow) * scale, (y + 3.1f * grow) * scale)
         }
         drawPath(
             bolt,
             colour,
-            style = Stroke(width = scale * 1.2f, cap = StrokeCap.Round, join = StrokeJoin.Round),
+            style = Stroke(
+                width = scale * strokeWidth,
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round,
+            ),
         )
     }
 }
