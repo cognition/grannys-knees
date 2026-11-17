@@ -180,11 +180,11 @@ internal fun JournalScreen(
             focus = existing
             return
         }
-        // Each new mark starts blank; set its symptom and rating on its own.
+        // New marks default to stiffness at 0 so the colour scale works at once.
         chosen = chosen + ChosenPlace(
             part = part,
             side = side,
-            symptom = "",
+            symptom = "stiffness",
             rating = 0,
         )
         focus = chosen.lastIndex

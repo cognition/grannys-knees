@@ -124,8 +124,9 @@ private fun DrawScope.drawFigure(
     filledPath(footSteps(left = false), scale, mark("foot", "right"), paper, outline, stroke, bolts, 58f to 152f)
     limb(39.2f, 114f, 46.8f, 148f, 3.8f, scale, mark("ankle", "left"), paper, outline, stroke)
     limb(53.2f, 114f, 60.8f, 148f, 3.8f, scale, mark("ankle", "right"), paper, outline, stroke)
-    limb(37.4f, 78f, 48.2f, 116f, 4.8f, scale, mark("hip", "left"), paper, outline, stroke, bolts, 42.8f to 97f)
-    limb(51.8f, 78f, 62.6f, 116f, 4.8f, scale, mark("hip", "right"), paper, outline, stroke, bolts, 57.2f to 97f)
+    // Hip bloom sits at the hip joint (near the seam), not mid-thigh.
+    limb(37.4f, 78f, 48.2f, 116f, 4.8f, scale, mark("hip", "left"), paper, outline, stroke, bolts, 42.8f to 84f)
+    limb(51.8f, 78f, 62.6f, 116f, 4.8f, scale, mark("hip", "right"), paper, outline, stroke, bolts, 57.2f to 84f)
     joint(43f, 114.5f, 4.2f, 3.6f, scale, mark("knee", "left"), paper, outline, stroke, bolts)
     joint(57f, 114.5f, 4.2f, 3.6f, scale, mark("knee", "right"), paper, outline, stroke, bolts)
     joint(43f, 146.2f, 2.8f, 2.3f, scale, mark("ankle", "left"), paper, outline, stroke, bolts)
@@ -390,11 +391,13 @@ private fun DrawScope.limb(
         }
     }
     drawRoundRect(outline, topLeft, body, corner, style = stroke)
+    val cloudX = boltAt?.first ?: ((left + right) / 2f)
+    val cloudY = boltAt?.second ?: ((top + bottom) / 2f)
     cloudAround(
         scale,
         selected,
-        (left + right) / 2f,
-        (top + bottom) / 2f,
+        cloudX,
+        cloudY,
     ) { grow, colour ->
         drawRoundRect(
             colour,
