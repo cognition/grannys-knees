@@ -33,7 +33,8 @@ import com.aetherealmind.grannysknees.R
 
 /**
  * One chosen place on the figure.
- * [rating] runs from clear at 0 to red at 10. An ache draws a bolt.
+ * [rating] runs from clear at 0 to red at 10. Aches use the bolt ladder;
+ * stiffness is colour wash only.
  */
 internal data class FigureMark(
     val part: String,
@@ -194,28 +195,28 @@ internal fun cloudReach(rating: Int): Float {
 }
 
 /**
- * Stiffness rate as bolt count / layout, with brightness rising inside each tier.
+ * Ache rate as bolt count / layout, with brightness rising inside each tier.
  *
  * Boundary at 3: the second bolt appears at 3 (one bolt for 1–2; two for 3–5).
  * 6–8 adds a third; 9–10 uses two crossed bolts.
  */
-internal fun stiffnessBoltLayout(rating: Int): StiffnessBoltLayout {
+internal fun acheBoltLayout(rating: Int): AcheBoltLayout {
     val bounded = rating.coerceIn(0, 10)
     return when (bounded) {
-        0 -> StiffnessBoltLayout.None
-        in 1..2 -> StiffnessBoltLayout.Parallel(
+        0 -> AcheBoltLayout.None
+        in 1..2 -> AcheBoltLayout.Parallel(
             count = 1,
             brightness = tierBrightness(bounded, tierLow = 1, tierHigh = 2),
         )
-        in 3..5 -> StiffnessBoltLayout.Parallel(
+        in 3..5 -> AcheBoltLayout.Parallel(
             count = 2,
             brightness = tierBrightness(bounded, tierLow = 3, tierHigh = 5),
         )
-        in 6..8 -> StiffnessBoltLayout.Parallel(
+        in 6..8 -> AcheBoltLayout.Parallel(
             count = 3,
             brightness = tierBrightness(bounded, tierLow = 6, tierHigh = 8),
         )
-        else -> StiffnessBoltLayout.Crossed(
+        else -> AcheBoltLayout.Crossed(
             brightness = tierBrightness(bounded, tierLow = 9, tierHigh = 10),
         )
     }
@@ -227,21 +228,21 @@ internal fun tierBrightness(rating: Int, tierLow: Int, tierHigh: Int): Float {
     return ((rating - tierLow).toFloat() / (tierHigh - tierLow).toFloat()).coerceIn(0f, 1f)
 }
 
-/** How stiffness bolts are drawn for a rating. */
-internal sealed class StiffnessBoltLayout {
-    data object None : StiffnessBoltLayout()
+/** How ache bolts are drawn for a rating. */
+internal sealed class AcheBoltLayout {
+    data object None : AcheBoltLayout()
 
     data class Parallel(
         val count: Int,
         val brightness: Float,
-    ) : StiffnessBoltLayout()
+    ) : AcheBoltLayout()
 
     data class Crossed(
         val brightness: Float,
-    ) : StiffnessBoltLayout()
+    ) : AcheBoltLayout()
 }
 
-/** One joint centre that should show ache or stiffness bolts. */
+/** One joint centre that should show ache bolts. */
 private data class BoltSite(
     val x: Float,
     val y: Float,
@@ -254,7 +255,8 @@ private fun rememberBoltSite(
     x: Float,
     y: Float,
 ) {
-    if (mark == null || mark.rating <= 0) return
+    // Bolts are for aches only; stiffness stays colour-wash only.
+    if (mark == null || !mark.ache || mark.rating <= 0) return
     bolts += BoltSite(x, y, mark)
 }
 
@@ -279,7 +281,7 @@ private fun DrawScope.cloudAround(
     if (mark == null) {
         return
     }
-    // Stiffness rate is the bolt ladder; keep the soft bloom for ache only.
+    // Soft red bloom is for aches; stiffness is wash colour only.
     if (!mark.ache) {
         return
     }
@@ -430,21 +432,20 @@ private fun DrawScope.filledPath(
     }
 }
 
-/** Deep electric blue, so the ache mark stays clear of the red wash. */
+/** Deep electric blue, so the ache bolts stay clear of the red wash. */
 private val boltBlue: Color = Color(0xFF0026E6)
 
-/** Brighter end of the stiffness ladder (still distinct from the red wash). */
+/** Brighter end of the ache ladder (still distinct from the red wash). */
 private val boltBright: Color = Color(0xFF6B8CFF)
 
 private fun DrawScope.drawBoltSite(site: BoltSite, scale: Float) {
-    if (site.mark.ache) {
-        drawBolt(site.x, site.y, scale, boltBlue)
+    if (!site.mark.ache) {
         return
     }
-    when (val layout = stiffnessBoltLayout(site.mark.rating)) {
-        StiffnessBoltLayout.None -> Unit
-        is StiffnessBoltLayout.Parallel -> {
-            val colour = stiffnessBoltColour(layout.brightness)
+    when (val layout = acheBoltLayout(site.mark.rating)) {
+        AcheBoltLayout.None -> Unit
+        is AcheBoltLayout.Parallel -> {
+            val colour = acheBoltColour(layout.brightness)
             val spread = 2.4f
             val start = -(layout.count - 1) / 2f
             for (index in 0 until layout.count) {
@@ -452,15 +453,15 @@ private fun DrawScope.drawBoltSite(site: BoltSite, scale: Float) {
                 drawBolt(site.x + dx, site.y, scale, colour)
             }
         }
-        is StiffnessBoltLayout.Crossed -> {
-            val colour = stiffnessBoltColour(layout.brightness)
+        is AcheBoltLayout.Crossed -> {
+            val colour = acheBoltColour(layout.brightness)
             drawBolt(site.x, site.y, scale, colour, angleDegrees = -32f)
             drawBolt(site.x, site.y, scale, colour, angleDegrees = 32f)
         }
     }
 }
 
-private fun stiffnessBoltColour(brightness: Float): Color {
+private fun acheBoltColour(brightness: Float): Color {
     val amount = brightness.coerceIn(0f, 1f)
     return lerp(boltBlue, boltBright, amount).copy(alpha = 0.55f + 0.45f * amount)
 }
