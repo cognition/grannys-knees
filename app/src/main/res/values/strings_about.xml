@@ -45,5 +45,9 @@
     <string name="about_export_reports">Export history</string>
     <string name="about_reset_all_data">Reset all data</string>
     <string name="about_reset_all_data_hint">Clears saved history and today\'s draft figure on this phone.</string>
+    <string name="about_reset_all_data_confirm_title">Are you sure?</string>
+    <string name="about_reset_all_data_confirm_body">This clears journal history, today\'s draft figure, and Feel tuning samples on this phone. It cannot be undone.</string>
+    <string name="about_reset_all_data_confirm">Reset all data</string>
+    <string name="about_reset_all_data_cancel">Cancel</string>
     <string name="about_reset_done">All local history was cleared.</string>
 </resources>

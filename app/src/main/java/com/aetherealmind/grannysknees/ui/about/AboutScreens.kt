@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -247,6 +248,7 @@ internal fun SettingsScreen(
         )
     }
     var resetNotice by remember { mutableStateOf<String?>(null) }
+    var confirmResetAll by remember { mutableStateOf(false) }
     var feelSampleCount by remember {
         mutableStateOf(feelCalibrationStore?.read()?.size ?: 0)
     }
@@ -340,17 +342,7 @@ internal fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             TextButton(
-                onClick = {
-                    scope.launch {
-                        withContext(Dispatchers.IO) {
-                            repository.wipe()
-                            feelCalibrationStore?.clear()
-                            File(context.filesDir, "report-dummy.json").delete()
-                        }
-                        onDataReset()
-                        resetNotice = context.getString(R.string.about_reset_done)
-                    }
-                },
+                onClick = { confirmResetAll = true },
             ) {
                 Text(stringResource(R.string.about_reset_all_data))
             }
@@ -362,6 +354,41 @@ internal fun SettingsScreen(
                 )
             }
         }
+    }
+    if (confirmResetAll) {
+        AlertDialog(
+            onDismissRequest = { confirmResetAll = false },
+            title = {
+                Text(stringResource(R.string.about_reset_all_data_confirm_title))
+            },
+            text = {
+                Text(stringResource(R.string.about_reset_all_data_confirm_body))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmResetAll = false
+                        scope.launch {
+                            withContext(Dispatchers.IO) {
+                                repository.wipe()
+                                feelCalibrationStore?.clear()
+                                File(context.filesDir, "report-dummy.json").delete()
+                            }
+                            onDataReset()
+                            feelSampleCount = feelCalibrationStore?.read()?.size ?: 0
+                            resetNotice = context.getString(R.string.about_reset_done)
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.about_reset_all_data_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmResetAll = false }) {
+                    Text(stringResource(R.string.about_reset_all_data_cancel))
+                }
+            },
+        )
     }
 }
 

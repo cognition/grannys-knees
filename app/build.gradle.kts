@@ -101,8 +101,8 @@ android {
         targetSdk = 37
         // RC2 versioning: versionName is rc2.<feature>.<bugfix>.
         // versionCode = 20000 + feature * 100 + bugfix (e.g. rc2.2.5 → 20205).
-        versionCode = 20320
-        versionName = "rc2.3.20"
+        versionCode = 20321
+        versionName = "rc2.3.21"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
