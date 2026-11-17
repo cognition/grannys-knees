@@ -138,6 +138,31 @@ class WeatherIndexScorerTest {
     }
 
     @Test
+    fun `middle pressure nulls still score when endpoints are present`() {
+        val hours = (0..12).map { i ->
+            HourlyObservation(
+                epoch = BASE_EPOCH + i * 3600L,
+                surfacePressureHpa = when (i) {
+                    0 -> 1020.0
+                    12 -> 1010.0
+                    6 -> null // middle gap must not block dP12
+                    else -> 1015.0
+                },
+                relativeHumidityPct = 50.0,
+                temperatureC = 20.0,
+                feelsLikeC = 20.0,
+            )
+        }
+        val last = WeatherIndexScorer.score(
+            ScoringRequest(zoneId = "America/Toronto", hours = hours),
+        ).hours.last()
+
+        assertEquals(HourStatus.AVAILABLE, last.status)
+        assertNotNull(last.indexScore)
+        assertEquals(0, BigDecimal("-10.00").compareTo(last.subScores.pressure))
+    }
+
+    @Test
     fun `personal pressure sensitivity raises score when pressure falls`() {
         val request = flatWindowRequest(startPressure = 1020.0, endPressure = 1010.0)
         val baseline = WeatherIndexScorer.score(request).hours.last().indexScore!!

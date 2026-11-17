@@ -200,7 +200,10 @@ object WeatherIndexScorer {
 
         val tempsReady = temp4 != null && temp4.all { it != null }
         val humsReady = hum4 != null && hum4.all { it != null }
-        val pressuresReady = pressure13 != null && pressure13.all { it != null }
+        // Slope-index contract: dP12 only needs the 12 h pressure endpoints.
+        val pressuresReady = pressure13 != null &&
+            pressure13.first() != null &&
+            pressure13.last() != null
 
         val mT: Double?
         val mH: Double?
@@ -211,7 +214,6 @@ object WeatherIndexScorer {
         if (tempsReady && humsReady && pressuresReady) {
             val temps = temp4!!.map { it!! }
             val hums = hum4!!.map { it!! }
-            val pressures = pressure13!!.map { it!! }
             mT = deadband(slope4(temps[0], temps[1], temps[2], temps[3]), config.deadbandT)
             mH = deadband(slope4(hums[0], hums[1], hums[2], hums[3]), config.deadbandH)
             g = if (feels4 == null || feels4.any { it == null }) {
@@ -220,7 +222,7 @@ object WeatherIndexScorer {
                 val gap = temps.zip(feels4.map { it!! }) { t, f -> maxOf(0.0, t - f) }
                 deadband(slope4(gap[0], gap[1], gap[2], gap[3]), config.deadbandG)
             }
-            dP12 = pressures.last() - pressures.first()
+            dP12 = pressure13!!.last()!! - pressure13.first()!!
             indexUnrounded = assembleScore(
                 mT = mT,
                 mH = mH,
@@ -339,8 +341,12 @@ object WeatherIndexScorer {
             if (pressureWindow == null) {
                 add(REASON_PRESSURE_WINDOW)
             } else {
-                pressureWindow.forEach { hour ->
-                    if (hour.surfacePressureHpa == null) add(REASON_PRESSURE_NULL)
+                // Only endpoints feed dP12; middle nulls do not block scoring.
+                if (pressureWindow.first().surfacePressureHpa == null) {
+                    add(REASON_PRESSURE_NULL)
+                }
+                if (pressureWindow.last().surfacePressureHpa == null) {
+                    add(REASON_PRESSURE_NULL)
                 }
             }
             if (sample.surfacePressureHpa == null) add(REASON_PRESSURE_NULL)
