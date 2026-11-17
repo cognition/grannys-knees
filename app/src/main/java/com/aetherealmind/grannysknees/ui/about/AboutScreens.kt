@@ -1,5 +1,6 @@
 package com.aetherealmind.grannysknees.ui.about
 
+import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -326,9 +327,18 @@ internal fun SettingsScreen(
                             type = JournalCsvExport.MIME_TYPE
                             putExtra(Intent.EXTRA_STREAM, uri)
                             putExtra(Intent.EXTRA_SUBJECT, JournalCsvExport.FILE_NAME)
+                            // ClipData carries the grant; EXTRA_STREAM alone often does not.
+                            clipData = ClipData.newUri(
+                                context.contentResolver,
+                                JournalCsvExport.FILE_NAME,
+                                uri,
+                            )
                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
-                        context.startActivity(Intent.createChooser(share, null))
+                        val chooser = Intent.createChooser(share, null).apply {
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        context.startActivity(chooser)
                     }
                 },
                 shape = GrannyCorner,
