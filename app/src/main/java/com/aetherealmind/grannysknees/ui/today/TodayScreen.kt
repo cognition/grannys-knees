@@ -811,13 +811,19 @@ private fun CircularRefreshButton(
     }
 }
 
-/** Loads the packaged Granny Says list, or null when the asset is missing. */
+/**
+ * Loads the packaged Granny Says list, or null when the asset is missing or
+ * unreadable so Today still paints without a saying.
+ */
 private fun loadGrannySaysPicker(assets: android.content.res.AssetManager): GrannySaysPicker? {
     return try {
         assets.open("granny-says.json").use { stream ->
             GrannySaysPicker(GrannySaysCatalog.fromStream(stream))
         }
     } catch (_: IOException) {
+        null
+    } catch (_: RuntimeException) {
+        // Malformed JSON / parse errors must not crash Today.
         null
     }
 }

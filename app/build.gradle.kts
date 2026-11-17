@@ -89,6 +89,23 @@ val uploadSigningReady = releaseSigningCredentials != null
 val allowDebugReleaseSigning =
     System.getenv("ALLOW_DEBUG_RELEASE_SIGNING").equals("true", ignoreCase = true)
 
+// Canonical granny-says lives at repo assets/; package a real JSON file into the
+// APK (symlinks are unreliable in aapt packaging and can crash Today on parse).
+val copyGrannySaysAsset = tasks.register<Copy>("copyGrannySaysAsset") {
+    description = "Copy canonical granny-says.json into generated app assets"
+    from(rootProject.layout.projectDirectory.file("assets/granny-says.json"))
+    into(layout.buildDirectory.dir("generated/assets/grannySays"))
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.sources.assets?.addGeneratedSourceDirectory(
+            copyGrannySaysAsset,
+            Copy::getDestinationDirectory,
+        )
+    }
+}
+
 android {
     namespace = "com.aetherealmind.grannysknees"
     compileSdk = 37
@@ -101,8 +118,8 @@ android {
         targetSdk = 37
         // RC2 versioning: versionName is rc2.<feature>.<bugfix>.
         // versionCode = 20000 + feature * 100 + bugfix (e.g. rc2.2.5 → 20205).
-        versionCode = 20321
-        versionName = "rc2.3.21"
+        versionCode = 20322
+        versionName = "rc2.3.22"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
