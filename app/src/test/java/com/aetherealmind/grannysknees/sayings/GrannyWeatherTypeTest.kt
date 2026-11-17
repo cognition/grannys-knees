@@ -165,7 +165,7 @@ class GrannyWeatherTypeTest {
     }
 
     @Test
-    fun `cold front is a nearby cooling of three degrees or more`() {
+    fun `cold front needs a sharp drop within three hours`() {
         val now = Instant.parse("2026-11-15T18:00:00Z")
         val front = GrannyWeatherType.activeTypes(
             hours = listOf(
@@ -189,6 +189,24 @@ class GrannyWeatherTypeTest {
             referenceNow = now,
         )
         assertFalse(GrannyWeatherType.COLD_FRONT in steady)
+    }
+
+    @Test
+    fun `ordinary evening cooling over six hours is not a cold front`() {
+        val now = Instant.parse("2026-11-15T21:00:00Z")
+        // 4 °C drop across ±6 h — common evening cool-down, not a front.
+        val evening = GrannyWeatherType.activeTypes(
+            hours = listOf(
+                hour(now.epochSecond - 6 * 3600, weatherCode = 0, temperatureC = 15.0, humidity = 40),
+                hour(now.epochSecond - 3 * 3600, weatherCode = 1, temperatureC = 13.5, humidity = 45),
+                hour(now.epochSecond, weatherCode = 2, temperatureC = 12.0, humidity = 50),
+                hour(now.epochSecond + 3 * 3600, weatherCode = 2, temperatureC = 11.0, humidity = 55),
+            ),
+            scoredHours = emptyList(),
+            zoneId = ZoneOffset.UTC,
+            referenceNow = now,
+        )
+        assertFalse(GrannyWeatherType.COLD_FRONT in evening)
     }
 
     private fun hour(

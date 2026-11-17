@@ -58,10 +58,13 @@ internal object GrannyWeatherType {
     private const val WINDY_THRESHOLD_KMH = 30.0
 
     /**
-     * Cooling (°C) from the earliest to latest nearby hour that counts as a
-     * cold front arriving.
+     * Cooling (°C) within [COLD_FRONT_MAX_SPAN_SECONDS] that counts as a cold
+     * front arriving. Ordinary evening cooling over a longer window does not.
      */
     private const val COLD_FRONT_DROP_C = 3.0
+
+    /** Max span for a cold-front drop (3 hours). */
+    private const val COLD_FRONT_MAX_SPAN_SECONDS = 3L * 3600L
 
     /**
      * Active weather labels near [referenceNow] from the hourly forecast and
@@ -129,16 +132,23 @@ internal object GrannyWeatherType {
     }
 
     /**
-     * True when nearby hours cool by at least [COLD_FRONT_DROP_C] from the
-     * earliest to the latest temperature sample.
+     * True when nearby hours cool by at least [COLD_FRONT_DROP_C] within
+     * [COLD_FRONT_MAX_SPAN_SECONDS]. Earliest→latest over the full ±6 h window
+     * is too eager for calm evening cooling.
      */
     private fun isColdFront(nearby: List<ForecastHour>): Boolean {
         val temps = nearby
             .sortedBy { it.epoch }
             .mapNotNull { hour -> hour.temperature2m?.let { hour.epoch to it } }
         if (temps.size < 2) return false
-        val first = temps.first().second
-        val last = temps.last().second
-        return first - last >= COLD_FRONT_DROP_C
+        for (i in temps.indices) {
+            val (startEpoch, startTemp) = temps[i]
+            for (j in i + 1 until temps.size) {
+                val (endEpoch, endTemp) = temps[j]
+                if (endEpoch - startEpoch > COLD_FRONT_MAX_SPAN_SECONDS) break
+                if (startTemp - endTemp >= COLD_FRONT_DROP_C) return true
+            }
+        }
+        return false
     }
 }
