@@ -52,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import com.aetherealmind.grannysknees.ui.tabDestinationWindowInsets
@@ -805,9 +806,14 @@ internal fun HistoryScreen(
                 val anyFailed = withContext(Dispatchers.IO) {
                     val deletedAt = Instant.now()
                     var failed = false
+                    // removeMeasurement supersedes the observation id; keep the
+                    // live id so later rows from the same check-in still resolve.
+                    val liveObservationIds = mutableMapOf<String, String>()
                     targets.forEach { pending ->
+                        val observationId = liveObservationIds[pending.observationId]
+                            ?: pending.observationId
                         val removed = repository.deleteMeasurement(
-                            observationId = pending.observationId,
+                            observationId = observationId,
                             bodyPart = pending.measurement.bodyPart,
                             side = pending.measurement.side,
                             symptom = pending.measurement.symptom,
@@ -815,6 +821,8 @@ internal fun HistoryScreen(
                         )
                         if (removed == null) {
                             failed = true
+                        } else {
+                            liveObservationIds[pending.observationId] = removed.id
                         }
                     }
                     failed
@@ -1165,8 +1173,13 @@ private fun HistoryReportRow(
                 },
             )
             .padding(vertical = 2.dp)
-            .clearAndSetSemantics {
+            // Merge spoken summary without clearAndSetSemantics so the
+            // checkbox / Remove control stay available to TalkBack.
+            .semantics(mergeDescendants = true) {
                 contentDescription = spoken
+                if (selecting) {
+                    this.selected = selected
+                }
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -1180,7 +1193,8 @@ private fun HistoryReportRow(
         Box(
             modifier = Modifier
                 .height(HISTORY_THUMB_HEIGHT)
-                .aspectRatio(BodyMap.WIDTH / BodyMap.HEIGHT),
+                .aspectRatio(BodyMap.WIDTH / BodyMap.HEIGHT)
+                .clearAndSetSemantics { },
             contentAlignment = Alignment.Center,
         ) {
             BodyFigure(

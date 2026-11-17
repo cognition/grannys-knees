@@ -89,6 +89,45 @@ class JournalCommitterRemoveTest {
         )
     }
 
+    @Test
+    fun `bulk remove must follow the live observation id`() {
+        val original = observation(
+            id = "obs-1",
+            observedAt = Instant.parse("2026-11-10T15:00:00Z"),
+            measurements = listOf(
+                measurement("wrist", "left", "stiffness", 8),
+                measurement("knee", "right", "ache", 5),
+            ),
+        )
+        val afterFirst = requireNotNull(
+            JournalCommitter.removeMeasurement(
+                target = original,
+                bodyPart = "wrist",
+                side = "left",
+                symptom = "stiffness",
+                deletedAt = Instant.parse("2026-11-10T16:00:00Z"),
+                newId = "obs-2",
+            ),
+        )
+        // Stale id is superseded — History must refresh to obs-2 before the next remove.
+        assertTrue(
+            JournalCommitter.current(listOf(original, afterFirst))
+                .none { observation -> observation.id == "obs-1" },
+        )
+        val afterSecond = requireNotNull(
+            JournalCommitter.removeMeasurement(
+                target = afterFirst,
+                bodyPart = "knee",
+                side = "right",
+                symptom = "ache",
+                deletedAt = Instant.parse("2026-11-10T16:01:00Z"),
+                newId = "obs-3",
+            ),
+        )
+        assertNotNull(afterSecond.deletedAt)
+        assertTrue(JournalCommitter.current(listOf(original, afterFirst, afterSecond)).isEmpty())
+    }
+
     private fun observation(
         id: String,
         observedAt: Instant,
