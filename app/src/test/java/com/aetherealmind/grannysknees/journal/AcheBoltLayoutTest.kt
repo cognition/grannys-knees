@@ -5,7 +5,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Ache rate ladder: bolt count / crossed pair, brightness within each tier.
+ * Ache rate ladder: bolt count and brightness within each tier.
  * Rating 3 opens the two-bolt tier (1–2 stay on a single bolt).
  */
 class AcheBoltLayoutTest {
@@ -42,12 +42,12 @@ class AcheBoltLayoutTest {
     }
 
     @Test
-    fun `nine and ten are crossed bolts`() {
-        assertTrue(acheBoltLayout(9) is AcheBoltLayout.Crossed)
-        assertTrue(acheBoltLayout(10) is AcheBoltLayout.Crossed)
-        val dim = acheBoltLayout(9) as AcheBoltLayout.Crossed
-        val bright = acheBoltLayout(10) as AcheBoltLayout.Crossed
-        assertEquals(0f, dim.brightness, 0.0001f)
-        assertEquals(1f, bright.brightness, 0.0001f)
+    fun `nine is four dashes and ten is four dots`() {
+        val atNine = acheBoltLayout(9) as AcheBoltLayout.Parallel
+        assertEquals(4, atNine.count)
+        assertEquals(0f, atNine.brightness, 0.0001f)
+        val atTen = acheBoltLayout(10) as AcheBoltLayout.Dots
+        assertEquals(4, atTen.count)
+        assertEquals(1f, atTen.brightness, 0.0001f)
     }
 }

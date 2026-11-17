@@ -16,6 +16,8 @@
     <string name="journal_granny_ankle">These still dance, if the song is short.</string>
     <string name="journal_granny_foot">These still get her to the gate.</string>
     <string name="journal_granny_other">Somewhere she will only describe with a wave.</string>
+    <string name="journal_granny_overall">The whole works today. She will not pick just one joint.</string>
+    <string name="journal_overall_place">General overall</string>
     <string name="journal_unchanged">It is unchanged</string>
     <string name="journal_body_part">Body part: %1$s</string>
     <string name="journal_side">Side: %1$s</string>
@@ -57,7 +59,7 @@
     <string name="journal_figure_clear_done">Figure reset. Mark how you feel again.</string>
     <string name="journal_figure_clear_this">Clear this</string>
     <string name="journal_figure_clear_this_done">Removed that place. Others kept.</string>
-    <string name="journal_place_hint">Tap the figure to add places. Clear this removes only the one you are editing.</string>
+    <string name="journal_place_hint">Tap the figure to add places, or choose General overall. Clear this removes only the one you are editing.</string>
     <string name="journal_feel_tune_compact">Tune real-feel from Feel</string>
     <string name="journal_feel_no_backdate">You cannot currently go back in time to report earlier in the day. Each save is for now.</string>
 </resources>

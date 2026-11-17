@@ -294,8 +294,6 @@ private fun AppNavHost(
                 JournalScreen(
                     repository = repository,
                     feelCalibrationStore = feelCalibrationStore,
-                    feelCalibrationEnabled = feelCalibrationEnabled,
-                    onFeelCalibrationEnabledChange = onFeelCalibrationEnabledChange,
                     onFeelSaved = onFeelCleared,
                 )
             }

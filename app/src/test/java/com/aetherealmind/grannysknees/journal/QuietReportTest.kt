@@ -41,4 +41,16 @@ class QuietReportTest {
             ),
         )
     }
+
+    @Test
+    fun `general overall uses a whole-body title`() {
+        assertEquals(
+            "General overall stiffness",
+            quietReportTitle(null, OVERALL_PART, "stiffness"),
+        )
+        assertEquals(
+            "General overall ache, 7 - Mon 09:00",
+            quietHistoryHeadline(null, OVERALL_PART, "ache", 7, "Mon 09:00"),
+        )
+    }
 }

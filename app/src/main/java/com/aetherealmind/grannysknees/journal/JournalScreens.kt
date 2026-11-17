@@ -33,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -47,7 +46,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -91,8 +89,6 @@ private val HISTORY_ROW_GAP = 4.dp
 internal fun JournalScreen(
     repository: ForecastRepository? = null,
     feelCalibrationStore: FeelCalibrationStore? = null,
-    feelCalibrationEnabled: Boolean = true,
-    onFeelCalibrationEnabledChange: (Boolean) -> Unit = {},
     onFeelSaved: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -319,6 +315,12 @@ internal fun JournalScreen(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
+                InkChoice(
+                    label = stringResource(R.string.journal_overall_place),
+                    selected = place?.part == OVERALL_PART,
+                    enabled = editing,
+                    onClick = { addOrFocus(OVERALL_PART, null) },
+                )
                 SYMPTOMS.forEach { option ->
                     InkChoice(
                         label = option.replaceFirstChar { it.titlecase() },
@@ -532,25 +534,6 @@ internal fun JournalScreen(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.journal_feel_tune_compact),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
-                )
-                Switch(
-                    checked = feelCalibrationEnabled,
-                    onCheckedChange = onFeelCalibrationEnabledChange,
-                    modifier = Modifier.scale(0.55f),
-                )
             }
         }
     }
