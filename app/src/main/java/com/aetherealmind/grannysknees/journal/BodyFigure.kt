@@ -34,7 +34,7 @@ import com.aetherealmind.grannysknees.R
 /**
  * One chosen place on the figure.
  * [rating] runs from clear at 0 to red at 10. Aches use the bolt ladder;
- * stiffness is colour wash only.
+ * stiffness is colour only (fill wash + soft bloom, no bolts).
  */
 internal data class FigureMark(
     val part: String,
@@ -281,10 +281,9 @@ private fun DrawScope.cloudAround(
     if (mark == null) {
         return
     }
-    // Soft red bloom is for aches; stiffness is wash colour only.
-    if (!mark.ache) {
-        return
-    }
+    // Colour bloom is the stiffness (and shared wash) rate cue; ache bolts
+    // are drawn separately. Do not gate this on ache — that left stiffness
+    // with almost no visible scale after bolts moved off it.
     val reach = cloudReach(mark.rating)
     if (reach < 0.3f) {
         return
