@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Hardens TLS for HttpURLConnection (Open-Meteo forecast + geocoding):
+  - Cleartext HTTP is refused.
+  - Only the system CA store is trusted (user-installed CAs cannot MITM).
+  Certificate pinning is intentionally omitted so CDN/cert rotations for
+  open-meteo.com do not brick the app; revisit if a pin set is maintained.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

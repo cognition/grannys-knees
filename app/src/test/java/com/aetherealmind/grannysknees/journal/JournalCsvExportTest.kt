@@ -8,6 +8,11 @@ import java.time.Instant
 /** Flat CSV rows for the Settings history export. */
 class JournalCsvExportTest {
     @Test
+    fun `export subdirectory matches FileProvider cache-path`() {
+        assertEquals("exports", JournalCsvExport.CACHE_EXPORT_SUBDIR)
+    }
+
+    @Test
     fun `empty journal is header only`() {
         val csv = JournalCsvExport.format(emptyList())
         assertEquals(

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
+    <!-- Narrow share root: only the CSV export folder, not the whole cache. -->
     <cache-path
         name="export_cache"
-        path="." />
+        path="exports/" />
 </paths>

@@ -314,7 +314,11 @@ internal fun SettingsScreen(
                     scope.launch {
                         val exportFile = withContext(Dispatchers.IO) {
                             val payload = repository.exportCurrentCsv()
-                            File(context.cacheDir, JournalCsvExport.FILE_NAME).also { file ->
+                            val exportDir = File(
+                                context.cacheDir,
+                                JournalCsvExport.CACHE_EXPORT_SUBDIR,
+                            ).also { dir -> dir.mkdirs() }
+                            File(exportDir, JournalCsvExport.FILE_NAME).also { file ->
                                 file.writeText(payload, Charsets.UTF_8)
                             }
                         }

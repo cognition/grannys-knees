@@ -6,6 +6,8 @@ package com.aetherealmind.grannysknees.journal
  * Tombstones and corrected rows are omitted by the caller via [JournalRepository.current].
  */
 internal object JournalCsvExport {
+    /** Subdirectory under cacheDir exposed by FileProvider (`file_paths.xml`). */
+    const val CACHE_EXPORT_SUBDIR: String = "exports"
     const val FILE_NAME: String = "grannys-knees-history.csv"
     const val MIME_TYPE: String = "text/csv"
 
