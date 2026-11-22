@@ -58,7 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.aetherealmind.grannysknees.ui.tabDestinationWindowInsets
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.room.Room
+import com.aetherealmind.grannysknees.GrannysKneesApplication
 import com.aetherealmind.grannysknees.R
 import com.aetherealmind.grannysknees.data.FeelCalibrationStore
 import com.aetherealmind.grannysknees.data.ForecastRepository
@@ -96,13 +96,7 @@ internal fun JournalScreen(
     val context = LocalContext.current
     val forecastRepository = repository
     val journalRepository = remember {
-        JournalRepository(
-            Room.databaseBuilder(
-                context.applicationContext,
-                JournalDatabase::class.java,
-                "journal.db",
-            ).build().journalDao(),
-        )
+        (context.applicationContext as GrannysKneesApplication).journalRepository()
     }
     val zone = ZoneId.systemDefault()
     val store = remember { ReportDummyStore(File(context.filesDir, "report-dummy.json")) }
@@ -746,13 +740,7 @@ internal fun HistoryScreen(
 ) {
     val context = LocalContext.current
     val repository = remember {
-        JournalRepository(
-            Room.databaseBuilder(
-                context.applicationContext,
-                JournalDatabase::class.java,
-                "journal.db",
-            ).build().journalDao(),
-        )
+        (context.applicationContext as GrannysKneesApplication).journalRepository()
     }
     var rows by remember { mutableStateOf<List<JournalObservation>>(emptyList()) }
     var pendingRemove by remember { mutableStateOf<PendingHistoryRemove?>(null) }
@@ -803,34 +791,28 @@ internal fun HistoryScreen(
         exitSelection()
         scope.launch {
             try {
-                val anyFailed = withContext(Dispatchers.IO) {
-                    val deletedAt = Instant.now()
-                    var failed = false
-                    // removeMeasurement supersedes the observation id; keep the
-                    // live id so later rows from the same check-in still resolve.
-                    val liveObservationIds = mutableMapOf<String, String>()
-                    targets.forEach { pending ->
-                        val observationId = liveObservationIds[pending.observationId]
-                            ?: pending.observationId
-                        val removed = repository.deleteMeasurement(
-                            observationId = observationId,
-                            bodyPart = pending.measurement.bodyPart,
-                            side = pending.measurement.side,
-                            symptom = pending.measurement.symptom,
-                            deletedAt = deletedAt,
+                val failed = withContext(Dispatchers.IO) {
+                    try {
+                        repository.deleteMeasurements(
+                            targets = targets.map { pending ->
+                                MeasurementRemovalTarget(
+                                    observationId = pending.observationId,
+                                    bodyPart = pending.measurement.bodyPart,
+                                    side = pending.measurement.side,
+                                    symptom = pending.measurement.symptom,
+                                )
+                            },
+                            deletedAt = Instant.now(),
                         )
-                        if (removed == null) {
-                            failed = true
-                        } else {
-                            liveObservationIds[pending.observationId] = removed.id
-                        }
+                        false
+                    } catch (_: IllegalStateException) {
+                        true
                     }
-                    failed
                 }
                 rows = withContext(Dispatchers.IO) { loadNewestFirst() }
                 notice = when {
-                    anyFailed && targets.size == 1 -> deleteFailed
-                    anyFailed -> bulkDeleteFailed
+                    failed && targets.size == 1 -> deleteFailed
+                    failed -> bulkDeleteFailed
                     else -> null
                 }
             } finally {

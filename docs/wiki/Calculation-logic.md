@@ -57,7 +57,7 @@ The current implementation uses `slope-index/1.0.0` and `index-slope-v1`. Refere
 
 ## Missing or invalid data
 
-An hour is unavailable when any required temperature, humidity, or pressure sample in the slope or 12-hour pressure window is missing, or when contiguous hourly samples for those windows do not exist. A missing value is never treated as zero. Missing feels-like alone does not mark the hour unavailable; the gap term is simply dropped (`g = 0`).
+An hour is unavailable when any required temperature or humidity sample in the contiguous 4-hour slope window is missing, when that slope window’s hours are not contiguous, or when either 12-hour pressure endpoint (`t−12h` or now) is missing or null. Middle hours between the pressure endpoints may be absent or null; they are not used for `dP12`. A missing value is never treated as zero. Missing feels-like alone does not mark the hour unavailable; the gap term is simply dropped (`g = 0`).
 
 Unavailable hours are omitted from calculations and shown as gaps or unavailable states. They do not lower the daily low or increase the daily high.
 

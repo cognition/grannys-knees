@@ -163,6 +163,32 @@ class WeatherIndexScorerTest {
     }
 
     @Test
+    fun `missing middle pressure epoch still scores when endpoints are present`() {
+        // Hours 0..12 except hour 6 (a hole in the map, not a null pressure).
+        // Slope needs the last four hours contiguous; pressure only needs endpoints.
+        val hours = (0..12).filter { i -> i != 6 }.map { i ->
+            HourlyObservation(
+                epoch = BASE_EPOCH + i * 3600L,
+                surfacePressureHpa = when (i) {
+                    0 -> 1020.0
+                    12 -> 1010.0
+                    else -> 1015.0
+                },
+                relativeHumidityPct = 50.0,
+                temperatureC = 20.0,
+                feelsLikeC = 20.0,
+            )
+        }
+        val last = WeatherIndexScorer.score(
+            ScoringRequest(zoneId = "America/Toronto", hours = hours),
+        ).hours.last()
+
+        assertEquals(HourStatus.AVAILABLE, last.status)
+        assertNotNull(last.indexScore)
+        assertEquals(0, BigDecimal("-10.00").compareTo(last.subScores.pressure))
+    }
+
+    @Test
     fun `personal pressure sensitivity raises score when pressure falls`() {
         val request = flatWindowRequest(startPressure = 1020.0, endPressure = 1010.0)
         val baseline = WeatherIndexScorer.score(request).hours.last().indexScore!!

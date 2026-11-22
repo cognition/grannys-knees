@@ -45,7 +45,7 @@ object WeatherIndexScorer {
     private const val REASON_SLOPE_WINDOW =
         "4-hour slope window unavailable (missing contiguous hourly samples)"
     private const val REASON_PRESSURE_WINDOW =
-        "12-hour pressure window unavailable (missing contiguous hourly samples)"
+        "12-hour pressure endpoints unavailable (missing t-12h or now sample)"
 
     private val MC = MathContext.DECIMAL128
     private val TWO = BigDecimal("2")
@@ -191,19 +191,19 @@ object WeatherIndexScorer {
         val zoned = instant.atZone(zone)
 
         val slopeWindow = window(sample.epoch, SLOPE_POINTS, byEpoch)
-        val pressureWindow = window(sample.epoch, PRESSURE_POINTS, byEpoch)
+        // dP12 uses only the 12 h endpoints; middle hours need not be present.
+        val pressureThen = byEpoch[sample.epoch - (PRESSURE_POINTS - 1) * HOUR_SECONDS]
+        val pressureNow = byEpoch[sample.epoch]
+        val pressureThenHpa = pressureThen?.surfacePressureHpa
+        val pressureNowHpa = pressureNow?.surfacePressureHpa
 
         val temp4 = slopeWindow?.map { it.temperatureC }
         val hum4 = slopeWindow?.map { it.relativeHumidityPct }
         val feels4 = slopeWindow?.map { it.feelsLikeC }
-        val pressure13 = pressureWindow?.map { it.surfacePressureHpa }
 
         val tempsReady = temp4 != null && temp4.all { it != null }
         val humsReady = hum4 != null && hum4.all { it != null }
-        // Slope-index contract: dP12 only needs the 12 h pressure endpoints.
-        val pressuresReady = pressure13 != null &&
-            pressure13.first() != null &&
-            pressure13.last() != null
+        val pressuresReady = pressureThenHpa != null && pressureNowHpa != null
 
         val mT: Double?
         val mH: Double?
@@ -222,7 +222,9 @@ object WeatherIndexScorer {
                 val gap = temps.zip(feels4.map { it!! }) { t, f -> maxOf(0.0, t - f) }
                 deadband(slope4(gap[0], gap[1], gap[2], gap[3]), config.deadbandG)
             }
-            dP12 = pressure13!!.last()!! - pressure13.first()!!
+            val thenHpa = checkNotNull(pressureThenHpa)
+            val nowHpa = checkNotNull(pressureNowHpa)
+            dP12 = nowHpa - thenHpa
             indexUnrounded = assembleScore(
                 mT = mT,
                 mH = mH,
@@ -260,7 +262,8 @@ object WeatherIndexScorer {
             buildReasons(
                 sample = sample,
                 slopeWindow = slopeWindow,
-                pressureWindow = pressureWindow,
+                pressureThen = pressureThen,
+                pressureNow = pressureNow,
             )
         }
 
@@ -327,7 +330,8 @@ object WeatherIndexScorer {
     private fun buildReasons(
         sample: HourlyObservation,
         slopeWindow: List<HourlyObservation>?,
-        pressureWindow: List<HourlyObservation>?,
+        pressureThen: HourlyObservation?,
+        pressureNow: HourlyObservation?,
     ): List<String> =
         buildList {
             if (slopeWindow == null) {
@@ -338,14 +342,13 @@ object WeatherIndexScorer {
                     if (hour.relativeHumidityPct == null) add(REASON_HUMIDITY_NULL)
                 }
             }
-            if (pressureWindow == null) {
+            if (pressureThen == null || pressureNow == null) {
                 add(REASON_PRESSURE_WINDOW)
             } else {
-                // Only endpoints feed dP12; middle nulls do not block scoring.
-                if (pressureWindow.first().surfacePressureHpa == null) {
+                if (pressureThen.surfacePressureHpa == null) {
                     add(REASON_PRESSURE_NULL)
                 }
-                if (pressureWindow.last().surfacePressureHpa == null) {
+                if (pressureNow.surfacePressureHpa == null) {
                     add(REASON_PRESSURE_NULL)
                 }
             }

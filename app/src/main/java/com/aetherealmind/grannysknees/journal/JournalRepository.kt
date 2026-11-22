@@ -4,13 +4,24 @@ import java.time.Instant
 import java.util.UUID
 
 /**
+ * One measurement to remove from a current observation (History multi-select).
+ */
+internal data class MeasurementRemovalTarget(
+    val observationId: String,
+    val bodyPart: String,
+    val side: String?,
+    val symptom: String,
+)
+
+/**
  * Room-backed journal. History is append-only: removals write corrections or
  * tombstones. A full wipe is the only table-clearing delete and stays on this
  * device.
  */
 internal class JournalRepository(
-    private val dao: JournalDao,
+    private val database: JournalDatabase,
 ) {
+    private val dao: JournalDao = database.journalDao()
     /** Every stored observation, including tombstones. */
     fun all(): List<JournalObservation> =
         dao.observations().map { entity -> toObservation(entity) }
@@ -87,6 +98,44 @@ internal class JournalRepository(
         ) ?: return null
         insert(marker, snapshot = null)
         return marker
+    }
+
+    /**
+     * Removes several measurements in one Room transaction.
+     *
+     * If any target is no longer current, the whole batch rolls back so History
+     * never shows a partial wipe with a bulk-failure notice.
+     *
+     * @throws IllegalStateException when a target cannot be removed
+     */
+    fun deleteMeasurements(
+        targets: List<MeasurementRemovalTarget>,
+        deletedAt: Instant,
+    ) {
+        if (targets.isEmpty()) {
+            return
+        }
+        database.runInTransaction {
+            val liveObservationIds = mutableMapOf<String, String>()
+            targets.forEach { pending ->
+                val observationId = liveObservationIds[pending.observationId]
+                    ?: pending.observationId
+                val removed = deleteMeasurement(
+                    observationId = observationId,
+                    bodyPart = pending.bodyPart,
+                    side = pending.side,
+                    symptom = pending.symptom,
+                    deletedAt = deletedAt,
+                )
+                if (removed == null) {
+                    throw IllegalStateException(
+                        "Measurement no longer current: ${pending.bodyPart}/" +
+                            "${pending.side}/${pending.symptom} on $observationId",
+                    )
+                }
+                liveObservationIds[pending.observationId] = removed.id
+            }
+        }
     }
 
     /** Removes the local tables. Does not contact a server. */

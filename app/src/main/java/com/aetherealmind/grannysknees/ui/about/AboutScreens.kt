@@ -44,13 +44,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-import androidx.room.Room
+import com.aetherealmind.grannysknees.GrannysKneesApplication
 import com.aetherealmind.grannysknees.R
 import com.aetherealmind.grannysknees.data.FeelCalibrationStore
 import com.aetherealmind.grannysknees.data.LocalBarometerSensor
 import com.aetherealmind.grannysknees.data.SensitivityProfile
 import com.aetherealmind.grannysknees.journal.JournalCsvExport
-import com.aetherealmind.grannysknees.journal.JournalDatabase
 import com.aetherealmind.grannysknees.journal.JournalRepository
 import com.aetherealmind.grannysknees.ui.tabDestinationWindowInsets
 import com.aetherealmind.grannysknees.ui.theme.BrandHeading
@@ -240,13 +239,7 @@ internal fun SettingsScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val repository = remember {
-        JournalRepository(
-            Room.databaseBuilder(
-                context.applicationContext,
-                JournalDatabase::class.java,
-                "journal.db",
-            ).build().journalDao(),
-        )
+        (context.applicationContext as GrannysKneesApplication).journalRepository()
     }
     var resetNotice by remember { mutableStateOf<String?>(null) }
     var confirmResetAll by remember { mutableStateOf(false) }
