@@ -1,0 +1,9 @@
+# UE-01, UE-09, UE-14 — first launch honesty. Clear data before run for a true first launch:
+#   adb shell pm clear com.aetherealmind.grannysknees
+appId: com.aetherealmind.grannysknees
+---
+- launchApp
+- assertVisible: "A little science. A little superstition."
+- tapOn: "Continue"
+- assertVisible: "City"
+- assertVisible: "Search"

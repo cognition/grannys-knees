@@ -44,6 +44,7 @@ object FixtureSupport {
         val temperature = hourly["temperature_2m"] as List<Any?>
         val humidity = hourly["relative_humidity_2m"] as List<Any?>
         val pressure = hourly["surface_pressure"] as List<Any?>
+        val apparent = hourly["apparent_temperature"] as List<Any?>?
 
         val hours = times.indices.map { i ->
             HourlyObservation(
@@ -51,6 +52,7 @@ object FixtureSupport {
                 surfacePressureHpa = (pressure[i] as BigDecimal?)?.toDouble(),
                 relativeHumidityPct = (humidity[i] as BigDecimal?)?.toDouble(),
                 temperatureC = (temperature[i] as BigDecimal?)?.toDouble(),
+                feelsLikeC = apparent?.get(i)?.let { (it as BigDecimal?)?.toDouble() },
             )
         }
         return ScoringRequest(zoneId = zoneId, hours = hours)

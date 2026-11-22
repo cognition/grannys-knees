@@ -3,10 +3,22 @@ package com.aetherealmind.grannysknees.journal
 import com.aetherealmind.grannysknees.R
 import java.util.Locale
 
+/** Body-part id for a whole-body / general Feel rating (no figure spot). */
+internal const val OVERALL_PART: String = "overall"
+
 /**
  * One-line title for a saved measurement, such as "Left knee ache".
  */
 internal fun quietReportTitle(side: String?, bodyPart: String, symptom: String): String {
+    if (bodyPart == OVERALL_PART) {
+        val words = listOfNotNull(
+            "General overall",
+            symptom.takeIf { it.isNotBlank() },
+        ).joinToString(separator = " ")
+        return words.replaceFirstChar { character ->
+            if (character.isLowerCase()) character.titlecase(Locale.CANADA) else character.toString()
+        }
+    }
     val sideLabel = side?.replaceFirstChar { character ->
         if (character.isLowerCase()) character.titlecase(Locale.CANADA) else character.toString()
     }
@@ -33,6 +45,7 @@ internal fun grannyAside(part: String, side: String?): Int {
         "knee" -> R.string.journal_granny_knee
         "ankle" -> R.string.journal_granny_ankle
         "foot" -> R.string.journal_granny_foot
+        OVERALL_PART -> R.string.journal_granny_overall
         else -> R.string.journal_granny_other
     }
 }

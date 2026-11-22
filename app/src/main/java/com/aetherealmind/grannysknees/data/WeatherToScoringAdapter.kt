@@ -30,6 +30,7 @@ internal object WeatherToScoringAdapter {
                     else hour.surfacePressure,
                     relativeHumidityPct = hour.relativeHumidity2m?.toDouble(),
                     temperatureC = hour.temperature2m,
+                    feelsLikeC = hour.apparentTemperature,
                 )
             },
         )

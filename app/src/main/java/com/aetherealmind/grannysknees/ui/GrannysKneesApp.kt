@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +31,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -107,6 +109,9 @@ internal fun GrannysKneesApp(
     }
     var sensitivityEpoch by remember { mutableStateOf(0) }
     var journalDataEpoch by remember { mutableIntStateOf(0) }
+    var showFeelSchemaResetNotice by remember {
+        mutableStateOf(sensitivityStore?.readPendingFeelSchemaResetNotice() == true)
+    }
     LaunchedEffect(sensitivityEpoch) {
         if (sensitivityEpoch == 0) {
             return@LaunchedEffect
@@ -123,6 +128,30 @@ internal fun GrannysKneesApp(
                 },
             )
             return@GrannysKneesTheme
+        }
+        if (showFeelSchemaResetNotice) {
+            AlertDialog(
+                onDismissRequest = {
+                    showFeelSchemaResetNotice = false
+                    sensitivityStore?.writePendingFeelSchemaResetNotice(false)
+                },
+                title = {
+                    Text(stringResource(R.string.feel_schema_reset_title))
+                },
+                text = {
+                    Text(stringResource(R.string.feel_schema_reset_body))
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showFeelSchemaResetNotice = false
+                            sensitivityStore?.writePendingFeelSchemaResetNotice(false)
+                        },
+                    ) {
+                        Text(stringResource(R.string.feel_schema_reset_confirm))
+                    }
+                },
+            )
         }
         val navController = rememberNavController()
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -145,12 +174,26 @@ internal fun GrannysKneesApp(
         }
         val isLandscape =
             LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-        // Zero content insets here: the tab chrome owns system-nav padding, and
-        // each destination Scaffold owns status-bar / top insets. Applying
-        // safeDrawing again on the outer Scaffold doubled the gap above the tabs.
-        if (isLandscape) {
-            Row(modifier = Modifier.fillMaxSize()) {
-                if (showTabs) {
+        // One shell for both orientations so AppNavHost (and TodayRoute) stay
+        // mounted across rotate. Zero content insets: tab chrome owns system-nav
+        // padding; each destination Scaffold owns status-bar / top insets.
+        Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            bottomBar = {
+                if (!isLandscape && showTabs) {
+                    BottomTabs(
+                        currentRoute = selectedTabRoute,
+                        onSelect = onSelectTab,
+                    )
+                }
+            },
+        ) { innerPadding ->
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            ) {
+                if (isLandscape && showTabs) {
                     SideTabs(
                         currentRoute = selectedTabRoute,
                         onSelect = onSelectTab,
@@ -199,61 +242,6 @@ internal fun GrannysKneesApp(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                )
-            }
-        } else {
-            Scaffold(
-                contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                bottomBar = {
-                    if (showTabs) {
-                        BottomTabs(
-                            currentRoute = selectedTabRoute,
-                            onSelect = onSelectTab,
-                        )
-                    }
-                },
-            ) { innerPadding ->
-                AppNavHost(
-                    navController = navController,
-                    repository = repository,
-                    cityStore = cityStore,
-                    feelCalibrationStore = feelCalibrationStore,
-                    themePreference = themePreference,
-                    onThemePreferenceChange = { next ->
-                        themePreference = next
-                        themePreferenceStore?.write(next)
-                    },
-                    sensitivityProfile = sensitivityProfile,
-                    onSensitivityProfileChange = { next ->
-                        sensitivityProfile = next
-                        sensitivityStore?.write(next)
-                        sensitivityEpoch += 1
-                    },
-                    feelCalibrationEnabled = feelCalibrationEnabled,
-                    onFeelCalibrationEnabledChange = { enabled ->
-                        feelCalibrationEnabled = enabled
-                        sensitivityStore?.writeFeelCalibrationEnabled(enabled)
-                        sensitivityEpoch += 1
-                    },
-                    grannySpeaksFreely = grannySpeaksFreely,
-                    onGrannySpeaksFreelyChange = { enabled ->
-                        grannySpeaksFreely = enabled
-                        sensitivityStore?.writeGrannySpeaksFreely(enabled)
-                    },
-                    localPressureEnabled = localPressureEnabled,
-                    onLocalPressureEnabledChange = { enabled ->
-                        localPressureEnabled = enabled
-                        sensitivityStore?.writeLocalPressureEnabled(enabled)
-                        sensitivityEpoch += 1
-                    },
-                    sensitivityEpoch = sensitivityEpoch,
-                    onFeelCleared = { sensitivityEpoch += 1 },
-                    journalDataEpoch = journalDataEpoch,
-                    onDataReset = {
-                        journalDataEpoch += 1
-                        sensitivityEpoch += 1
-                    },
-                    modifier = Modifier.padding(innerPadding),
                 )
             }
         }
@@ -306,8 +294,6 @@ private fun AppNavHost(
                 JournalScreen(
                     repository = repository,
                     feelCalibrationStore = feelCalibrationStore,
-                    feelCalibrationEnabled = feelCalibrationEnabled,
-                    onFeelCalibrationEnabledChange = onFeelCalibrationEnabledChange,
                     onFeelSaved = onFeelCleared,
                 )
             }

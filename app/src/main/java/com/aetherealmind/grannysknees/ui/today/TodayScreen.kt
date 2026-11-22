@@ -224,6 +224,44 @@ internal fun TodayScreen(
     onChangeCity: (() -> Unit)? = null,
     grannySpeaksFreely: Boolean = false,
 ) {
+    // Hoist Granny Says above portrait/landscape so rotation only relayouts.
+    val context = LocalContext.current
+    val picker = remember { loadGrannySaysPicker(context.assets) }
+    var sayingText by remember { mutableStateOf<String?>(null) }
+    val available = state as? TodayUiState.Available
+    val today = LocalDate.now()
+    val season = GrannySeason.current(today.monthValue)
+    LaunchedEffect(
+        available?.score,
+        available?.personalScore,
+        grannySpeaksFreely,
+        available?.forecastHasSnow,
+        available?.activeWeatherTypes,
+        picker,
+        season,
+        today,
+    ) {
+        if (available == null || picker == null) {
+            sayingText = null
+            return@LaunchedEffect
+        }
+        sayingText = picker.showForScore(
+            score = available.score.setScale(0, RoundingMode.HALF_UP).intValueExact(),
+            personalScore = available.personalScore
+                ?.setScale(0, RoundingMode.HALF_UP)
+                ?.intValueExact(),
+            allowFreeSpeech = grannySpeaksFreely,
+            season = season,
+            snowInForecast = available.forecastHasSnow,
+            activeWeatherTypes = available.activeWeatherTypes,
+        )?.text?.let(SayingPlaceholders::render)
+    }
+    val onAnotherSaying: () -> Unit = {
+        val next = picker?.refresh()?.text?.let(SayingPlaceholders::render)
+        if (next != null) {
+            sayingText = next
+        }
+    }
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     if (isLandscape) {
@@ -234,7 +272,9 @@ internal fun TodayScreen(
             isRefreshing = isRefreshing,
             onRefresh = onRefresh,
             onChangeCity = onChangeCity,
-            grannySpeaksFreely = grannySpeaksFreely,
+            sayingText = sayingText,
+            onAnotherSaying = onAnotherSaying,
+            sayingAvailable = picker != null,
         )
     } else {
         PortraitTodayScreen(
@@ -244,7 +284,9 @@ internal fun TodayScreen(
             isRefreshing = isRefreshing,
             onRefresh = onRefresh,
             onChangeCity = onChangeCity,
-            grannySpeaksFreely = grannySpeaksFreely,
+            sayingText = sayingText,
+            onAnotherSaying = onAnotherSaying,
+            sayingAvailable = picker != null,
         )
     }
 }
@@ -261,7 +303,9 @@ private fun LandscapeTodayScreen(
     isRefreshing: Boolean = false,
     onRefresh: (() -> Unit)? = null,
     onChangeCity: (() -> Unit)? = null,
-    grannySpeaksFreely: Boolean = false,
+    sayingText: String? = null,
+    onAnotherSaying: () -> Unit = {},
+    sayingAvailable: Boolean = false,
 ) {
     Scaffold(
         modifier = modifier,
@@ -291,8 +335,9 @@ private fun LandscapeTodayScreen(
                         is TodayUiState.Loading -> LoadingNotice()
                         is TodayUiState.Available -> {
                             GrannySayingBlock(
-                                state = state,
-                                grannySpeaksFreely = grannySpeaksFreely,
+                                sayingText = sayingText,
+                                onAnotherSaying = onAnotherSaying,
+                                sayingAvailable = sayingAvailable,
                             )
                             LastUpdated(
                                 label = state.lastUpdatedLabel,
@@ -464,7 +509,9 @@ private fun PortraitTodayScreen(
     isRefreshing: Boolean = false,
     onRefresh: (() -> Unit)? = null,
     onChangeCity: (() -> Unit)? = null,
-    grannySpeaksFreely: Boolean = false,
+    sayingText: String? = null,
+    onAnotherSaying: () -> Unit = {},
+    sayingAvailable: Boolean = false,
 ) {
     Scaffold(
         modifier = modifier,
@@ -530,7 +577,9 @@ private fun PortraitTodayScreen(
                             )
                             IndexCard(
                                 state = state,
-                                grannySpeaksFreely = grannySpeaksFreely,
+                                sayingText = sayingText,
+                                onAnotherSaying = onAnotherSaying,
+                                sayingAvailable = sayingAvailable,
                             )
                         }
                         LastUpdated(
@@ -626,7 +675,9 @@ private fun LocationHeader(location: String, onChangeCity: (() -> Unit)?) {
 @Composable
 private fun IndexCard(
     state: TodayUiState.Available,
-    grannySpeaksFreely: Boolean = false,
+    sayingText: String? = null,
+    onAnotherSaying: () -> Unit = {},
+    sayingAvailable: Boolean = false,
 ) {
     val bandLabel = bandLabel(state.band)
     val scoreLabel = state.scoreLabel
@@ -680,8 +731,9 @@ private fun IndexCard(
             overflow = TextOverflow.Ellipsis,
         )
         GrannySayingBlock(
-            state = state,
-            grannySpeaksFreely = grannySpeaksFreely,
+            sayingText = sayingText,
+            onAnotherSaying = onAnotherSaying,
+            sayingAvailable = sayingAvailable,
         )
     }
 }
@@ -689,50 +741,25 @@ private fun IndexCard(
 /**
  * Granny Says line with refresh. Lives under the index in portrait, and inside
  * the scroll stack in landscape so graphs keep the leftover height.
+ *
+ * Saying text is owned by [TodayScreen] so orientation changes do not re-pick.
  */
 @Composable
 private fun GrannySayingBlock(
-    state: TodayUiState.Available,
-    grannySpeaksFreely: Boolean = false,
+    sayingText: String?,
+    onAnotherSaying: () -> Unit,
+    sayingAvailable: Boolean,
 ) {
-    val context = LocalContext.current
-    val picker = remember {
-        loadGrannySaysPicker(context.assets)
-    }
-    val today = LocalDate.now()
-    val season = GrannySeason.current(today.monthValue)
-    var sayingText by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(
-        state.score,
-        state.personalScore,
-        grannySpeaksFreely,
-        state.forecastHasSnow,
-        picker,
-        season,
-        today,
-    ) {
-        sayingText = picker?.showForScore(
-            score = state.score.setScale(0, RoundingMode.HALF_UP).intValueExact(),
-            personalScore = state.personalScore?.setScale(0, RoundingMode.HALF_UP)?.intValueExact(),
-            allowFreeSpeech = grannySpeaksFreely,
-            season = season,
-            snowInForecast = state.forecastHasSnow,
-        )?.text?.let(SayingPlaceholders::render)
-    }
-    // Always reserve two saying lines so Another saying never shifts the layout.
-    if (picker != null) {
+    // Reserve two saying lines so short quotes do not jump the layout; grow when
+    // a longer saying needs more than two lines.
+    if (sayingAvailable) {
         Row(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(top = 6.dp),
         ) {
             CircularRefreshButton(
-                onClick = {
-                    val next = picker.refresh()?.text?.let(SayingPlaceholders::render)
-                    if (next != null) {
-                        sayingText = next
-                    }
-                },
+                onClick = onAnotherSaying,
                 contentDescription = stringResource(R.string.today_another_saying),
                 buttonSize = 28.dp,
                 iconSize = 16.dp,
@@ -747,8 +774,6 @@ private fun GrannySayingBlock(
                 color = MaterialTheme.colorScheme.onSurface,
                 softWrap = true,
                 minLines = 2,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f, fill = true),
             )
         }
@@ -786,13 +811,19 @@ private fun CircularRefreshButton(
     }
 }
 
-/** Loads the packaged Granny Says list, or null when the asset is missing. */
+/**
+ * Loads the packaged Granny Says list, or null when the asset is missing or
+ * unreadable so Today still paints without a saying.
+ */
 private fun loadGrannySaysPicker(assets: android.content.res.AssetManager): GrannySaysPicker? {
     return try {
         assets.open("granny-says.json").use { stream ->
             GrannySaysPicker(GrannySaysCatalog.fromStream(stream))
         }
     } catch (_: IOException) {
+        null
+    } catch (_: RuntimeException) {
+        // Malformed JSON / parse errors must not crash Today.
         null
     }
 }

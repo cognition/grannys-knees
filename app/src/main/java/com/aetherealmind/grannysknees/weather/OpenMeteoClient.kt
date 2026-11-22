@@ -1,6 +1,8 @@
 package com.aetherealmind.grannysknees.weather
 
+import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -13,13 +15,15 @@ import java.nio.charset.StandardCharsets
 private val REQUIRED_HOURLY_VARIABLES = listOf(
     "temperature_2m",
     "relative_humidity_2m",
+    "apparent_temperature",
     "surface_pressure",
     "weather_code",
+    "wind_speed_10m",
 )
 
 /**
  * Hours before "now" so the **whole local calendar day** is in the payload,
- * plus the 12-hour trailing window lead-in before local midnight (`index-v2`).
+ * plus the 12-hour trailing window lead-in before local midnight (slope index).
  *
  * With only twelve past hours, a late-evening open would leave the morning
  * blank on Today's curve.
@@ -30,7 +34,7 @@ const val DEFAULT_PAST_HOURS: Int = 24 + 12
  * A single Open-Meteo `/v1/forecast` request.
  *
  * Defaults: `timeformat=unixtime`, `forecast_days >= 6` (5-day outlook +
- * current local day), and `past_hours >= 12` for the 12-hour index window.
+ * current local day), and `past_hours >= 12` for the 12-hour pressure window.
  * [DEFAULT_PAST_HOURS] also covers morning→night on Today's curve.
  */
 data class OpenMeteoRequest(
@@ -72,10 +76,39 @@ fun interface HttpTransport {
     fun get(url: String): String
 }
 
+/**
+ * Reads an HTTP body into a UTF-8 string, refusing payloads larger than
+ * [maxBytes] so a hostile or runaway response cannot exhaust memory.
+ */
+internal object BoundedHttpBodyReader {
+    private const val CHUNK_BYTES: Int = 8_192
+
+    @Throws(IOException::class)
+    fun readUtf8(input: InputStream, maxBytes: Int): String {
+        require(maxBytes > 0) { "maxBytes must be positive" }
+        val buffer = ByteArrayOutputStream(minOf(maxBytes, CHUNK_BYTES))
+        val chunk = ByteArray(CHUNK_BYTES)
+        var total = 0
+        while (true) {
+            val read = input.read(chunk)
+            if (read < 0) {
+                break
+            }
+            total += read
+            if (total > maxBytes) {
+                throw IOException("HTTP response exceeded $maxBytes bytes")
+            }
+            buffer.write(chunk, 0, read)
+        }
+        return buffer.toString(StandardCharsets.UTF_8.name())
+    }
+}
+
 /** Default [HttpTransport] backed by [HttpURLConnection]; no third-party HTTP dependency. */
 class UrlHttpTransport(
     private val connectTimeoutMs: Int = 10_000,
     private val readTimeoutMs: Int = 10_000,
+    private val maxResponseBytes: Int = DEFAULT_MAX_RESPONSE_BYTES,
 ) : HttpTransport {
 
     @Throws(IOException::class)
@@ -91,11 +124,23 @@ class UrlHttpTransport(
             if (status !in 200..299) {
                 throw IOException("Open-Meteo returned HTTP $status ${connection.responseMessage}")
             }
-            return connection.inputStream.bufferedReader(StandardCharsets.UTF_8)
-                .use { it.readText() }
+            val declaredLength = connection.contentLengthLong
+            if (declaredLength > maxResponseBytes) {
+                throw IOException(
+                    "Open-Meteo Content-Length $declaredLength exceeds $maxResponseBytes bytes",
+                )
+            }
+            return connection.inputStream.use { stream ->
+                BoundedHttpBodyReader.readUtf8(stream, maxResponseBytes)
+            }
         } finally {
             connection.disconnect()
         }
+    }
+
+    companion object {
+        /** Caps forecast/geocoding JSON well above normal Open-Meteo payloads. */
+        const val DEFAULT_MAX_RESPONSE_BYTES: Int = 2 * 1024 * 1024
     }
 }
 

@@ -16,6 +16,10 @@ internal class LocalBarometerSensor(
     private val sensor = manager.getDefaultSensor(Sensor.TYPE_PRESSURE)
     private var smoothedPressure: Double? = null
 
+    /** True when this device exposes a pressure / barometer sensor. */
+    val isAvailable: Boolean
+        get() = sensor != null
+
     fun start() {
         val pressureSensor = sensor ?: return
         manager.registerListener(this, pressureSensor, SensorManager.SENSOR_DELAY_NORMAL)
@@ -37,7 +41,13 @@ internal class LocalBarometerSensor(
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
 
-    private companion object {
-        const val SMOOTHING_ALPHA = 0.20
+    companion object {
+        private const val SMOOTHING_ALPHA = 0.20
+
+        /** Whether [context]'s device has a usable TYPE_PRESSURE sensor. */
+        fun isAvailable(context: Context): Boolean {
+            val manager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+            return manager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null
+        }
     }
 }

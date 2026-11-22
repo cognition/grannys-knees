@@ -2,6 +2,8 @@ package com.aetherealmind.grannysknees.journal
 
 import androidx.room.Room
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -85,11 +87,51 @@ class JournalRoomTest {
         assertEquals(5, remaining.single().rating)
     }
 
+    @Test
+    fun `bulk delete rolls back when a later target is already gone`() {
+        val repository = repository()
+        val saved = requireNotNull(
+            repository.save(
+                committedAt = Instant.parse("2026-11-10T15:00:00Z"),
+                edits = listOf(
+                    SeriesEdit("wrist", "left", "stiffness", 8),
+                    SeriesEdit("knee", "right", "ache", 5),
+                ),
+                confirmations = emptyList(),
+            ),
+        )
+
+        assertThrows(IllegalStateException::class.java) {
+            repository.deleteMeasurements(
+                targets = listOf(
+                    MeasurementRemovalTarget(
+                        observationId = saved.id,
+                        bodyPart = "wrist",
+                        side = "left",
+                        symptom = "stiffness",
+                    ),
+                    MeasurementRemovalTarget(
+                        observationId = saved.id,
+                        bodyPart = "elbow",
+                        side = "left",
+                        symptom = "ache",
+                    ),
+                ),
+                deletedAt = Instant.parse("2026-11-10T16:00:00Z"),
+            )
+        }
+
+        val remaining = repository.current().single().measurements
+        assertEquals(2, remaining.size)
+        assertTrue(remaining.any { it.bodyPart == "wrist" && it.side == "left" })
+        assertTrue(remaining.any { it.bodyPart == "knee" && it.side == "right" })
+    }
+
     private fun repository(): JournalRepository {
         val database = Room.inMemoryDatabaseBuilder(
             RuntimeEnvironment.getApplication(),
             JournalDatabase::class.java,
         ).allowMainThreadQueries().build()
-        return JournalRepository(database.journalDao())
+        return JournalRepository(database)
     }
 }

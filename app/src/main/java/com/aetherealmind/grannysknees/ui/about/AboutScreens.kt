@@ -1,6 +1,10 @@
 package com.aetherealmind.grannysknees.ui.about
 
+import android.content.ClipData
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.FileProvider
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,11 +44,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-import androidx.room.Room
+import com.aetherealmind.grannysknees.GrannysKneesApplication
 import com.aetherealmind.grannysknees.R
 import com.aetherealmind.grannysknees.data.FeelCalibrationStore
+import com.aetherealmind.grannysknees.data.LocalBarometerSensor
 import com.aetherealmind.grannysknees.data.SensitivityProfile
-import com.aetherealmind.grannysknees.journal.JournalDatabase
+import com.aetherealmind.grannysknees.journal.JournalCsvExport
 import com.aetherealmind.grannysknees.journal.JournalRepository
 import com.aetherealmind.grannysknees.ui.tabDestinationWindowInsets
 import com.aetherealmind.grannysknees.ui.theme.BrandHeading
@@ -166,8 +172,47 @@ internal fun AboutScreen(
             TextButton(onClick = onOpenPrivacy) {
                 Text(stringResource(R.string.about_open_privacy_action))
             }
+            AboutVersionLine()
         }
     }
+}
+
+/** Shows the installed versionName and versionCode on About. */
+@Composable
+private fun AboutVersionLine(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val label = remember(context) {
+        val info = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(
+                    context.packageName,
+                    PackageManager.PackageInfoFlags.of(0),
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(context.packageName, 0)
+            }
+        } catch (_: PackageManager.NameNotFoundException) {
+            null
+        }
+        val name = info?.versionName.orEmpty().ifBlank { "—" }
+        val code = when {
+            info == null -> 0L
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> info.longVersionCode
+            else -> {
+                @Suppress("DEPRECATION")
+                info.versionCode.toLong()
+            }
+        }
+        context.getString(R.string.about_version_label, name, code.toInt())
+    }
+    Text(
+        text = label,
+        modifier = modifier.fillMaxWidth(),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+    )
 }
 
 /**
@@ -194,17 +239,15 @@ internal fun SettingsScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val repository = remember {
-        JournalRepository(
-            Room.databaseBuilder(
-                context.applicationContext,
-                JournalDatabase::class.java,
-                "journal.db",
-            ).build().journalDao(),
-        )
+        (context.applicationContext as GrannysKneesApplication).journalRepository()
     }
     var resetNotice by remember { mutableStateOf<String?>(null) }
+    var confirmResetAll by remember { mutableStateOf(false) }
     var feelSampleCount by remember {
         mutableStateOf(feelCalibrationStore?.read()?.size ?: 0)
+    }
+    val localPressureAvailable = remember(context) {
+        LocalBarometerSensor.isAvailable(context)
     }
     Scaffold(
         modifier = modifier,
@@ -238,10 +281,12 @@ internal fun SettingsScreen(
                     resetNotice = context.getString(R.string.about_feel_clear_done)
                 },
             )
-            LocalPressureSection(
-                enabled = localPressureEnabled,
-                onEnabledChange = onLocalPressureEnabledChange,
-            )
+            if (localPressureAvailable) {
+                LocalPressureSection(
+                    enabled = localPressureEnabled,
+                    onEnabledChange = onLocalPressureEnabledChange,
+                )
+            }
             FreeSpeechSection(
                 enabled = grannySpeaksFreely,
                 onEnabledChange = onGrannySpeaksFreelyChange,
@@ -260,14 +305,37 @@ internal fun SettingsScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        val payload = withContext(Dispatchers.IO) {
-                            repository.exportCurrentJson()
+                        val exportFile = withContext(Dispatchers.IO) {
+                            val payload = repository.exportCurrentCsv()
+                            val exportDir = File(
+                                context.cacheDir,
+                                JournalCsvExport.CACHE_EXPORT_SUBDIR,
+                            ).also { dir -> dir.mkdirs() }
+                            File(exportDir, JournalCsvExport.FILE_NAME).also { file ->
+                                file.writeText(payload, Charsets.UTF_8)
+                            }
                         }
+                        val uri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            exportFile,
+                        )
                         val share = Intent(Intent.ACTION_SEND).apply {
-                            type = "application/json"
-                            putExtra(Intent.EXTRA_TEXT, payload)
+                            type = JournalCsvExport.MIME_TYPE
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            putExtra(Intent.EXTRA_SUBJECT, JournalCsvExport.FILE_NAME)
+                            // ClipData carries the grant; EXTRA_STREAM alone often does not.
+                            clipData = ClipData.newUri(
+                                context.contentResolver,
+                                JournalCsvExport.FILE_NAME,
+                                uri,
+                            )
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
-                        context.startActivity(Intent.createChooser(share, null))
+                        val chooser = Intent.createChooser(share, null).apply {
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        context.startActivity(chooser)
                     }
                 },
                 shape = GrannyCorner,
@@ -281,17 +349,7 @@ internal fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             TextButton(
-                onClick = {
-                    scope.launch {
-                        withContext(Dispatchers.IO) {
-                            repository.wipe()
-                            feelCalibrationStore?.clear()
-                            File(context.filesDir, "report-dummy.json").delete()
-                        }
-                        onDataReset()
-                        resetNotice = context.getString(R.string.about_reset_done)
-                    }
-                },
+                onClick = { confirmResetAll = true },
             ) {
                 Text(stringResource(R.string.about_reset_all_data))
             }
@@ -303,6 +361,41 @@ internal fun SettingsScreen(
                 )
             }
         }
+    }
+    if (confirmResetAll) {
+        AlertDialog(
+            onDismissRequest = { confirmResetAll = false },
+            title = {
+                Text(stringResource(R.string.about_reset_all_data_confirm_title))
+            },
+            text = {
+                Text(stringResource(R.string.about_reset_all_data_confirm_body))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmResetAll = false
+                        scope.launch {
+                            withContext(Dispatchers.IO) {
+                                repository.wipe()
+                                feelCalibrationStore?.clear()
+                                File(context.filesDir, "report-dummy.json").delete()
+                            }
+                            onDataReset()
+                            feelSampleCount = feelCalibrationStore?.read()?.size ?: 0
+                            resetNotice = context.getString(R.string.about_reset_done)
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.about_reset_all_data_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmResetAll = false }) {
+                    Text(stringResource(R.string.about_reset_all_data_cancel))
+                }
+            },
+        )
     }
 }
 

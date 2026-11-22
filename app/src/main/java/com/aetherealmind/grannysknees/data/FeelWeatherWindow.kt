@@ -14,7 +14,10 @@ internal object FeelWeatherWindow {
     val HALF_WINDOW: Duration = Duration.ofHours(3)
 
     /**
-     * Mean AVAILABLE index in [T−3h, T+3h] plus nearest-hour 12h deltas.
+     * Mean AVAILABLE index in [T−3h, T+3h] plus nearest-hour slope drivers.
+     *
+     * Pressure uses the 12 h net change ([HourIndex.pressureTrend3hHpa] / dP12).
+     * Humidity and temperature use the four-hour slopes on [HourIndex.subScores].
      */
     fun capture(
         hours: List<HourIndex>,
@@ -38,7 +41,7 @@ internal object FeelWeatherWindow {
             .minByOrNull { hour -> kotlin.math.abs(hour.epoch - centreEpoch) }
         return FeelWeatherCapture(
             weatherWindowMean = windowMean,
-            deltaPressure = nearest?.subScores?.pressure?.toDouble(),
+            deltaPressure = nearest?.pressureTrend3hHpa?.toDouble(),
             deltaHumidity = nearest?.subScores?.humidity?.toDouble(),
             deltaTemperature = nearest?.subScores?.temperature?.toDouble(),
         )

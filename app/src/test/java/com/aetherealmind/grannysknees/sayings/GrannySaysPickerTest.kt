@@ -157,4 +157,20 @@ class GrannySaysPickerTest {
         picker.showForScore(5, season = GrannySeason.SUMMER, snowInForecast = true)
         assertEquals("winter", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
     }
+
+    @Test
+    fun `weather typed sayings stay hidden until that weather is active`() {
+        val plain = GrannySaying(GrannyTone.WARM, "plain")
+        val snowy = GrannySaying(
+            tone = GrannyTone.WRY,
+            text = "snow line",
+            weatherTypes = setOf(GrannyWeatherType.SNOW),
+        )
+        val picker = GrannySaysPicker(listOf(plain, snowy), random = Random(9))
+
+        picker.showForScore(5, activeWeatherTypes = emptySet())
+        assertEquals("plain", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+        picker.showForScore(5, activeWeatherTypes = setOf(GrannyWeatherType.SNOW))
+        assertEquals("snow line", picker.pick(ToneWeights(wry = 100, warm = 0, spicy = 0), null)!!.text)
+    }
 }

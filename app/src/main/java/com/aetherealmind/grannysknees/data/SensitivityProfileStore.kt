@@ -34,6 +34,10 @@ internal class SensitivityProfileStore(
     /** Whether the phone barometer may refine the Personal pressure signal. */
     fun readLocalPressureEnabled(): Boolean = readState().localPressureEnabled
 
+    /** Whether the Feel slope-schema reset dialog still needs to be shown. */
+    fun readPendingFeelSchemaResetNotice(): Boolean =
+        readState().pendingFeelSchemaResetNotice
+
     /** Combined Adj + Feel opt-in state. */
     fun readState(): SensitivityPreferences {
         if (!file.exists()) return SensitivityPreferences.DEFAULT
@@ -68,6 +72,11 @@ internal class SensitivityProfileStore(
         writeState(readState().copy(localPressureEnabled = enabled))
     }
 
+    /** Marks or clears the one-time Feel schema-reset notice. */
+    fun writePendingFeelSchemaResetNotice(pending: Boolean) {
+        writeState(readState().copy(pendingFeelSchemaResetNotice = pending))
+    }
+
     /** Replaces Adj and Feel opt-in together. */
     fun writeState(state: SensitivityPreferences) {
         val safe = state.copy(profile = state.profile.clamped())
@@ -78,6 +87,7 @@ internal class SensitivityProfileStore(
             put("feelCalibrationEnabled", safe.feelCalibrationEnabled)
             put("grannySpeaksFreely", safe.grannySpeaksFreely)
             put("localPressureEnabled", safe.localPressureEnabled)
+            put("pendingFeelSchemaResetNotice", safe.pendingFeelSchemaResetNotice)
         }.toString()
         AtomicFileWriter.writeText(file, payload)
     }
@@ -90,6 +100,8 @@ internal class SensitivityProfileStore(
         val feelEnabled = root["feelCalibrationEnabled"]?.jsonPrimitive?.booleanOrNull ?: true
         val grannySpeaksFreely = root["grannySpeaksFreely"]?.jsonPrimitive?.booleanOrNull ?: false
         val localPressureEnabled = root["localPressureEnabled"]?.jsonPrimitive?.booleanOrNull ?: false
+        val pendingFeelSchemaResetNotice =
+            root["pendingFeelSchemaResetNotice"]?.jsonPrimitive?.booleanOrNull ?: false
         return SensitivityPreferences(
             profile = SensitivityProfile(
                 pressure = pressure,
@@ -99,6 +111,7 @@ internal class SensitivityProfileStore(
             feelCalibrationEnabled = feelEnabled,
             grannySpeaksFreely = grannySpeaksFreely,
             localPressureEnabled = localPressureEnabled,
+            pendingFeelSchemaResetNotice = pendingFeelSchemaResetNotice,
         )
     }
 
@@ -111,12 +124,15 @@ internal class SensitivityProfileStore(
  * Persisted Adj sliders plus the Feel calibration opt-in.
  *
  * [feelCalibrationEnabled] defaults to true when absent from disk.
+ * [pendingFeelSchemaResetNotice] is set when legacy Feel samples are cleared
+ * for the slope-v1 driver schema and cleared after the user dismisses the dialog.
  */
 internal data class SensitivityPreferences(
     val profile: SensitivityProfile = SensitivityProfile.DEFAULT,
     val feelCalibrationEnabled: Boolean = true,
     val grannySpeaksFreely: Boolean = false,
     val localPressureEnabled: Boolean = false,
+    val pendingFeelSchemaResetNotice: Boolean = false,
 ) {
     companion object {
         val DEFAULT: SensitivityPreferences = SensitivityPreferences()

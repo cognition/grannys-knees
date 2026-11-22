@@ -1,0 +1,31 @@
+# UE-02, UE-04 — city switch + Today shape. Prefer a network-capable emulator.
+# Asserts band words / city text, never a pinned index number.
+appId: com.aetherealmind.grannysknees
+---
+- launchApp
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+- tapOn:
+    id: ".*search.*|City"
+    optional: true
+- tapOn:
+    text: "City"
+    optional: true
+- tapOn: "City"
+- eraseText
+- inputText: "Ottawa"
+- tapOn: "Search"
+- extendedWaitUntil:
+    visible: "Ottawa"
+    timeout: 30000
+- tapOn:
+    text: "Ottawa.*"
+    index: 0
+- extendedWaitUntil:
+    visible: "Today"
+    timeout: 30000
+- assertVisible:
+    text: "Calm|Mild|Noticeable|Rough|Stormy|Fetching|No forecast|No score|Forecast expired|Stale"

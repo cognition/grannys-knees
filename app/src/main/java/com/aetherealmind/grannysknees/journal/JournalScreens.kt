@@ -2,7 +2,10 @@ package com.aetherealmind.grannysknees.journal
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,14 +24,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -42,19 +46,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import com.aetherealmind.grannysknees.ui.tabDestinationWindowInsets
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.room.Room
+import com.aetherealmind.grannysknees.GrannysKneesApplication
 import com.aetherealmind.grannysknees.R
 import com.aetherealmind.grannysknees.data.FeelCalibrationStore
 import com.aetherealmind.grannysknees.data.ForecastRepository
@@ -86,21 +90,13 @@ private val HISTORY_ROW_GAP = 4.dp
 internal fun JournalScreen(
     repository: ForecastRepository? = null,
     feelCalibrationStore: FeelCalibrationStore? = null,
-    feelCalibrationEnabled: Boolean = true,
-    onFeelCalibrationEnabledChange: (Boolean) -> Unit = {},
     onFeelSaved: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val forecastRepository = repository
     val journalRepository = remember {
-        JournalRepository(
-            Room.databaseBuilder(
-                context.applicationContext,
-                JournalDatabase::class.java,
-                "journal.db",
-            ).build().journalDao(),
-        )
+        (context.applicationContext as GrannysKneesApplication).journalRepository()
     }
     val zone = ZoneId.systemDefault()
     val store = remember { ReportDummyStore(File(context.filesDir, "report-dummy.json")) }
@@ -120,12 +116,14 @@ internal fun JournalScreen(
     }
     val scope = rememberCoroutineScope()
     LaunchedEffect(chosen, focus) {
-        if (chosen.isEmpty()) {
-            return@LaunchedEffect
+        val draftFocus = if (chosen.isEmpty()) {
+            0
+        } else {
+            focus.coerceIn(0, chosen.lastIndex)
         }
         val draft = ReportDummy(
             places = chosen,
-            focus = focus.coerceIn(0, chosen.lastIndex),
+            focus = draftFocus,
             savedAt = Instant.now(),
         )
         withContext(Dispatchers.IO) { store.write(draft) }
@@ -165,22 +163,22 @@ internal fun JournalScreen(
     val displayedFocus = if (editing) focus else 0
     val place = displayed.getOrNull(displayedFocus)
     fun addOrFocus(part: String, side: String?) {
-        if (!editing || chosen.isEmpty()) {
+        if (!editing) {
             return
         }
         val existing = chosen.indexOfFirst { it.part == part && it.side == side }
         if (existing >= 0) {
             focus = existing
-        } else {
-            val current = chosen.getOrNull(focus.coerceIn(0, chosen.lastIndex)) ?: return
-            chosen = chosen + ChosenPlace(
-                part,
-                side,
-                current.symptom,
-                ratingForSymptom(current.symptom, current.rating),
-            )
-            focus = chosen.lastIndex
+            return
         }
+        // New marks default to stiffness at 0 so the colour scale works at once.
+        chosen = chosen + ChosenPlace(
+            part = part,
+            side = side,
+            symptom = "stiffness",
+            rating = 0,
+        )
+        focus = chosen.lastIndex
     }
     fun replaceFocus(next: ChosenPlace) {
         if (!editing) {
@@ -190,6 +188,20 @@ internal fun JournalScreen(
             rating = ratingForSymptom(next.symptom, next.rating),
         )
         chosen = chosen.mapIndexed { index, item -> if (index == focus) adjusted else item }
+    }
+    fun removeFocus() {
+        if (!editing || chosen.isEmpty()) {
+            return
+        }
+        val index = focus.coerceIn(0, chosen.lastIndex)
+        val next = chosen.filterIndexed { itemIndex, _ -> itemIndex != index }
+        chosen = next
+        focus = when {
+            next.isEmpty() -> 0
+            index >= next.size -> next.lastIndex
+            else -> index
+        }
+        notice = context.getString(R.string.journal_figure_clear_this_done)
     }
 
     val isLandscape =
@@ -235,7 +247,7 @@ internal fun JournalScreen(
             )
             TextButton(
                 onClick = {
-                    if (!editing) {
+                    if (!editing || chosen.isEmpty()) {
                         return@TextButton
                     }
                     val cleared = store.fresh(Instant.now())
@@ -249,7 +261,7 @@ internal fun JournalScreen(
                     frameLabel = null
                     notice = context.getString(R.string.journal_figure_clear_done)
                 },
-                enabled = editing,
+                enabled = editing && chosen.isNotEmpty(),
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -287,10 +299,23 @@ internal fun JournalScreen(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            Text(
+                text = stringResource(R.string.journal_place_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
+                InkChoice(
+                    label = stringResource(R.string.journal_overall_place),
+                    selected = place?.part == OVERALL_PART,
+                    enabled = editing,
+                    onClick = { addOrFocus(OVERALL_PART, null) },
+                )
                 SYMPTOMS.forEach { option ->
                     InkChoice(
                         label = option.replaceFirstChar { it.titlecase() },
@@ -306,6 +331,17 @@ internal fun JournalScreen(
                             )
                         },
                     )
+                }
+                if (editing && place != null) {
+                    TextButton(
+                        onClick = { removeFocus() },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.journal_figure_clear_this),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
                 }
             }
             if (displayed.size > 1) {
@@ -330,7 +366,7 @@ internal fun JournalScreen(
             Slider(
                 value = place?.rating?.toFloat() ?: 0f,
                 onValueChange = { value ->
-                    if (!editing || place == null) {
+                    if (!editing || place == null || place.symptom.isBlank()) {
                         return@Slider
                     }
                     chosen = chosen.mapIndexed { index, item ->
@@ -341,7 +377,7 @@ internal fun JournalScreen(
                         }
                     }
                 },
-                enabled = editing && place != null,
+                enabled = editing && place != null && place.symptom.isNotBlank(),
                 valueRange = if (place?.symptom == "ache") 1f..10f else 0f..10f,
                 steps = if (place?.symptom == "ache") 8 else 9,
                 colors = SliderDefaults.colors(
@@ -358,14 +394,16 @@ internal fun JournalScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        val edits = chosen.map { item ->
-                            SeriesEdit(
-                                item.part,
-                                item.side,
-                                item.symptom,
-                                ratingForSymptom(item.symptom, item.rating),
-                            )
-                        }
+                        val edits = chosen
+                            .filter { item -> item.symptom.isNotBlank() }
+                            .map { item ->
+                                SeriesEdit(
+                                    item.part,
+                                    item.side,
+                                    item.symptom,
+                                    ratingForSymptom(item.symptom, item.rating),
+                                )
+                            }
                         val now = Instant.now()
                         val wrote = withContext(Dispatchers.IO) {
                             val observation = journalRepository.save(
@@ -390,7 +428,7 @@ internal fun JournalScreen(
                         }
                     }
                 },
-                enabled = editing,
+                enabled = editing && chosen.any { item -> item.symptom.isNotBlank() },
                 shape = GrannyCorner,
                 contentPadding = ACTION_PADDING,
                 modifier = Modifier
@@ -439,15 +477,17 @@ internal fun JournalScreen(
                 )
                 QuietAction(
                     label = stringResource(R.string.journal_unchanged),
-                    enabled = editing,
+                    enabled = editing && chosen.any { item -> item.symptom.isNotBlank() },
                     onClick = {
                         if (!editing) {
                             return@QuietAction
                         }
                         scope.launch {
-                            val keys = chosen.map { item ->
-                                SeriesKey(item.part, item.side, item.symptom)
-                            }
+                            val keys = chosen
+                                .filter { item -> item.symptom.isNotBlank() }
+                                .map { item ->
+                                    SeriesKey(item.part, item.side, item.symptom)
+                                }
                             val now = Instant.now()
                             val wrote = withContext(Dispatchers.IO) {
                                 val observation = journalRepository.save(
@@ -489,25 +529,6 @@ internal fun JournalScreen(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.journal_feel_tune_compact),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
-                )
-                Switch(
-                    checked = feelCalibrationEnabled,
-                    onCheckedChange = onFeelCalibrationEnabledChange,
-                    modifier = Modifier.scale(0.55f),
-                )
             }
         }
     }
@@ -712,29 +733,93 @@ private fun QuietAction(
 }
 
 /** Saved check-ins as full-width cards with a larger figure thumb. */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 internal fun HistoryScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val repository = remember {
-        JournalRepository(
-            Room.databaseBuilder(
-                context.applicationContext,
-                JournalDatabase::class.java,
-                "journal.db",
-            ).build().journalDao(),
-        )
+        (context.applicationContext as GrannysKneesApplication).journalRepository()
     }
     var rows by remember { mutableStateOf<List<JournalObservation>>(emptyList()) }
+    var pendingRemove by remember { mutableStateOf<PendingHistoryRemove?>(null) }
+    var pendingBulkRemove by remember { mutableStateOf<List<PendingHistoryRemove>?>(null) }
+    var isRemoving by remember { mutableStateOf(false) }
+    var selecting by remember { mutableStateOf(false) }
+    var selectedKeys by remember { mutableStateOf<Set<HistorySelectionKey>>(emptySet()) }
+    var notice by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val deleteFailed = stringResource(R.string.journal_delete_failed)
+    val bulkDeleteFailed = stringResource(R.string.journal_history_bulk_failed)
     val formatter = remember {
         DateTimeFormatter.ofPattern("EEE d MMM · HH:mm", Locale.CANADA)
             .withZone(ZoneId.systemDefault())
     }
     fun loadNewestFirst(): List<JournalObservation> =
         repository.current().sortedByDescending { observation -> observation.observedAt }
+
+    fun exitSelection() {
+        selecting = false
+        selectedKeys = emptySet()
+    }
+
+    fun toggleSelection(pending: PendingHistoryRemove) {
+        val key = pending.selectionKey()
+        selectedKeys = if (key in selectedKeys) {
+            selectedKeys - key
+        } else {
+            selectedKeys + key
+        }
+        if (selectedKeys.isEmpty()) {
+            selecting = false
+        }
+    }
+
+    fun beginSelection(pending: PendingHistoryRemove) {
+        notice = null
+        selecting = true
+        selectedKeys = setOf(pending.selectionKey())
+        pendingRemove = null
+    }
+
+    fun removeMeasurements(targets: List<PendingHistoryRemove>) {
+        if (isRemoving || targets.isEmpty()) return
+        isRemoving = true
+        pendingRemove = null
+        pendingBulkRemove = null
+        exitSelection()
+        scope.launch {
+            try {
+                val failed = withContext(Dispatchers.IO) {
+                    try {
+                        repository.deleteMeasurements(
+                            targets = targets.map { pending ->
+                                MeasurementRemovalTarget(
+                                    observationId = pending.observationId,
+                                    bodyPart = pending.measurement.bodyPart,
+                                    side = pending.measurement.side,
+                                    symptom = pending.measurement.symptom,
+                                )
+                            },
+                            deletedAt = Instant.now(),
+                        )
+                        false
+                    } catch (_: IllegalStateException) {
+                        true
+                    }
+                }
+                rows = withContext(Dispatchers.IO) { loadNewestFirst() }
+                notice = when {
+                    failed && targets.size == 1 -> deleteFailed
+                    failed -> bulkDeleteFailed
+                    else -> null
+                }
+            } finally {
+                isRemoving = false
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         rows = withContext(Dispatchers.IO) { loadNewestFirst() }
@@ -745,7 +830,52 @@ internal fun HistoryScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    BrandHeading(title = stringResource(R.string.journal_open_history))
+                    if (selecting) {
+                        Text(
+                            text = stringResource(
+                                R.string.journal_history_select_count,
+                                selectedKeys.size,
+                            ),
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                    } else {
+                        BrandHeading(title = stringResource(R.string.journal_open_history))
+                    }
+                },
+                navigationIcon = {
+                    if (selecting) {
+                        TextButton(onClick = { exitSelection() }) {
+                            Text(stringResource(R.string.journal_history_select_cancel))
+                        }
+                    }
+                },
+                actions = {
+                    if (selecting) {
+                        TextButton(
+                            onClick = {
+                                if (selectedKeys.isEmpty() || isRemoving) return@TextButton
+                                notice = null
+                                pendingBulkRemove = selectedKeys.map { key ->
+                                    PendingHistoryRemove(
+                                        observationId = key.observationId,
+                                        measurement = JournalMeasurement(
+                                            bodyPart = key.bodyPart,
+                                            side = key.side,
+                                            symptom = key.symptom,
+                                            rating = 0,
+                                            reportKind = "",
+                                            previousObservationId = null,
+                                            previousRating = null,
+                                            previousObservedAt = null,
+                                        ),
+                                    )
+                                }
+                            },
+                            enabled = selectedKeys.isNotEmpty() && !isRemoving,
+                        ) {
+                            Text(stringResource(R.string.journal_history_delete_selected))
+                        }
+                    }
                 },
             )
         },
@@ -755,69 +885,158 @@ internal fun HistoryScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            if (rows.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.journal_history_empty),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(horizontal = 32.dp),
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        horizontal = 12.dp,
-                        vertical = 6.dp,
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(HISTORY_ROW_GAP),
-                ) {
-                    items(
-                        items = rows,
-                        key = { observation -> observation.id },
-                    ) { observation ->
-                        HistoryObservationCard(
-                            observation = observation,
-                            formatter = formatter,
-                            onRemoveMeasurement = { measurement ->
-                                scope.launch {
-                                    withContext(Dispatchers.IO) {
-                                        val liveId = repository.current()
-                                            .firstOrNull { row ->
-                                                row.measurements.any { item ->
-                                                    item.bodyPart == measurement.bodyPart &&
-                                                        item.side == measurement.side &&
-                                                        item.symptom == measurement.symptom
-                                                }
-                                            }
-                                            ?.id
-                                        if (liveId != null) {
-                                            repository.deleteMeasurement(
-                                                observationId = liveId,
-                                                bodyPart = measurement.bodyPart,
-                                                side = measurement.side,
-                                                symptom = measurement.symptom,
-                                                deletedAt = Instant.now(),
-                                            )
-                                        }
-                                    }
-                                    rows = withContext(Dispatchers.IO) { loadNewestFirst() }
-                                }
-                            },
+            Column(modifier = Modifier.fillMaxSize()) {
+                notice?.let { message ->
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    )
+                }
+                if (rows.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.journal_history_empty),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 32.dp),
                         )
                     }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentPadding = PaddingValues(
+                            horizontal = 12.dp,
+                            vertical = 6.dp,
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(HISTORY_ROW_GAP),
+                    ) {
+                        items(
+                            items = rows,
+                            key = { observation -> observation.id },
+                        ) { observation ->
+                            HistoryObservationCard(
+                                observation = observation,
+                                formatter = formatter,
+                                selecting = selecting,
+                                selectedKeys = selectedKeys,
+                                onRemoveMeasurement = { measurement ->
+                                    notice = null
+                                    pendingRemove = PendingHistoryRemove(
+                                        observationId = observation.id,
+                                        measurement = measurement,
+                                    )
+                                },
+                                onToggleSelect = { measurement ->
+                                    toggleSelection(
+                                        PendingHistoryRemove(
+                                            observationId = observation.id,
+                                            measurement = measurement,
+                                        ),
+                                    )
+                                },
+                                onBeginSelect = { measurement ->
+                                    beginSelection(
+                                        PendingHistoryRemove(
+                                            observationId = observation.id,
+                                            measurement = measurement,
+                                        ),
+                                    )
+                                },
+                            )
+                        }
+                    }
                 }
+            }
+            pendingRemove?.let { pending ->
+                AlertDialog(
+                    onDismissRequest = { pendingRemove = null },
+                    title = {
+                        Text(stringResource(R.string.journal_delete_confirm_title))
+                    },
+                    text = {
+                        Text(stringResource(R.string.journal_delete_confirm_body))
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { removeMeasurements(listOf(pending)) }) {
+                            Text(stringResource(R.string.journal_delete_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { pendingRemove = null }) {
+                            Text(stringResource(R.string.journal_delete_cancel))
+                        }
+                    },
+                )
+            }
+            pendingBulkRemove?.let { pending ->
+                AlertDialog(
+                    onDismissRequest = { pendingBulkRemove = null },
+                    title = {
+                        Text(stringResource(R.string.journal_history_bulk_confirm_title))
+                    },
+                    text = {
+                        Text(
+                            stringResource(
+                                R.string.journal_history_bulk_confirm_body,
+                                pending.size,
+                            ),
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { removeMeasurements(pending) }) {
+                            Text(stringResource(R.string.journal_delete_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { pendingBulkRemove = null }) {
+                            Text(stringResource(R.string.journal_delete_cancel))
+                        }
+                    },
+                )
             }
         }
     }
 }
 
+/** Confirmed History remove: the card's observation id plus the series row. */
+private data class PendingHistoryRemove(
+    val observationId: String,
+    val measurement: JournalMeasurement,
+) {
+    fun selectionKey(): HistorySelectionKey = HistorySelectionKey(
+        observationId = observationId,
+        bodyPart = measurement.bodyPart,
+        side = measurement.side,
+        symptom = measurement.symptom,
+    )
+}
+
+/** Stable identity for multi-select (matches [JournalRepository.deleteMeasurement]). */
+private data class HistorySelectionKey(
+    val observationId: String,
+    val bodyPart: String,
+    val side: String?,
+    val symptom: String,
+)
+
 @Composable
 private fun HistoryObservationCard(
     observation: JournalObservation,
     formatter: DateTimeFormatter,
+    selecting: Boolean,
+    selectedKeys: Set<HistorySelectionKey>,
     onRemoveMeasurement: (JournalMeasurement) -> Unit,
+    onToggleSelect: (JournalMeasurement) -> Unit,
+    onBeginSelect: (JournalMeasurement) -> Unit,
 ) {
     val panel = MaterialTheme.colorScheme.surfaceContainerLowest
     Column(
@@ -828,11 +1047,21 @@ private fun HistoryObservationCard(
         verticalArrangement = Arrangement.spacedBy(HISTORY_ROW_GAP),
     ) {
         observation.measurements.forEach { measurement ->
+            val key = HistorySelectionKey(
+                observationId = observation.id,
+                bodyPart = measurement.bodyPart,
+                side = measurement.side,
+                symptom = measurement.symptom,
+            )
             HistoryReportRow(
                 measurement = measurement,
                 observedAt = measurement.previousObservedAt ?: observation.observedAt,
                 formatter = formatter,
+                selecting = selecting,
+                selected = key in selectedKeys,
                 onRemove = { onRemoveMeasurement(measurement) },
+                onToggleSelect = { onToggleSelect(measurement) },
+                onBeginSelect = { onBeginSelect(measurement) },
             )
         }
     }
@@ -862,12 +1091,17 @@ private fun recordFeelCalibration(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HistoryReportRow(
     measurement: JournalMeasurement,
     observedAt: Instant,
     formatter: DateTimeFormatter,
+    selecting: Boolean,
+    selected: Boolean,
     onRemove: () -> Unit,
+    onToggleSelect: () -> Unit,
+    onBeginSelect: () -> Unit,
 ) {
     val whenLabel = formatter.format(observedAt)
     val label = quietReportTitle(
@@ -891,19 +1125,58 @@ private fun HistoryReportRow(
         rating = measurement.rating,
         ache = measurement.symptom == "ache",
     )
+    val selectedBorder = MaterialTheme.colorScheme.primary
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clearAndSetSemantics {
+            .then(
+                if (selected) {
+                    Modifier.border(
+                        width = 2.dp,
+                        color = selectedBorder,
+                        shape = RoundedCornerShape(HISTORY_CARD_CORNER),
+                    )
+                } else {
+                    Modifier
+                },
+            )
+            .combinedClickable(
+                onClick = {
+                    if (selecting) {
+                        onToggleSelect()
+                    }
+                },
+                onLongClick = {
+                    if (selecting) {
+                        onToggleSelect()
+                    } else {
+                        onBeginSelect()
+                    }
+                },
+            )
+            .padding(vertical = 2.dp)
+            // Merge spoken summary without clearAndSetSemantics so the
+            // checkbox / Remove control stay available to TalkBack.
+            .semantics(mergeDescendants = true) {
                 contentDescription = spoken
+                if (selecting) {
+                    this.selected = selected
+                }
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        if (selecting) {
+            Checkbox(
+                checked = selected,
+                onCheckedChange = { onToggleSelect() },
+            )
+        }
         Box(
             modifier = Modifier
                 .height(HISTORY_THUMB_HEIGHT)
-                .aspectRatio(BodyMap.WIDTH / BodyMap.HEIGHT),
+                .aspectRatio(BodyMap.WIDTH / BodyMap.HEIGHT)
+                .clearAndSetSemantics { },
             contentAlignment = Alignment.Center,
         ) {
             BodyFigure(
@@ -931,15 +1204,17 @@ private fun HistoryReportRow(
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        TextButton(
-            onClick = onRemove,
-            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.journal_delete),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        if (!selecting) {
+            TextButton(
+                onClick = onRemove,
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.journal_delete),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

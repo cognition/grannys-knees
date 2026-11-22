@@ -22,6 +22,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
@@ -31,7 +34,8 @@ import com.aetherealmind.grannysknees.R
 
 /**
  * One chosen place on the figure.
- * [rating] runs from clear at 0 to red at 10. An ache draws a bolt.
+ * [rating] runs from clear at 0 to red at 10. Aches use a horizontal stack of dashes;
+ * stiffness is colour only (fill wash + soft bloom, no ticks).
  */
 internal data class FigureMark(
     val part: String,
@@ -112,7 +116,7 @@ private fun DrawScope.drawFigure(
     val scale = size.width / BodyMap.WIDTH
     val stroke = Stroke(width = scale * 1.15f, cap = StrokeCap.Round, join = StrokeJoin.Round)
     val seam = Stroke(width = scale * 0.85f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-    val bolts = mutableListOf<Pair<Float, Float>>()
+    val bolts = mutableListOf<BoltSite>()
     fun mark(name: String, place: String? = null): FigureMark? {
         return marks.firstOrNull { it.part == name && it.side == place }
     }
@@ -121,8 +125,9 @@ private fun DrawScope.drawFigure(
     filledPath(footSteps(left = false), scale, mark("foot", "right"), paper, outline, stroke, bolts, 58f to 152f)
     limb(39.2f, 114f, 46.8f, 148f, 3.8f, scale, mark("ankle", "left"), paper, outline, stroke)
     limb(53.2f, 114f, 60.8f, 148f, 3.8f, scale, mark("ankle", "right"), paper, outline, stroke)
-    limb(37.4f, 78f, 48.2f, 116f, 4.8f, scale, mark("hip", "left"), paper, outline, stroke, bolts, 42.8f to 97f)
-    limb(51.8f, 78f, 62.6f, 116f, 4.8f, scale, mark("hip", "right"), paper, outline, stroke, bolts, 57.2f to 97f)
+    // Hip bloom sits at the hip joint (near the seam), not mid-thigh.
+    limb(37.4f, 78f, 48.2f, 116f, 4.8f, scale, mark("hip", "left"), paper, outline, stroke, bolts, 42.8f to 84f)
+    limb(51.8f, 78f, 62.6f, 116f, 4.8f, scale, mark("hip", "right"), paper, outline, stroke, bolts, 57.2f to 84f)
     joint(43f, 114.5f, 4.2f, 3.6f, scale, mark("knee", "left"), paper, outline, stroke, bolts)
     joint(57f, 114.5f, 4.2f, 3.6f, scale, mark("knee", "right"), paper, outline, stroke, bolts)
     joint(43f, 146.2f, 2.8f, 2.3f, scale, mark("ankle", "left"), paper, outline, stroke, bolts)
@@ -146,9 +151,7 @@ private fun DrawScope.drawFigure(
     drawPath(torso, paper)
     if (back != null) {
         drawPath(torso, washOf(back))
-        if (back.ache) {
-            bolts += 50f to 62f
-        }
+        rememberBoltSite(bolts, back, 50f, 62f)
     }
     drawPath(torso, outline, style = stroke)
     cloudAround(
@@ -167,7 +170,13 @@ private fun DrawScope.drawFigure(
     openCurve(hipSeam(), scale, outline, seam)
     limb(47f, 19.5f, 53f, 31f, 1.6f, scale, mark("neck"), paper, outline, stroke, bolts, 50f to 25f)
     joint(50f, 12f, 7.6f, 9.2f, scale, mark("head"), paper, outline, stroke, bolts)
-    bolts.forEach { (x, y) -> drawBolt(x, y, scale, boltBlue) }
+    // Whole-body cue for the General overall place (no single joint spot).
+    // Ache bolts sit in the upper chest (heart height), centred on the torso.
+    mark(OVERALL_PART)?.let { overall ->
+        rememberBoltSite(bolts, overall, 50f, 48f)
+        overallOvalAura(scale, overall)
+    }
+    bolts.forEach { site -> drawBoltSite(site, scale) }
 }
 
 /** Clear at rest, red at the top of the scale. */
@@ -193,12 +202,141 @@ internal fun cloudReach(rating: Int): Float {
     return kotlin.math.sqrt(amount) * 16f
 }
 
+/**
+ * Ache rate as bolt count / layout, with brightness rising inside each tier.
+ *
+ * Boundary at 3: the second dash appears at 3 (one for 1–2; two for 3–5).
+ * 6–8 adds a third; 9 uses four dashes; 10 is four dots.
+ */
+internal fun acheBoltLayout(rating: Int): AcheBoltLayout {
+    val bounded = rating.coerceIn(0, 10)
+    return when (bounded) {
+        0 -> AcheBoltLayout.None
+        in 1..2 -> AcheBoltLayout.Parallel(
+            count = 1,
+            brightness = tierBrightness(bounded, tierLow = 1, tierHigh = 2),
+        )
+        in 3..5 -> AcheBoltLayout.Parallel(
+            count = 2,
+            brightness = tierBrightness(bounded, tierLow = 3, tierHigh = 5),
+        )
+        in 6..8 -> AcheBoltLayout.Parallel(
+            count = 3,
+            brightness = tierBrightness(bounded, tierLow = 6, tierHigh = 8),
+        )
+        9 -> AcheBoltLayout.Parallel(
+            count = 4,
+            brightness = 0f,
+        )
+        else -> AcheBoltLayout.Dots(
+            count = 4,
+            brightness = 1f,
+        )
+    }
+}
+
+/** 0 at the bottom of a tier, 1 at the top — brightness within that step only. */
+internal fun tierBrightness(rating: Int, tierLow: Int, tierHigh: Int): Float {
+    if (tierHigh <= tierLow) return 1f
+    return ((rating - tierLow).toFloat() / (tierHigh - tierLow).toFloat()).coerceIn(0f, 1f)
+}
+
+/** How ache marks are drawn for a rating. */
+internal sealed class AcheBoltLayout {
+    data object None : AcheBoltLayout()
+
+    data class Parallel(
+        val count: Int,
+        val brightness: Float,
+    ) : AcheBoltLayout()
+
+    /** Top of the scale: a short row of filled dots. */
+    data class Dots(
+        val count: Int,
+        val brightness: Float,
+    ) : AcheBoltLayout()
+}
+
+/** One joint centre that should show ache bolts. */
+private data class BoltSite(
+    val x: Float,
+    val y: Float,
+    val mark: FigureMark,
+)
+
+private fun rememberBoltSite(
+    bolts: MutableList<BoltSite>,
+    mark: FigureMark?,
+    x: Float,
+    y: Float,
+) {
+    // Bolts are for aches only; stiffness stays colour-wash only.
+    if (mark == null || !mark.ache || mark.rating <= 0) return
+    bolts += BoltSite(x, y, mark)
+}
+
 private val cloudPuffs: List<Pair<Float, Float>> = listOf(
     0.42f to -0.24f,
     -0.36f to 0.28f,
     0.14f to 0.4f,
     -0.16f to -0.38f,
 )
+
+/**
+ * Soft oval aura around the whole figure for General overall.
+ * One continuous radiated-heat glow (not concentric wave rings): warmer near
+ * the body, fading smoothly outward. As rating rises, heat fills inward and
+ * the outer bloom grows.
+ */
+private fun DrawScope.overallOvalAura(scale: Float, mark: FigureMark) {
+    val rating = mark.rating.coerceIn(0, 10)
+    val reach = cloudReach(rating)
+    if (reach < 0.3f) {
+        return
+    }
+    val presence = 0.45f + 0.55f * (rating / 10f)
+    val heatAmount = rating / 10f
+    val centreX = 50f
+    val centreY = 78f
+    val bodyRadiusX = 44f
+    val bodyRadiusY = 80f
+    val outwardBloom = reach * 2.4f + 8f
+    val outerRadiusX = bodyRadiusX + 6f + outwardBloom
+    val outerRadiusY = bodyRadiusY + 6f + outwardBloom
+    // Centre fills with heat as the rating climbs; low ratings stay quieter mid-body.
+    val centreHeat = acheRed.copy(alpha = 0.18f * presence + 0.48f * presence * heatAmount)
+    val bodyHeat = acheRed.copy(alpha = 0.62f * presence)
+    val nearEdge = acheRed.copy(alpha = 0.38f * presence)
+    val pivot = Offset(centreX * scale, centreY * scale)
+    val outerY = outerRadiusY.coerceAtLeast(1f)
+    val outerX = outerRadiusX.coerceAtLeast(1f)
+    val radiusPx = outerY * scale
+    // Body sits partway out from the centre along the ellipse.
+    val bodyStop = (
+        (bodyRadiusX / outerX) + (bodyRadiusY / outerY)
+        ).times(0.5f).coerceIn(0.2f, 0.75f)
+    val nearStop = (bodyStop + (1f - bodyStop) * 0.35f).coerceIn(bodyStop + 0.02f, 0.9f)
+    scale(
+        scaleX = outerX / outerY,
+        scaleY = 1f,
+        pivot = pivot,
+    ) {
+        drawCircle(
+            brush = Brush.radialGradient(
+                colorStops = arrayOf(
+                    0f to centreHeat,
+                    bodyStop to bodyHeat,
+                    nearStop to nearEdge,
+                    1f to Color.Transparent,
+                ),
+                center = pivot,
+                radius = radiusPx,
+            ),
+            radius = radiusPx,
+            center = pivot,
+        )
+    }
+}
 
 /**
  * Draws the ache bloom after the outline, so the red leaves the figure
@@ -214,6 +352,9 @@ private fun DrawScope.cloudAround(
     if (mark == null) {
         return
     }
+    // Colour bloom is the stiffness (and shared wash) rate cue; ache bolts
+    // are drawn separately. Do not gate this on ache — that left stiffness
+    // with almost no visible scale after bolts moved off it.
     val reach = cloudReach(mark.rating)
     if (reach < 0.3f) {
         return
@@ -276,16 +417,14 @@ private fun DrawScope.joint(
     paper: Color,
     outline: Color,
     stroke: Stroke,
-    bolts: MutableList<Pair<Float, Float>>,
+    bolts: MutableList<BoltSite>,
 ) {
     val topLeft = Offset((centreX - radiusX) * scale, (centreY - radiusY) * scale)
     val oval = Size(radiusX * 2f * scale, radiusY * 2f * scale)
     drawOval(paper, topLeft, oval)
     if (selected != null) {
         drawOval(washOf(selected), topLeft, oval)
-        if (selected.ache) {
-            bolts += centreX to centreY
-        }
+        rememberBoltSite(bolts, selected, centreX, centreY)
     }
     drawOval(outline, topLeft, oval, style = stroke)
     cloudAround(scale, selected, centreX, centreY) { grow, colour ->
@@ -308,7 +447,7 @@ private fun DrawScope.limb(
     paper: Color,
     outline: Color,
     stroke: Stroke,
-    bolts: MutableList<Pair<Float, Float>>? = null,
+    bolts: MutableList<BoltSite>? = null,
     boltAt: Pair<Float, Float>? = null,
 ) {
     val topLeft = Offset(left * scale, top * scale)
@@ -317,16 +456,18 @@ private fun DrawScope.limb(
     drawRoundRect(paper, topLeft, body, corner)
     if (selected != null) {
         drawRoundRect(washOf(selected), topLeft, body, corner)
-        if (selected.ache && boltAt != null && bolts != null) {
-            bolts += boltAt
+        if (boltAt != null && bolts != null) {
+            rememberBoltSite(bolts, selected, boltAt.first, boltAt.second)
         }
     }
     drawRoundRect(outline, topLeft, body, corner, style = stroke)
+    val cloudX = boltAt?.first ?: ((left + right) / 2f)
+    val cloudY = boltAt?.second ?: ((top + bottom) / 2f)
     cloudAround(
         scale,
         selected,
-        (left + right) / 2f,
-        (top + bottom) / 2f,
+        cloudX,
+        cloudY,
     ) { grow, colour ->
         drawRoundRect(
             colour,
@@ -344,16 +485,14 @@ private fun DrawScope.filledPath(
     paper: Color,
     outline: Color,
     stroke: Stroke,
-    bolts: MutableList<Pair<Float, Float>>,
+    bolts: MutableList<BoltSite>,
     boltAt: Pair<Float, Float>,
 ) {
     val shape = pathOf(trace(steps), scale)
     drawPath(shape, paper)
     if (selected != null) {
         drawPath(shape, washOf(selected))
-        if (selected.ache) {
-            bolts += boltAt
-        }
+        rememberBoltSite(bolts, selected, boltAt.first, boltAt.second)
     }
     drawPath(shape, outline, style = stroke)
     cloudAround(scale, selected, boltAt.first, boltAt.second) { grow, colour ->
@@ -365,20 +504,85 @@ private fun DrawScope.filledPath(
     }
 }
 
-/** Deep electric blue, so the ache mark stays clear of the red wash. */
+/** Deep electric blue, so the ache bolts stay clear of the red wash. */
 private val boltBlue: Color = Color(0xFF0026E6)
 
-private fun DrawScope.drawBolt(x: Float, y: Float, scale: Float, colour: Color) {
-    val bolt = Path().apply {
-        moveTo((x - 1.3f) * scale, (y - 3.1f) * scale)
-        lineTo((x + 0.7f) * scale, (y - 0.2f) * scale)
-        lineTo((x - 0.5f) * scale, (y + 0.3f) * scale)
-        lineTo((x + 1.4f) * scale, (y + 3.1f) * scale)
+/** Brighter end of the ache ladder (still distinct from the red wash). */
+private val boltBright: Color = Color(0xFF6B8CFF)
+
+/** Overall chest bolts grow with rating; joint bolts keep the default size. */
+private fun overallBoltSize(mark: FigureMark): Float {
+    if (mark.part != OVERALL_PART) {
+        return 1f
     }
-    drawPath(
-        bolt,
+    return 1.45f + 0.75f * (mark.rating.coerceIn(0, 10) / 10f)
+}
+
+private fun DrawScope.drawBoltSite(site: BoltSite, scale: Float) {
+    if (!site.mark.ache) {
+        return
+    }
+    val size = overallBoltSize(site.mark)
+    when (val layout = acheBoltLayout(site.mark.rating)) {
+        AcheBoltLayout.None -> Unit
+        is AcheBoltLayout.Parallel -> {
+            val colour = acheBoltColour(layout.brightness)
+            // Horizontal stack: short dashes side by side.
+            val spread = 2.8f * size
+            val start = -(layout.count - 1) / 2f
+            for (index in 0 until layout.count) {
+                val dx = (start + index) * spread
+                drawAcheTick(
+                    site.x + dx,
+                    site.y,
+                    scale,
+                    colour,
+                    length = size,
+                    strokeWidth = 1.45f * size,
+                )
+            }
+        }
+        is AcheBoltLayout.Dots -> {
+            val colour = acheBoltColour(layout.brightness)
+            val spread = 2.9f * size
+            val start = -(layout.count - 1) / 2f
+            val radius = 1.05f * size
+            for (index in 0 until layout.count) {
+                val dx = (start + index) * spread
+                drawCircle(
+                    colour,
+                    radius = radius * scale,
+                    center = Offset((site.x + dx) * scale, site.y * scale),
+                )
+            }
+        }
+    }
+}
+
+private fun acheBoltColour(brightness: Float): Color {
+    val amount = brightness.coerceIn(0f, 1f)
+    return lerp(boltBlue, boltBright, amount).copy(alpha = 0.55f + 0.45f * amount)
+}
+
+/**
+ * Soft horizontal ache dash — rounded capsule in a side-by-side stack.
+ */
+private fun DrawScope.drawAcheTick(
+    x: Float,
+    y: Float,
+    scale: Float,
+    colour: Color,
+    length: Float = 1f,
+    strokeWidth: Float = 1.45f,
+) {
+    val grow = length.coerceAtLeast(0.5f)
+    val halfWidth = 1.15f * grow
+    drawLine(
         colour,
-        style = Stroke(width = scale * 1.2f, cap = StrokeCap.Round, join = StrokeJoin.Round),
+        start = Offset((x - halfWidth) * scale, y * scale),
+        end = Offset((x + halfWidth) * scale, y * scale),
+        strokeWidth = scale * strokeWidth * 1.35f,
+        cap = StrokeCap.Round,
     )
 }
 

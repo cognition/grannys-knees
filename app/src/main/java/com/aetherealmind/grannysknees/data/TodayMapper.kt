@@ -3,6 +3,7 @@ package com.aetherealmind.grannysknees.data
 import com.aetherealmind.grannysknees.index.HourIndex
 import com.aetherealmind.grannysknees.index.HourStatus
 import com.aetherealmind.grannysknees.index.IndexResult
+import com.aetherealmind.grannysknees.sayings.GrannyWeatherType
 import com.aetherealmind.grannysknees.ui.today.ForecastFreshness
 import com.aetherealmind.grannysknees.ui.today.TodayUiState
 import com.aetherealmind.grannysknees.ui.today.UnavailableReason
@@ -31,6 +32,7 @@ internal object TodayMapper {
         referenceNow: Instant,
         personalResult: IndexResult? = null,
         forecastHasSnow: Boolean = false,
+        activeWeatherTypes: Set<String> = emptySet(),
     ): TodayUiState {
         val lastUpdated = formatFetchedAt(fetchedAt, zoneId)
         return when (cacheStatus) {
@@ -84,7 +86,9 @@ internal object TodayMapper {
                     score = hour.indexScore!!,
                     freshness = freshness,
                     personalScore = personalScore,
-                    forecastHasSnow = forecastHasSnow,
+                    forecastHasSnow = forecastHasSnow ||
+                        GrannyWeatherType.SNOW in activeWeatherTypes,
+                    activeWeatherTypes = activeWeatherTypes,
                 )
             }
         }

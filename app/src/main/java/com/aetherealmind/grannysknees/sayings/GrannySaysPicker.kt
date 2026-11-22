@@ -30,6 +30,7 @@ internal class GrannySaysPicker(
     private var personalScore: Int? = null
     private var freeSpeechEnabled: Boolean = false
     private var season: GrannySeason = GrannySeason.ALL_YEAR
+    private var activeWeatherTypes: Set<String> = emptySet()
     private var current: GrannySaying? = null
 
     /** Weights used for the next pick of the current score. */
@@ -40,6 +41,9 @@ internal class GrannySaysPicker(
      *
      * When the score is unchanged, returns the existing line. When it changes,
      * resets the wry climb and picks again.
+     *
+     * [activeWeatherTypes] gates sayings that declare `weatherTypes` in the
+     * catalog. [snowInForecast] also promotes the season to winter.
      */
     fun showForScore(
         score: Int,
@@ -47,10 +51,17 @@ internal class GrannySaysPicker(
         allowFreeSpeech: Boolean = false,
         season: GrannySeason = GrannySeason.ALL_YEAR,
         snowInForecast: Boolean = false,
+        activeWeatherTypes: Set<String> = emptySet(),
     ): GrannySaying? {
-        val nextSeason = if (snowInForecast) GrannySeason.WINTER else season
+        val weather = activeWeatherTypes.toSet()
+        val nextSeason = if (snowInForecast || GrannyWeatherType.SNOW in weather) {
+            GrannySeason.WINTER
+        } else {
+            season
+        }
         if (this.score == score && this.personalScore == personalScore &&
-            freeSpeechEnabled == allowFreeSpeech && this.season == nextSeason && current != null
+            freeSpeechEnabled == allowFreeSpeech && this.season == nextSeason &&
+            this.activeWeatherTypes == weather && current != null
         ) {
             return current
         }
@@ -58,6 +69,7 @@ internal class GrannySaysPicker(
         this.personalScore = personalScore
         freeSpeechEnabled = allowFreeSpeech
         this.season = nextSeason
+        this.activeWeatherTypes = weather
         refreshIndex = 0
         current = pick(currentWeights(), excludeText = null)
         return current
@@ -95,6 +107,7 @@ internal class GrannySaysPicker(
         val personalAgrees = personalPresent && personal == standard
         val eligible = band.filter { saying ->
             seasonMatches(saying) &&
+                weatherMatches(saying) &&
                 (!saying.requiresPersonalAgreement || personalAgrees) &&
                 (!saying.requiresPersonalDifference || personalDiffers) &&
                 (saying.expectedPersonalScore == null || saying.expectedPersonalScore == personal) &&
@@ -102,6 +115,7 @@ internal class GrannySaysPicker(
         }
         val clean = band.filter { saying ->
             seasonMatches(saying) &&
+                saying.weatherTypes.isEmpty() &&
                 !saying.requiresFreeSpeech &&
                 !saying.requiresPersonalAgreement &&
                 !saying.requiresPersonalDifference
@@ -111,6 +125,10 @@ internal class GrannySaysPicker(
 
     private fun seasonMatches(saying: GrannySaying): Boolean =
         saying.season == GrannySeason.ALL_YEAR || saying.season == season
+
+    private fun weatherMatches(saying: GrannySaying): Boolean =
+        saying.weatherTypes.isEmpty() ||
+            saying.weatherTypes.any { type -> type in activeWeatherTypes }
 
     private fun drawTone(weights: ToneWeights, band: List<GrannySaying>): GrannyTone? {
         val present = buildList {

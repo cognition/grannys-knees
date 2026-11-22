@@ -26,7 +26,17 @@ internal object FeelCalibration {
      */
     const val SUGGEST_GAIN: Double = 0.08
 
-    private const val DRIVER_NOISE: Double = 0.05
+    /**
+     * Driver units for Feel captures that feed [suggest]: 12 h ΔP (hPa) plus
+     * four-hour humidity / temperature slopes (pp/h, °C/h).
+     */
+    const val DRIVER_SCHEMA: String = "slope-v1"
+
+    /** Absolute noise floor for 12 h pressure change (hPa). */
+    internal const val DRIVER_NOISE_PRESSURE: Double = 0.05
+
+    /** Absolute noise floor for humidity / temperature slopes (pp/h, °C/h). */
+    internal const val DRIVER_NOISE_SLOPE: Double = 0.02
 
     /**
      * Mean and sample standard deviation of [ratings].
@@ -67,6 +77,7 @@ internal object FeelCalibration {
             ratings = prior.ratings + incoming.ratings,
             observationIds = (prior.observationIds + incoming.observationIds).distinct(),
             centreAt = maxOf(prior.centreAt, incoming.centreAt),
+            driverSchema = DRIVER_SCHEMA,
         )
         return existing.toMutableList().also { it[matchIndex] = merged }.sortedBy { it.centreAt }
     }
@@ -105,13 +116,13 @@ internal object FeelCalibration {
             return SensitivityProfile.DEFAULT
         }
         return SensitivityProfile(
-            pressure = suggestFactor(counted) { sample ->
+            pressure = suggestFactor(counted, DRIVER_NOISE_PRESSURE) { sample ->
                 sample.deltaPressure?.let { -it }
             },
-            humidity = suggestFactor(counted) { sample ->
+            humidity = suggestFactor(counted, DRIVER_NOISE_SLOPE) { sample ->
                 sample.deltaHumidity
             },
-            cold = suggestFactor(counted) { sample ->
+            cold = suggestFactor(counted, DRIVER_NOISE_SLOPE) { sample ->
                 sample.deltaTemperature?.let { -it }
             },
         ).clamped()
@@ -136,13 +147,14 @@ internal object FeelCalibration {
 
     private fun suggestFactor(
         samples: List<FeelCalibrationSample>,
+        driverNoise: Double,
         driverOf: (FeelCalibrationSample) -> Double?,
     ): Float {
         var weightedSum = 0.0
         var weightTotal = 0.0
         for (sample in samples) {
             val driver = driverOf(sample) ?: continue
-            if (kotlin.math.abs(driver) < DRIVER_NOISE) continue
+            if (kotlin.math.abs(driver) < driverNoise) continue
             val residual = sample.meanRating - sample.weatherWindowMean
             val weight = 1.0 / (1.0 + sample.ratingStdDev)
             weightedSum += weight * residual * kotlin.math.sign(driver)

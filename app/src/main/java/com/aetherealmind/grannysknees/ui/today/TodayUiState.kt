@@ -62,6 +62,11 @@ internal sealed interface TodayUiState {
         val personalScore: BigDecimal? = null,
         /** True when any forecast hour carries a snow WMO weather code. */
         val forecastHasSnow: Boolean = false,
+        /**
+         * Active [com.aetherealmind.grannysknees.sayings.GrannyWeatherType] labels
+         * near now, used to gate weather-specific Granny Says.
+         */
+        val activeWeatherTypes: Set<String> = emptySet(),
     ) : TodayUiState {
         /** Display band derived from [score]. */
         val band: TodayScoreBand get() = TodayScoreBand.forScore(score)

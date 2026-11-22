@@ -17,4 +17,9 @@ class GrannyAsideTest {
         assertEquals(R.string.journal_granny_hand, grannyAside("hand", "left"))
         assertEquals(R.string.journal_granny_other, grannyAside("other", null))
     }
+
+    @Test
+    fun `general overall has its own aside`() {
+        assertEquals(R.string.journal_granny_overall, grannyAside(OVERALL_PART, null))
+    }
 }

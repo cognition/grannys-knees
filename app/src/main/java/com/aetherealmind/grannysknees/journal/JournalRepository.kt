@@ -1,13 +1,17 @@
 package com.aetherealmind.grannysknees.journal
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import java.time.Instant
 import java.util.UUID
+
+/**
+ * One measurement to remove from a current observation (History multi-select).
+ */
+internal data class MeasurementRemovalTarget(
+    val observationId: String,
+    val bodyPart: String,
+    val side: String?,
+    val symptom: String,
+)
 
 /**
  * Room-backed journal. History is append-only: removals write corrections or
@@ -15,8 +19,9 @@ import java.util.UUID
  * device.
  */
 internal class JournalRepository(
-    private val dao: JournalDao,
+    private val database: JournalDatabase,
 ) {
+    private val dao: JournalDao = database.journalDao()
     /** Every stored observation, including tombstones. */
     fun all(): List<JournalObservation> =
         dao.observations().map { entity -> toObservation(entity) }
@@ -95,6 +100,44 @@ internal class JournalRepository(
         return marker
     }
 
+    /**
+     * Removes several measurements in one Room transaction.
+     *
+     * If any target is no longer current, the whole batch rolls back so History
+     * never shows a partial wipe with a bulk-failure notice.
+     *
+     * @throws IllegalStateException when a target cannot be removed
+     */
+    fun deleteMeasurements(
+        targets: List<MeasurementRemovalTarget>,
+        deletedAt: Instant,
+    ) {
+        if (targets.isEmpty()) {
+            return
+        }
+        database.runInTransaction {
+            val liveObservationIds = mutableMapOf<String, String>()
+            targets.forEach { pending ->
+                val observationId = liveObservationIds[pending.observationId]
+                    ?: pending.observationId
+                val removed = deleteMeasurement(
+                    observationId = observationId,
+                    bodyPart = pending.bodyPart,
+                    side = pending.side,
+                    symptom = pending.symptom,
+                    deletedAt = deletedAt,
+                )
+                if (removed == null) {
+                    throw IllegalStateException(
+                        "Measurement no longer current: ${pending.bodyPart}/" +
+                            "${pending.side}/${pending.symptom} on $observationId",
+                    )
+                }
+                liveObservationIds[pending.observationId] = removed.id
+            }
+        }
+    }
+
     /** Removes the local tables. Does not contact a server. */
     fun wipe() {
         dao.deleteReadings()
@@ -104,15 +147,8 @@ internal class JournalRepository(
         dao.deleteSeenEvents()
     }
 
-    /** Current journal as JSON. Tombstones and corrected rows are omitted. */
-    fun exportCurrentJson(): String {
-        val rows = buildJsonArray {
-            current().forEach { observation ->
-                add(observationJson(observation))
-            }
-        }
-        return rows.toString()
-    }
+    /** Current journal as CSV. Tombstones and corrected rows are omitted. */
+    fun exportCurrentCsv(): String = JournalCsvExport.format(current())
 
     private fun insert(observation: JournalObservation, snapshot: JournalSnapshot?) {
         dao.insertObservation(
@@ -184,22 +220,4 @@ internal class JournalRepository(
         )
     }
 
-    private fun observationJson(observation: JournalObservation) = buildJsonObject {
-        put("id", observation.id)
-        put("observedAt", observation.observedAt.toString())
-        put(
-            "measurements",
-            JsonArray(
-                observation.measurements.map { measurement ->
-                    buildJsonObject {
-                        put("bodyPart", measurement.bodyPart)
-                        put("side", measurement.side?.let(::JsonPrimitive) ?: JsonNull)
-                        put("symptom", measurement.symptom)
-                        put("rating", measurement.rating)
-                        put("reportKind", measurement.reportKind)
-                    }
-                },
-            ),
-        )
-    }
 }

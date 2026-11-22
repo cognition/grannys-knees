@@ -31,6 +31,8 @@ data class HourlyObservation(
     val surfacePressureHpa: Double?,
     val relativeHumidityPct: Double?,
     val temperatureC: Double?,
+    /** Apparent (feels-like) temperature in °C, or null when the feed omits it. */
+    val feelsLikeC: Double? = null,
 )
 
 /**
@@ -51,12 +53,16 @@ data class HourInputs(
     val surfacePressureHpa: Double?,
     val relativeHumidityPct: Double?,
     val temperatureC: Double?,
+    val feelsLikeC: Double? = null,
 )
 
 /**
- * The three `index-v1` sub-scores (each 0-10). A sub-score is `null` when its
- * own input is unavailable; the `pressure` sub-score depends on the 3-hour
- * trend, so it is `null` whenever that trend is undefined (contract §9.1, §7).
+ * Slope-index diagnostic drivers for one hour (null when that window is missing).
+ *
+ * - [pressure]: 12 h net pressure change dP12 (hPa), same value as
+ *   [HourIndex.pressureTrend3hHpa]
+ * - [humidity]: four-hour humidity slope mH (percentage points per hour)
+ * - [temperature]: four-hour temperature slope mT (°C per hour)
  */
 data class SubScores(
     val pressure: BigDecimal?,
@@ -70,11 +76,11 @@ enum class HourStatus { AVAILABLE, UNAVAILABLE }
 /**
  * The scored result for one hour.
  *
- * [pressureTrend3hHpa] is quantised to 2 dp, [subScores] and [indexRaw] to
- * 4 dp, [indexScore] to 1 dp, and [indexDisplay] is an integer — all half-up
- * (contract §9.3-§9.4). When [status] is [HourStatus.UNAVAILABLE] the aggregate
- * index fields are `null` and [unavailableReasons] lists the machine-readable
- * causes; it is empty for available hours.
+ * [pressureTrend3hHpa] is the 12 h net pressure change (field name retained);
+ * [subScores] carries dP12 / mH / mT. Quantisation: trends and sub-scores to
+ * 2 dp, [indexRaw] to 4 dp, [indexScore] to 1 dp, [indexDisplay] integer —
+ * all half-up. When [status] is [HourStatus.UNAVAILABLE] the aggregate index
+ * fields are `null` and [unavailableReasons] lists the causes.
  */
 data class HourIndex(
     val epoch: Long,
